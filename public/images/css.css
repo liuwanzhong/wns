@@ -1,0 +1,176 @@
+.model,.model_select,.model_edit,.food_sort_up{
+	width: 800px;
+	height: 600px;
+	margin: 0 auto;
+	background: rgba(255,255,255,1);
+	position: absolute;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 99;
+	box-shadow: 0 10px 10px rgba(51,51,51,.6);
+	display: none;
+}
+.model .head,.model_select .head,.model_edit .head,.food_sort_up .head{
+	height: 50px;
+	background-color: #333;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	color: #fff;
+	padding: 0 15px;
+}
+.head>span{
+	font-size: 16px;
+}
+.head>a{
+	color: #fff;
+	font-size: 36px;
+	cursor: pointer;
+}
+.model .content,.model_select .content,.model_edit .content,.food_sort_up .content{
+	padding: 25px 40px;
+}
+.content .wrap{
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+}
+.content .wrap label{
+	font-size: 14px;
+	width: 80px;
+	margin-right: 20px;
+	text-align: right;
+}
+.content .wrap input[type='text']{
+	border: 1px solid #ddd;
+	height: 30px;
+	padding: 0 10px;
+	flex: 1;
+}
+.content .wrap select{
+	border: 1px solid #ddd;
+	height: 32px;
+	padding: 0 10px;
+	flex: 1;
+}
+.content .wrap textarea{
+	border: 1px solid #ddd;
+	height: 50px;
+	padding: 3px 10px;
+	flex: 1;
+}
+.content .wrap .status{
+	height: 30px;
+	display: flex;
+	align-items: center;
+}
+.content .wrap .status>span{
+	display: flex;
+	align-items: center;
+	height: 100%;
+	margin-right: 20px;
+}
+.content .wrap .status input{
+	width: 16px;
+	height: 16px;
+	margin-right: 5px;
+}
+.content .btn{
+	padding-top: 30px;
+	justify-content: center;
+}
+.content .wrap .save{
+	width:70px;
+	height: 35px;
+	background-color: #009688;
+	color: #fff;
+	border: 0;
+	margin-right: 30px;
+}
+.content .wrap .reset{
+	width:70px;
+	height: 35px;
+	background-color: #666;
+	color: #fff;
+	border: 0;
+}
+
+
+
+
+
+
+
+.head>span{
+	font-size: 16px;
+}
+.head>a{
+	color: #fff;
+	font-size: 36px;
+	cursor: pointer;
+}
+.content .wrap{
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+}
+.content .wrap label{
+	font-size: 14px;
+	width: 120px;
+	margin-right: 20px;
+	text-align: right;
+}
+.content .wrap input[type='text'],.content .wrap input[type='password'],.content .wrap input[type='email']{
+	border: 1px solid #ddd;
+	height: 30px;
+	padding: 0 10px;
+	flex: 1;
+}
+.content .wrap select{
+	border: 1px solid #ddd;
+	height: 32px;
+	padding: 0 10px;
+	flex: 1;
+}
+.content .wrap textarea{
+	border: 1px solid #ddd;
+	height: 50px;
+	padding: 3px 10px;
+	flex: 1;
+}
+.content .wrap .status{
+	height: 30px;
+	display: flex;
+	align-items: center;
+}
+.content .wrap .status>span{
+	display: flex;
+	align-items: center;
+	height: 100%;
+	margin-right: 20px;
+}
+.content .wrap .status input{
+	width: 16px;
+	height: 16px;
+	margin-right: 5px;
+}
+.content .btn{
+	padding-top: 30px;
+	justify-content: center;
+}
+.content .wrap .save{
+	width:70px;
+	height: 35px;
+	background-color: #009688;
+	color: #fff;
+	border: 0;
+	margin-right: 30px;
+}
+.content .wrap .reset{
+	width:70px;
+	height: 35px;
+	background-color: #666;
+	color: #fff;
+	border: 0;
+}

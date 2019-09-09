@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>后台管理系统</title>
+		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
+		<script src="/images/jquery.js"></script>
+		<link rel="stylesheet" href="/images/css.css">
+		<link rel="stylesheet" href="/images/boot.css">	</head>
+	</head>
+	<body>
+				
+		<div class="note">
+			<h4><a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">添加商品</a></h4>
+		<form action="{:url('ceshi/upload_excel')}" method="post" enctype="multipart/form-data">
+			<div class="wrap">
+                <label>文件</label>
+                <input type="file" name="file" value="" required oninvalid="setCustomValidity('
+                不能为空') oninput="setCustomValidity('')"/>
+			</div>
+			<input type="submit" class="save" id="btn" value="确定"/>
+		</form>
+		</div>
+		<div class="wrap">
+			<a href="{:url('ceshi/out_excel')}" class="btn btn-warning">导出</a>
+		</div>
+		<script src="/static/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript">
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	</body>
+</html>
