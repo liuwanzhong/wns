@@ -21,12 +21,11 @@ class Controller
     public function qx()
     {
         $us=Session::get('users');
-        if($us['role_id']!=1){
-            $i=Session::get('users');//管理员信息
-            $qx=db('pow_power')->where('power_id',$i['role_id'])->find();
-            $qx=explode(",",$qx['pow_id']);
+        $us=db('staffs')->where('id',$us['id'])->find();
+        if($us['id']!=1){
+            $qx=explode(",",$us['power']);
             $rows=db('pow')
-                ->where('is_delete',0)
+                ->where('is_del',1)
                 ->where('cj',3)
                 ->select();
             $con=request()->controller();
@@ -44,7 +43,7 @@ class Controller
             }
             return $ms;
         }else{
-            return $ms=1;
+            return $ms=2;
         }
     }
     //无限极分类
@@ -56,6 +55,18 @@ class Controller
                 $data['name_txt']=str_repeat('|__',$number).$data['pow_name'];
                 $md[]=$data;
                 $this->order($datas,$data['id'],$number+1);
+            }
+        }
+        return $md;
+    }
+    public function order_two($datas,$id=0,$number=0)
+    {
+        static $md=[];
+        foreach ($datas as $data) {
+            if($data['parent_id']==$id){
+                $data['name_txt']=str_repeat('|__',$number).$data['pow_name'];
+                $md[]=$data;
+                $this->order_two($datas,$data['id'],$number+1);
             }
         }
         return $md;

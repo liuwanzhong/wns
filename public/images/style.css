@@ -11,7 +11,7 @@ ul,li{
 }
 .title{
 	line-height: 30px;
-	
+
 }
 .children{
 	display: flex;
@@ -24,7 +24,7 @@ ul,li{
 	margin-left: 20px;
 }
 
-input{
+input[type=checkbox]{
 	display: none;
 }
 label:before{
@@ -34,7 +34,7 @@ label:before{
 	height: 14px;
 	border: 1px solid #ddd;
 	margin-right: 5px;
-	
+
 }
 label.selted i{
 	display: inline-block;
