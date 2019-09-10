@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>在库管理</title>
+    <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" href="/images/boot.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+    <style type="text/css">
+        .button1{margin:2rem auto;width:600px;}
+        .button1 a{padding:15px 60px;border-radius:4px;margin:0 10px;color:#fff;font-size:1.2em}
+
+        .layui-table th{text-align: center;font-weight: bold;}
+        .layui-table td{text-align: center;}
+        #upload-add,#upload-edit{height: 30px;line-height: 30px;padding: 0 10px;margin-left: 10px;}
+    </style>
+</head>
+<body>
+<div class="note">
+    <h4><a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">添加货物</a></h4>
+    <table class="news_form layui-table" style="width: 96%; margin: 12px auto;">
+        <tr>
+            <th>ID</th>
+            <th>货物名</th>
+            <th>总库存</th>
+            <th>可分配库存</th>
+            <th>冻结库存</th>
+            <th>入库时间</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+        {volist name='list' id='v'}
+        <tr>
+            <td>{$v.id}</td>
+            <td>{$v.title}</td>
+            <td>{$v.count}</td>
+            <td>{$v.goods_feel}</td>
+            <td>{$v.goods_frozen}</td>
+            <td>{$v.create_time}</td>
+            <td>{$v.status}</td>
+            <td style="width:300px">
+                <a href="#" class="layui-btn layui-btn-sm shows">冻结<input type="hidden" name="myids" value="{$v.id}"></a>
+                <a href="#" class="layui-btn layui-btn-sm frozens">解冻<input type="hidden" name="myids" value="{$v.id}"></a>
+                <a href="#" class="layui-btn layui-btn-sm layui-btn-normal edit">分配</a>
+                <a href="{:url('instor/delete','id='.$v['id'])}" class="layui-btn layui-btn-sm layui-btn-danger">删除</a>
+            </td>
+        </tr>
+        {/volist}
+    </table>
+</div>
+
+<div class="model modeladd">
+    <div class="head">
+        <span>添加货物</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content">
+        <form action="{:url('instor/insert')}" method="post" enctype="multipart/form-data">
+            <div class="wrap">
+                <label>货物名称</label>
+                <input type="text" name="title">
+            </div>
+            <div class="wrap">
+                <label>入库数量</label>
+                <input type="number" name="count" placeholder="整数"/>
+            </div>
+            <div class="wrap">
+                <label>货物重量</label>
+                <input type="number" name="weight" placeholder="只能填数字" />
+            </div>
+            <div class="wrap btn">
+                <input type="submit" class="save" value="确定"/>
+                <input type="reset" class="reset" value="重置"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="model modeleditcount">
+    <div class="head">
+        <span>冻结货物</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content">
+        <form action="{:url('instor/editfrozen')}" method="post">
+            <input type="hidden" name="editfrozenid" class="editfrozenid">
+            <div class="wrap">
+                <label>货物名称</label>
+                <input type="text" name="title" class="forzentitle" readonly>
+            </div>
+            <div class="wrap">
+                <label>可冻结数量</label>
+                <input type="number" name="goods_feel" class="frozencount"/>
+            </div>
+            <div class="wrap">
+                <label>冻结数量</label>
+                <input type="number" name="goods_frozen" placeholder="只能填数字" />
+            </div>
+            <div class="wrap btn">
+                <input type="submit" class="save" value="确定"/>
+                <input type="reset" class="reset" value="重置"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="model modeleditfeelcount">
+    <div class="head">
+        <span>解冻货物</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content">
+        <form action="{:url('instor/editfeel')}" method="post">
+            <input type="hidden" name="editfrozenid" class="editfrozenid">
+            <div class="wrap">
+                <label>货物名称</label>
+                <input type="text" name="title" class="feeltitle" readonly>
+            </div>
+            <div class="wrap">
+                <label>可解冻数量</label>
+                <input type="number" name="goods_frozen" class="frozencount"/>
+            </div>
+            <div class="wrap">
+                <label>解冻数量</label>
+                <input type="number" name="goods_feel" placeholder="只能填数字" />
+            </div>
+            <div class="wrap btn">
+                <input type="submit" class="save" value="确定"/>
+                <input type="reset" class="reset" value="重置"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/static/jquery-1.9.1.min.js"></script>
+
+<script type="text/javascript">
+    $('#dialog').on('click', function(){
+        $('.modeladd').show();
+    })
+    $('.close').on('click', function(){
+        $('.modeladd').hide();
+    })
+    $('.shows').on('click', function() {
+        //从隐藏域中拿到userID
+        var id = $(this).children().val();
+        $.ajax({
+            type: "get",//请求方式有post，get请求方式，这里是post请求
+            url: '/index/instor/frozen/id/' + id,//请求的方法的路径
+            dataType: 'json',//请求参数的格式为json.另外还有text等
+            success: function(data){
+                var data = JSON.parse(data);
+                $(".forzentitle").val(data.title);
+                $('.frozencount').val(data.goods_feel);
+                $(".editfrozenid").val(data.id);
+            }
+        })
+        $('.modeleditcount').show();
+    })
+    $('.close').on('click', function(){
+        $('.modeleditcount').hide();
+    })
+
+    $('.frozens').on('click', function() {
+        //从隐藏域中拿到userID
+        var id = $(this).children().val();
+        $.ajax({
+            type: "get",//请求方式有post，get请求方式，这里是post请求
+            url: '/index/instor/frozen/id/' + id,//请求的方法的路径
+            dataType: 'json',//请求参数的格式为json.另外还有text等
+            success: function(data){
+                var data = JSON.parse(data);
+                $(".feeltitle").val(data.title);
+                $('.frozencount').val(data.goods_frozen);
+                $(".editfrozenid").val(data.id);
+            }
+        })
+        $('.modeleditfeelcount').show();
+    })
+    $('.close').on('click', function(){
+        $('.modeleditfeelcount').hide();
+    })
+
+    $('.edit').on('click', function() {
+        $('.imgsson').remove();
+        $('.noneimg').remove();
+        $('.imgfile').remove();
+        //从隐藏域中拿到userID
+        var id = $(this).children().val();
+        $.ajax({
+            type: "get",//请求方式有post，get请求方式，这里是post请求
+            url: '/index/room/edit/id/' + id,//请求的方法的路径
+            dataType: 'json',//请求参数的格式为json.另外还有text等
+            success: function(data){
+                var data = JSON.parse(data);
+                $('#myid').val(data.id);
+                $('.type_id').val(data.type_id);
+                $('.name').val(data.name);
+                if(data.img_id == null){
+                    $('.imgs').append("<input type='file' name='path' class='imgfile'/>");
+                }else{
+                    $('.imgs').append("<img src='"+data.img_id.path+"' class='imgsson' height='60px'/>");
+                    $('.imgs').append("<input type='file' name='path' class='imgfile'/>");
+                }
+                $('.content').val(data.content);
+            }
+        })
+        $('.modeledit').show();
+    })
+    $('.close').on('click', function(){
+        $('.modeledit').hide();
+    })
+
+    // 添加图片-上传
+    $('#upload-add').click(function(){
+        $('#add_rule').click();
+    })
+    $('#add_rule').on('change',function(){
+        let name = this.files[0].name;
+        $('#add_img').val(name);
+    })
+    // 编辑-上传
+    $('#upload-edit').click(function(){
+        $('.edit_rule').click();
+        $('#img').hide();
+        $('#edit_img').show();
+    })
+    $('.room_imgs').on('change', '.edit_rule',function(){
+        let pics = this.files;
+        console.log(pics)
+        let html = `<input type="file" name="path2[]" class="edit_rule" style="display: none;">`;
+
+        for(var i = 0; i < pics.length; i++ ){
+            let fr = new FileReader();
+            fr.onload = function(e){
+                console.log("回显了图片");
+                let img = `<img src='${this.result}' width="55px" height="55px" />`;
+                $('.lists').append(img);
+            }
+            fr.readAsDataURL(pics[i]);//读取文件
+        }
+        // $(this).removeClass('edit_rule');
+        // $('.room_imgs').append(html);
+    })
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>
