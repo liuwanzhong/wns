@@ -96,7 +96,7 @@ class Cwmanagement extends Controller
         $objExcel = new \PHPExcel();
         //set document Property
         $objWriter = \PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
- 
+
         $objActSheet = $objExcel->getActiveSheet();
         $key = ord("A");
         $letter =explode(',',"A,B,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w");
@@ -135,7 +135,7 @@ class Cwmanagement extends Controller
             // 表格高度
             $objActSheet->getRowDimension($k)->setRowHeight(20);
         }
- 
+
         $width = array(10,15,20,25,30);
         //设置表格的宽度
         $objActSheet->getColumnDimension('A')->setWidth($width[1]);
@@ -161,8 +161,8 @@ class Cwmanagement extends Controller
         $objActSheet->getColumnDimension('U')->setWidth($width[2]);
         $objActSheet->getColumnDimension('V')->setWidth($width[2]);
         $objActSheet->getColumnDimension('W')->setWidth($width[2]);
- 
- 
+
+
         $outfile = "信息列表.xlsx";
         ob_end_clean();
         header("Content-Type: application/force-download");
@@ -181,7 +181,6 @@ class Cwmanagement extends Controller
     }
     // 详细信息回显
     public function record_edit($id){
-        $id=input('id');
         $row=db('cw_management')->where('id',$id)->find();
         if($row['delivery_time']!=0){
             $row['delivery_time'] = date("Y/m/d",$row['delivery_time']);
@@ -245,7 +244,7 @@ class Cwmanagement extends Controller
         $objExcel = new \PHPExcel();
         //set document Property
         $objWriter = \PHPExcel_IOFactory::createWriter($objExcel, 'Excel2007');
- 
+
         $objActSheet = $objExcel->getActiveSheet();
         $key = ord("A");
         $letter =explode(',',"A,B,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w");
@@ -284,7 +283,7 @@ class Cwmanagement extends Controller
             // 表格高度
             $objActSheet->getRowDimension($k)->setRowHeight(20);
         }
- 
+
         $width = array(10,15,20,25,30);
         //设置表格的宽度
         $objActSheet->getColumnDimension('A')->setWidth($width[1]);
@@ -310,8 +309,8 @@ class Cwmanagement extends Controller
         $objActSheet->getColumnDimension('U')->setWidth($width[2]);
         $objActSheet->getColumnDimension('V')->setWidth($width[2]);
         $objActSheet->getColumnDimension('W')->setWidth($width[2]);
- 
- 
+
+
         $outfile = "信息列表.xlsx";
         ob_end_clean();
         header("Content-Type: application/force-download");

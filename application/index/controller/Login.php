@@ -54,6 +54,12 @@ class Login extends Controller
                 }
             }
             $a=$rows;
+            foreach ($a as $k=>$item) {
+                if(!isset($item['er'])){
+                    $a[$k]['er']=[];
+                }
+            }
+
         }else{
             $u=db('staffs')->where('id',$user['id'])->find();
             $code=explode(",",$u['power']);

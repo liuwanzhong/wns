@@ -35,7 +35,7 @@
 						<td>{$row['sort']}</td>
 						<td>{$row['id']}</td>
 						<td style="text-align:left">{$row['name_txt']}</td>
-						<td>{$row['pow_url']}</td>
+						<td style="text-align:left">{$row['pow_url']}</td>
 						<td>{$row['cj']}</td>
 						<td><?php if($row['cj']!=3): ?><a href="{:url('Staffs/pow_state','id='.$row['id'])}">{$row.state}</a><?php else: ?>{$row.state}<?php endif;?></td>
 						<td>

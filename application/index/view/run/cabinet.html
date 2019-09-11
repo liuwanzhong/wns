@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>新增权限</title>
+		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
+		<link rel="stylesheet" href="/images/css.css">
+		<link rel="stylesheet" href="/images/boot.css">
+		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+		<style type="text/css">
+			.layui-table th{text-align: center;font-weight: bold;}
+			.layui-table td{text-align: center;}
+		</style>
+	<body>
+		<div class="note">
+			<h4>
+				<span>地区库房</span>
+				<a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">添加库房</a>
+			</h4>
+			<table class="news_list layui-table" style="width: 96%; margin: 12px auto;">
+				<thead>
+				<tr>
+					<th>ID</th>
+					<th>货位名称</th>
+					<th>所属仓库</th>
+					<th>创建时间</th>
+					<th>操作</th>
+				</tr>
+				</thead>
+				<tbody>
+				{volist name='rows' id='row'}
+					<tr>
+						<td>{$row['id']}</td>
+						<td>{$row['name']}</td>
+						<td>{$row['w_name']}</td>
+						<td>{$row['state_time']}</td>
+						<td>
+							<a href="#" class="edit ks">编辑</a>
+							<a href="{:url('Run/warehouse_del','id='.$row['id'])}">删除</a>
+						</td>
+					</tr>
+				{/volist}
+				</tbody>
+			</table>
+		</div>
+
+		<!--添加-->
+		<div class="model">
+			<div class="head">
+				<span>添加</span>
+				<a href="javascript:" class="close">×</a>
+			</div>
+			<div class="content">
+				<form action="{:url('Run/cabinet_add')}" method="post">
+					<div class="wrap">
+						<label>货位名称:</label>
+						<input type="text" name="name" value="" required oninput="setCustomValidity('')" placeholder='A001'/>
+					</div>
+					<div class="wrap">
+						<label>所属仓库:</label>
+						<select name="warehouse_id" id="">
+							<option value="0">---请选择所属仓库---</option>
+							{volist name='ware' id='w'}
+							<option value="{$w['id']}">{$w['name']}</option>
+							{/volist}
+						</select>
+					</div>
+					<div class="wrap">
+						<label>货位说明</label>
+						<textarea name="content" id="" cols="30" rows="10"></textarea>
+					</div>
+					<div class="wrap btn">
+						<input type="submit" class="save" value="确定"/>
+						<input type="reset" class="reset" value="重置"/>
+					</div>
+				</form>
+			</div>
+		</div>
+		<!--修改-->
+		<div class="model_edit">
+			<div class="head">
+				<span>修改</span>
+				<a href="javascript:" class="close_edit">×</a>
+			</div>
+			<div class="content">
+				<form action="{:url('Run/cabinet_edit')}" method="post">
+					<input type="hidden" name="id" id="id">
+					<div class="wrap">
+						<label>货位名称:</label>
+						<input type="text" name="name" id="name" value="" required oninput="setCustomValidity('')" placeholder='A001'/>
+					</div>
+					<div class="wrap">
+						<label>所属仓库:</label>
+						<select name="warehouse_id" id="warehouse_id">
+							<option value="0">---请选择所属仓库---</option>
+							{volist name='ware' id='w'}
+							<option value="{$w['id']}">{$w['name']}</option>
+							{/volist}
+						</select>
+					</div>
+					<div class="wrap">
+						<label>货位说明</label>
+						<textarea name="content" id="content" cols="30" rows="10"></textarea>
+					</div>
+					<div class="wrap btn">
+						<input type="submit" class="save" value="确定"/>
+						<input type="reset" class="reset" value="重置"/>
+					</div>
+				</form>
+			</div>
+		</div>
+		<script src="/static/jquery-1.9.1.min.js"></script>
+		<script type="text/javascript">
+			//添加
+			$('#dialog').on('click', function(){
+				$('.model').show();
+			})
+			$('.close').on('click', function(){
+				$('.model').hide();
+			})
+
+			//修改
+			$('.edit').on('click', function(){
+				$('.model_edit').show();
+			})
+			$('.close_edit').on('click', function(){
+				$('.model_edit').hide();
+			})
+
+			//查看数据
+			$('.ks').click(function () {
+				let id=$(this).parents('tr').find('td').eq(0).text();
+				$.ajax({
+					url:'/index/Run/cabinet_select',
+					type:'post',
+					data:{"id":id},
+					success:function (data) {
+						$('#name').val(data.name)
+						$('#content').val(data.content)
+						$('#warehouse_id').val(data.warehouse_id)
+						$('#id').val(data.id)
+					}
+				})
+			})
+		</script>
+		<style>
+			ul{margin:0 auto;overflow: hidden;width:100px}
+			ul li{float:left;list-style: none;padding:6px 10px;text-align:center;border:1px solid red;margin:0 4px}
+			.button1{margin:2rem auto;width:600px;}
+			.button1 a{padding:15px 60px;border-radius:4px;margin:0 10px;color:#fff;font-size:1.2em}
+			th{text-align:center}
+		</style>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	</body>
+</html>
