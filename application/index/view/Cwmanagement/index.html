@@ -10,7 +10,7 @@
         <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
 	</head>
 	<body>
-				
+
 		<div class="note">
                 <h4><a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">导入excel表</a><a href="{:url('Cwmanagement/clink')}" style="float: right;background:#75bdb6;padding:5px;border:none;color:#fff" id="clink">清除数据</a></h4>
                 <div>
@@ -19,7 +19,7 @@
                         <div class="wrap">
                             <label>搜索条件</label>
                             <label>调拨订单号</label>
-                            <input type="text" id="transfers_id" name="transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+                            <input type="text" id="transfers_i" name="transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
                             <label>时间</label>
                             <div class="layui-input-inline">
                                 <input type="text" class="layui-input" id="delivery_time" name="delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
@@ -32,21 +32,19 @@
                     </div>
                     <input type="submit" value="删除" id="del"/>
                 </div>
-                
+
 			<table class="news_list">
 				<thead>
 					<tr>
                         <th><input type="checkbox" id="all"></th>
-						<th>ID</th>
 						<th>调拨订单编号</th>
 						<th>物料名</th>
-						<th>交货单实际出货日期</th>
 						<th>调拨出库工厂</th>
 						<th>生产日期</th>
 						<th>调出数量</th>
-						<th>调拨入库地点</th>
 						<th>调拨入库日期</th>
 						<th>调拨入库数量</th>
+                        <th>净重</th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -54,15 +52,13 @@
                 {if condition="!empty($list)"}
 				{volist name='list' id='r'}
 					<tr id="check">
-                        <td><input type="checkbox" value="{$r.id}"></td> 
-                        <td>{$r.id}</td>    
+                        <input type="hidden" name="id" value="{$r.id}">
+                        <td><input type="checkbox" value="{$r.id}"></td>
 						<td>{$r.transfers_id}</td>
 						<td>{$r.material_name}</td>
-						<td><?php if($r['delivery_time']!=0){echo date("Y/m/d",$r['delivery_time']);}?></td>
 						<td>{$r.transfers_factory}</td>
 						<td><?php if($r['production_time']!=0){echo date("Y/m/d",$r['production_time']);}?></td>
 						<td>{$r.Bring_up_num}</td>
-						<td>{$r.transfers_into_addres}</td>
 						<td><?php if($r['transfers_into_time']!=0){echo date("Y/m/d",$r['transfers_into_time']);}?></td>
 						<td>{$r.transfers_into_num}</td>
 						<td>
@@ -79,7 +75,7 @@
             {$list->render()}
             {/if}
             </div>
-            
+
         </div>
         <!-- 导入 -->
         <div class="model">
@@ -92,9 +88,8 @@
                         <div class="wrap">
                             <input type="file" name="file" value="" required oninvalid="setCustomValidity('
                                 不能为空') oninput="setCustomValidity('')"/>
-                            </div>
                             <input type="submit" class="save" id="btn" value="确定"/>
-                        </div>    
+                        </div>
                     </form>
                 </div>
             </div>
@@ -212,7 +207,7 @@
                             <input type="text" id="note" name="note" value="" required oninvalid="setCustomValidity('
                             不能为空') oninput="setCustomValidity('')"/>
                         </div>
-                        
+
                         <div class="wrap btn">
                             <input type="submit" class="save" id="btn" value="修改"/>
                         </div>
@@ -232,19 +227,21 @@
 			})
             //详细
 			$('.img_edit').on('click', function(){
-				$('.model_edit').show();	
+				$('.model_edit').show();
 			})
             $('.close_edit').on('click', function(){
 				$('.model_edit').hide();
 			})
             //详细回显
 			$('.img_edit').click(function(){
-				let val = $(this).parents('tr').find('td').eq(1).text();
+				let val = $(this).parents('tr').find('input[type=hidden]').val();
+				console.log(val)
 				$.ajax({
 					url:'/index/Cwmanagement/record_edit',
 					type:'post',
 					data:{'id':val},
 					success:function(data){
+					    console.log(data)
                         $('#id').val(data.id)
 						$('#transfers_id').val(data.transfers_id)
 						$('#delivery_id').val(data.delivery_id)
@@ -269,17 +266,16 @@
 						$('#transfers_into_net_weight').val(data.transfers_into_net_weight)
 					}
 				})
-            })     
+            })
 
             //全选或全不选
-            $("#all").click(function(){   
-                if(this.checked){   
-                $("#check :checkbox,#all").prop("checked", true);  
-                }else{   
+            $("#all").click(function(){
+                if(this.checked){
+                $("#check :checkbox,#all").prop("checked", true);
+                }else{
                 $("#check :checkbox,#all").prop("checked", false);
-                }   
-            }); 
-
+                }
+            });
             let check_all=[];
                 // 删除选中
                 $('#del').click(function(){
@@ -318,7 +314,7 @@
                     })
                 })
         </script>
-        
+
         <!-- 时间选择 -->
         <script>
             layui.use('laydate', function(){
@@ -331,10 +327,49 @@
                     }
                 });
             })
-            laydate-btns-confirm
-            $('.laydate-btns-confirm').click(function(){
-                console.log(1);
+                    $.ajax({
+                        url:'/index/Cwmanagement/check_out_excel',
+                        type:'post',
+                        data:{'check_all':check_all},
+                        success:function (data) {
+                            if(data.error!=1){
+                                alert('导出成功');
+                            }
+                        },
+                        error:function(error){
+                            console.log('错误提示:' + error)
+                        }
+                    })
+
+            let session=[];
+            $('.news_list').on('click','input[type=checkbox]',function () {
+                let ses=JSON.parse(sessionStorage.getItem('session'));
+                session = ses === null ? [] : ses;
+
+                if($(this)[0].checked == true){
+                    session.push($(this).val());
+                }else{
+                    let val = $(this).val();
+                    for (let i in session){
+                        if(session[i] == val){
+                            session.splice(i,1);
+                        }
+                    }
+                }
+                sessionStorage.setItem('session',JSON.stringify(session));
             })
+
+            $(function () {
+                let list = JSON.parse(sessionStorage.getItem('session'));
+                $('.news_list input[type=checkbox]').each(function () {
+                    if(list.includes($(this).val()) ){
+                        $(this).prop('checked',true);
+                    }
+                })
+            })
+        $('#bt').click(function () {
+
+        })
         </script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	</body>
