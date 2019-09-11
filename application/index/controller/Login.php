@@ -53,11 +53,11 @@ class Login extends Controller
                     }
 
                 }
-            }
-            $a=$rows;
-            foreach ($a as $k=>$item) {
-                if(!isset($item['er'])){
-                    $a[$k]['er']=[];
+                $a=$rows;
+                foreach ($a as $k=>$item) {
+                    if(!isset($item['er'])){
+                        $a[$k]['er']=[];
+                    }
                 }
             }
         }else{

@@ -5,6 +5,7 @@
 		<title>新增权限</title>
 		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
 		<link rel="stylesheet" href="/images/css.css">
+		<link rel="stylesheet" href="/images/boot.css">
 		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
 		<style type="text/css">
 			.layui-table th{text-align: center;font-weight: bold;}
@@ -12,21 +13,16 @@
 		</style>
 	<body>
 		<div class="note">
-			<div class="nav">
-				<span class="layui-breadcrumb">
-					<a href="/public/main.html" target="box">首页</a>
-					<a href="javascript:;">基础设置</a>
-					<a><cite>部门列表</cite></a>
-				</span>
-			</div>
-			<div class="handle">
-				<button type="button" class="layui-btn" id="dialog">添加</button>
-			</div>
-			<table class="layui-table" style="width: 96%; margin: 12px auto;">
+			<h4>
+				<span>地区库房</span>
+				<a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">添加库房</a>
+			</h4>
+			<table class="news_list layui-table" style="width: 96%; margin: 12px auto;">
 				<thead>
 				<tr>
 					<th>ID</th>
-					<th>部门</th>
+					<th>货位名称</th>
+					<th>所属仓库</th>
 					<th>创建时间</th>
 					<th>操作</th>
 				</tr>
@@ -36,11 +32,11 @@
 					<tr>
 						<td>{$row['id']}</td>
 						<td>{$row['name']}</td>
+						<td>{$row['w_name']}</td>
 						<td>{$row['state_time']}</td>
 						<td>
-							<a href="#" class="select ks" title="查看"><i class="ico">&#xe61a;</i></a>
-							<a href="#" class="edit ks" title="编辑"><i class="ico">&#xe619;</i></a>
-							<a href="{:url('Staffs/department_del','id='.$row['id'])}" title="删除" class="ks"><i class="ico">&#xe605;</i></a>
+							<a href="#" class="edit ks">编辑</a>
+							<a href="{:url('Run/warehouse_del','id='.$row['id'])}">删除</a>
 						</td>
 					</tr>
 				{/volist}
@@ -55,13 +51,22 @@
 				<a href="javascript:" class="close">×</a>
 			</div>
 			<div class="content">
-				<form action="{:url('Staffs/department_add')}" method="post">
+				<form action="{:url('Run/cabinet_add')}" method="post">
 					<div class="wrap">
-						<label>部门名称:</label>
-						<input type="text" name="name" id="rule" value="" required oninput="setCustomValidity('')" placeholder='部门名称'/>
+						<label>货位名称:</label>
+						<input type="text" name="name" value="" required oninput="setCustomValidity('')" placeholder='A001'/>
 					</div>
 					<div class="wrap">
-						<label>部门说明:</label>
+						<label>所属仓库:</label>
+						<select name="warehouse_id" id="">
+							<option value="0">---请选择所属仓库---</option>
+							{volist name='ware' id='w'}
+							<option value="{$w['id']}">{$w['name']}</option>
+							{/volist}
+						</select>
+					</div>
+					<div class="wrap">
+						<label>货位说明</label>
 						<textarea name="content" id="" cols="30" rows="10"></textarea>
 					</div>
 					<div class="wrap btn">
@@ -78,14 +83,23 @@
 				<a href="javascript:" class="close_edit">×</a>
 			</div>
 			<div class="content">
-				<form action="{:url('Staffs/department_edit')}" method="post">
+				<form action="{:url('Run/cabinet_edit')}" method="post">
 					<input type="hidden" name="id" id="id">
 					<div class="wrap">
-						<label>部门名称:</label>
-						<input type="text" id="name" name="name">
+						<label>货位名称:</label>
+						<input type="text" name="name" id="name" value="" required oninput="setCustomValidity('')" placeholder='A001'/>
 					</div>
 					<div class="wrap">
-						<label>部门说明:</label>
+						<label>所属仓库:</label>
+						<select name="warehouse_id" id="warehouse_id">
+							<option value="0">---请选择所属仓库---</option>
+							{volist name='ware' id='w'}
+							<option value="{$w['id']}">{$w['name']}</option>
+							{/volist}
+						</select>
+					</div>
+					<div class="wrap">
+						<label>货位说明</label>
 						<textarea name="content" id="content" cols="30" rows="10"></textarea>
 					</div>
 					<div class="wrap btn">
@@ -95,31 +109,7 @@
 				</form>
 			</div>
 		</div>
-		<!--查看-->
-		<div class="model_select">
-			<div class="head">
-				<span>查看</span>
-				<a href="javascript:" class="close_select">×</a>
-			</div>
-			<div class="content">
-				<form action="{:url('Pow/up')}" method="post">
-					<div class="wrap">
-						<label>部门名称:</label>
-						<input type="text" id="r1" readonly>
-					</div>
-					<div class="wrap">
-						<label>部门说明:</label>
-						<textarea name="" id="r2" cols="30" rows="10" readonly></textarea>
-					</div>
-					<div class="wrap">
-						<label>创建时间:</label>
-						<input type="text" id="r3" readonly>
-					</div>
-				</form>
-			</div>
-		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
-		<script src="/layui/layui.js"></script>
 		<script type="text/javascript">
 			//添加
 			$('#dialog').on('click', function(){
@@ -137,35 +127,29 @@
 				$('.model_edit').hide();
 			})
 
-			//查看
-			$('.select').on('click', function(){
-				$('.model_select').show();
-			})
-			$('.close_select').on('click', function(){
-				$('.model_select').hide();
-			})
-
 			//查看数据
 			$('.ks').click(function () {
 				let id=$(this).parents('tr').find('td').eq(0).text();
 				$.ajax({
-					url:'/index/Staffs/department_select',
+					url:'/index/Run/cabinet_select',
 					type:'post',
 					data:{"id":id},
 					success:function (data) {
 						$('#name').val(data.name)
 						$('#content').val(data.content)
-						$('#r1').val(data.name)
-						$('#r2').val(data.content)
-						$('#r3').val(data.state_time)
+						$('#warehouse_id').val(data.warehouse_id)
 						$('#id').val(data.id)
 					}
 				})
 			})
-
-			layui.use('element', function () {
-				var element = layui.element;
-			})
 		</script>
+		<style>
+			ul{margin:0 auto;overflow: hidden;width:100px}
+			ul li{float:left;list-style: none;padding:6px 10px;text-align:center;border:1px solid red;margin:0 4px}
+			.button1{margin:2rem auto;width:600px;}
+			.button1 a{padding:15px 60px;border-radius:4px;margin:0 10px;color:#fff;font-size:1.2em}
+			th{text-align:center}
+		</style>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	</body>
 </html>

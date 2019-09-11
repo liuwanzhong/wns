@@ -43,7 +43,7 @@ class Controller
             }
             return $ms;
         }else{
-            return $ms=2;
+            return $ms=1;
         }
     }
     //无限极分类
