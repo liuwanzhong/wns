@@ -6,20 +6,37 @@
 		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
 		<script src="/images/jquery.js"></script>
 		<link rel="stylesheet" href="/images/css.css">
-		<link rel="stylesheet" href="/images/boot.css">	</head>
+        <link rel="stylesheet" href="/images/boot.css">	</head>
+        <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
 	</head>
 	<body>
 				
 		<div class="note">
-                <h4><a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">导入excel表</a></h4>
+                <h4><a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">导入excel表</a><a href="{:url('Cwmanagement/clink')}" style="float: right;background:#75bdb6;padding:5px;border:none;color:#fff" id="clink">清除数据</a></h4>
                 <div>
-                    <input type="button" value="全选" class="btn" id="selectAll">  
-                    <input type="button" value="全不选" class="btn" id="unSelect">  
+                    <div>
+                        <form action="{:url('Cwmanagement/index')}" method="post" enctype="multipart/form-data">
+                        <div class="wrap">
+                            <label>搜索条件</label>
+                            <label>调拨订单号</label>
+                            <input type="text" id="transfers_id" name="transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+                            <label>时间</label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input" id="delivery_time" name="delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+                            </div>
+                            <label>物料名</label>
+                            <input type="text" id="material_name" name="material_name" value="" value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
+                            <input type="submit" class="save" id="btn" value="查询"/>
+                        </div>
+                        </form>
+                    </div>
+                    <input type="submit" value="删除" id="del"/>
                 </div>
+                
 			<table class="news_list">
 				<thead>
 					<tr>
-                        <th>选择</th>
+                        <th><input type="checkbox" id="all"></th>
 						<th>ID</th>
 						<th>调拨订单编号</th>
 						<th>物料名</th>
@@ -30,7 +47,6 @@
 						<th>调拨入库地点</th>
 						<th>调拨入库日期</th>
 						<th>调拨入库数量</th>
-						<th>备注</th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -49,11 +65,9 @@
 						<td>{$r.transfers_into_addres}</td>
 						<td><?php if($r['transfers_into_time']!=0){echo date("Y/m/d",$r['transfers_into_time']);}?></td>
 						<td>{$r.transfers_into_num}</td>
-						<td>{$r.note}</td>
 						<td>
                             <a href="#" class="btn btn-info img_edit">详细</a>
-                            <a href="{:url('Cwmanagement/record_audit','id='.$r.id)}" class="btn btn-warning">审核</a>
-                            <a href="{:url('Cwmanagement/record_del','id='.$r.id)}" class="btn btn-danger">删除</a>
+                            <a href="{:url('Cwmanagement/check_record_del','id='.$r.id)}" class="btn btn-danger">删除</a>
                         </td>
 					</tr>
                 {/volist}
@@ -65,10 +79,7 @@
             {$list->render()}
             {/if}
             </div>
-            <div>
-                <input type="submit" value="删除" id="del"/>
-                <input type="submit" value="导出" id="excel_out"/>
-            </div>
+            
         </div>
         <!-- 导入 -->
         <div class="model">
@@ -83,7 +94,6 @@
                                 不能为空') oninput="setCustomValidity('')"/>
                             </div>
                             <input type="submit" class="save" id="btn" value="确定"/>
-                            <a href="{:url('Cwmanagement/out_excel')}" class="btn ">导出</a>
                         </div>    
                     </form>
                 </div>
@@ -211,6 +221,7 @@
             </div>
         <script src="/static/jquery-1.9.1.min.js"></script>
         <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+        <script src="/layui/layui.js"></script>
         <script type="text/javascript">
             //导入excel表
 			$('#dialog').on('click', function(){
@@ -223,9 +234,12 @@
 			$('.img_edit').on('click', function(){
 				$('.model_edit').show();	
 			})
+            $('.close_edit').on('click', function(){
+				$('.model_edit').hide();
+			})
             //详细回显
 			$('.img_edit').click(function(){
-				let val = $(this).parents('tr').find('td').eq(0).text();
+				let val = $(this).parents('tr').find('td').eq(1).text();
 				$.ajax({
 					url:'/index/Cwmanagement/record_edit',
 					type:'post',
@@ -253,18 +267,19 @@
 						$('#transfers_into_num').val(data.transfers_into_num)
 						$('#transfers_into_Gross_weight').val(data.transfers_into_Gross_weight)
 						$('#transfers_into_net_weight').val(data.transfers_into_net_weight)
-						$('#note').val(data.note)
 					}
 				})
-            })           
-            // 全选
-            $("#selectAll").click(function () {
+            })     
+
+            //全选或全不选
+            $("#all").click(function(){   
+                if(this.checked){   
                 $("#check :checkbox,#all").prop("checked", true);  
-            });
-            // 全不选
-            $("#unSelect").click(function () {  
-                $("#check :checkbox,#all").prop("checked", false);  
-            });
+                }else{   
+                $("#check :checkbox,#all").prop("checked", false);
+                }   
+            }); 
+
             let check_all=[];
                 // 删除选中
                 $('#del').click(function(){
@@ -274,6 +289,7 @@
                             check_all.push(s[i].value);
                         }
                     }
+                    console.log(check_all);
                     $.ajax({
                         url:'/index/Cwmanagement/check_record_del',
                         type:'post',
@@ -294,35 +310,31 @@
                                     }
                                 });
                             }
+                            console.log(data);
                         },
                         error:function(error){
                             console.log('错误提示:' + error)
                         }
                     })
                 })
-                // 导出选中
-                $('#excel_out').click(function(){
-                    var s=$("input:checkbox:checked");
-                    for (let i in s) {
-                        if(s[i].checked){
-                            check_all.push(s[i].value);
-                        }
+        </script>
+        
+        <!-- 时间选择 -->
+        <script>
+            layui.use('laydate', function(){
+                var laydate = layui.laydate;
+                laydate.render({
+                    elem: '#delivery_time'
+                    ,range: '~'
+                    ,done: function(value){
+                        $('#delivery_time').val(value)
                     }
-                    console.log(check_all);
-                    $.ajax({
-                        url:'/index/Cwmanagement/check_out_excel',
-                        type:'post',
-                        data:{'check_all':check_all},
-                        success:function (data) {
-                            if(data.error!=1){
-                                alert('导出成功');
-                            }
-                        },
-                        error:function(error){
-                            console.log('错误提示:' + error)
-                        }
-                    })
-                })
+                });
+            })
+            laydate-btns-confirm
+            $('.laydate-btns-confirm').click(function(){
+                console.log(1);
+            })
         </script>
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	</body>
