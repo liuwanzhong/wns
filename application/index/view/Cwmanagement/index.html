@@ -9,12 +9,12 @@
 		<link rel="stylesheet" href="/images/boot.css">	</head>
 	</head>
 	<body>
-				
+
 		<div class="note">
                 <h4><a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">导入excel表</a></h4>
                 <div>
-                    <input type="button" value="全选" class="btn" id="selectAll">  
-                    <input type="button" value="全不选" class="btn" id="unSelect">  
+                    <input type="button" value="全选" class="btn" id="selectAll">
+                    <input type="button" value="全不选" class="btn" id="unSelect">
                 </div>
 			<table class="news_list">
 				<thead>
@@ -23,14 +23,12 @@
 						<th>ID</th>
 						<th>调拨订单编号</th>
 						<th>物料名</th>
-						<th>交货单实际出货日期</th>
 						<th>调拨出库工厂</th>
 						<th>生产日期</th>
 						<th>调出数量</th>
-						<th>调拨入库地点</th>
 						<th>调拨入库日期</th>
 						<th>调拨入库数量</th>
-						<th>备注</th>
+                        <th>净重</th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -38,21 +36,18 @@
                 {if condition="!empty($list)"}
 				{volist name='list' id='r'}
 					<tr id="check">
-                        <td><input type="checkbox" value="{$r.id}"></td> 
-                        <td>{$r.id}</td>    
+                        <td><input type="checkbox" value="{$r.id}"></td>
+                        <td>{$r.id}</td>
 						<td>{$r.transfers_id}</td>
 						<td>{$r.material_name}</td>
-						<td><?php if($r['delivery_time']!=0){echo date("Y/m/d",$r['delivery_time']);}?></td>
 						<td>{$r.transfers_factory}</td>
 						<td><?php if($r['production_time']!=0){echo date("Y/m/d",$r['production_time']);}?></td>
 						<td>{$r.Bring_up_num}</td>
-						<td>{$r.transfers_into_addres}</td>
 						<td><?php if($r['transfers_into_time']!=0){echo date("Y/m/d",$r['transfers_into_time']);}?></td>
 						<td>{$r.transfers_into_num}</td>
-						<td>{$r.note}</td>
+                        <td>{$r.Bring_up_net_weight}</td>
 						<td>
                             <a href="#" class="btn btn-info img_edit">详细</a>
-                            <a href="{:url('Cwmanagement/record_audit','id='.$r.id)}" class="btn btn-warning">审核</a>
                             <a href="{:url('Cwmanagement/record_del','id='.$r.id)}" class="btn btn-danger">删除</a>
                         </td>
 					</tr>
@@ -84,7 +79,7 @@
                             </div>
                             <input type="submit" class="save" id="btn" value="确定"/>
                             <a href="{:url('Cwmanagement/out_excel')}" class="btn ">导出</a>
-                        </div>    
+                        </div>
                     </form>
                 </div>
             </div>
@@ -202,7 +197,7 @@
                             <input type="text" id="note" name="note" value="" required oninvalid="setCustomValidity('
                             不能为空') oninput="setCustomValidity('')"/>
                         </div>
-                        
+
                         <div class="wrap btn">
                             <input type="submit" class="save" id="btn" value="修改"/>
                         </div>
@@ -221,11 +216,14 @@
 			})
             //详细
 			$('.img_edit').on('click', function(){
-				$('.model_edit').show();	
+				$('.model_edit').show();
 			})
+            $('.close_edit').on('click', function(){
+                $('.model_edit').hide();
+            })
             //详细回显
 			$('.img_edit').click(function(){
-				let val = $(this).parents('tr').find('td').eq(0).text();
+				let val = $(this).parents('tr').find('td').eq(1).text();
 				$.ajax({
 					url:'/index/Cwmanagement/record_edit',
 					type:'post',
@@ -256,14 +254,14 @@
 						$('#note').val(data.note)
 					}
 				})
-            })           
+            })
             // 全选
             $("#selectAll").click(function () {
-                $("#check :checkbox,#all").prop("checked", true);  
+                $("#check :checkbox,#all").prop("checked", true);
             });
             // 全不选
-            $("#unSelect").click(function () {  
-                $("#check :checkbox,#all").prop("checked", false);  
+            $("#unSelect").click(function () {
+                $("#check :checkbox,#all").prop("checked", false);
             });
             let check_all=[];
                 // 删除选中

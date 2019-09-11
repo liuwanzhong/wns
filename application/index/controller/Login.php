@@ -51,9 +51,15 @@ class Login extends Controller
                     if($o['id']==$b['parent_id']){
                         $rows[$r]['er'][$b['pow_url']]=$b['pow_name'];
                     }
+
                 }
             }
             $a=$rows;
+            foreach ($a as $k=>$item) {
+                if(!isset($item['er'])){
+                    $a[$k]['er']=[];
+                }
+            }
         }else{
             $u=db('staffs')->where('id',$user['id'])->find();
             $code=explode(",",$u['power']);

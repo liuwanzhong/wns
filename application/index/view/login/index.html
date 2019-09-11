@@ -9,42 +9,55 @@
 		<script src="/images/jquery.js"></script>
 		<script src="/images/index.js"></script>
 	</head>
-	<body>
-		<header>
-			<h1>网站后台管理系统</h1>
-			<div class="right">
-				<p>
-					<a href="/public/main.html" target="box"><span class="icon home"></span>系统首页</a>
-				</p>
-				<div class="username">
-					<strong>{$menu.staffs_name}</strong>
-					<ul class="menu">
-						<input type="hidden" value="" name="id" id="id">
-						<li><a href="#"></a></li>
-						<li><a href="javascript:;" target="box" id="dialog">修改密码</a></li>
-						<li><a href="{:url('Login/out')}">安全退出</a></li>
+	<body class="layui-layout-body">
+		<div class="layui-layout layui-layout-admin">
+			<div class="layui-header">
+				<div class="layui-logo">WMS仓储管理系统</div>
+				<ul class="layui-nav layui-layout-right">
+                    <li class="layui-nav-item">
+                        <a href="/public/main.html" target="box"><span class="icon home"></span>系统首页</a>
+                    </li>
+					<li class="layui-nav-item">
+						<a href="javascript:;">
+							<img src="/images/avatar.jpg" class="layui-nav-img">
+                            {$menu.staffs_name}
+						</a>
+						<dl class="layui-nav-child">
+							<dd><a href="">基本资料</a></dd>
+							<dd><a href="javascript:;" target="box" id="dialog">修改密码</a></dd>
+							<dd><a href="{:url('Login/out')}">安全退出</a></dd>
+						</dl>
+					</li>
+				</ul>
+			</div>
+
+			<div class="layui-side layui-bg-black">
+				<div class="layui-side-scroll">
+					<!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+					<ul class="layui-nav layui-nav-tree"  lay-filter="test">
+                        {volist name="rows" id="row"}
+						<li class="layui-nav-item">
+							<a class="" href="javascript:;">{$row['pow_name']}</a>
+							<dl class="layui-nav-child">
+                                <?php foreach($row['er'] as $s=>$v): ?>
+								<dd><a href="{:url($s)}" target="box">{$v}</a></dd>
+                                <?php endforeach;?>
+							</dl>
+						</li>
+                        {/volist}
 					</ul>
 				</div>
 			</div>
-		</header>
-		<section>
-			<nav>
-				<dl>
-					{volist name="rows" id="row"}
-					<dt>
-						<span class="icon flink">{$row['pow_name']}</span>
-					</dt>
-					<dd>
-						<?php foreach($row['er'] as $s=>$v): ?>
-						<a href="{:url($s)}" target="box">-&emsp;{$v}</a>
-						<?php endforeach;?>
-					</dd>
-					{/volist}
-				</dl>
-			</nav>
-			<iframe src="/public/main.html"  class="mainbox" scrolling="yes" name="box"></iframe>
-		</section>
-	<!--修改密码-->
+
+			<div class="layui-body" style="bottom: 0; overflow-y: hidden;">
+				<!-- 内容主体区域 -->
+<!--				<div style="padding: 15px; height: 100%; background-color: #eee;">-->
+                    <iframe src="/public/main.html"  class="mainbox" scrolling="yes" name="box"></iframe>
+<!--                </div>-->
+			</div>
+		</div>
+
+		<!--修改密码-->
 		<div class="model">
 			<div class="head">
 				<span>修改密码</span>
@@ -72,15 +85,20 @@
 			</div>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
-	<script>
-		$('#dialog').on('click', function(){
-			$('.model').show();
-		})
-		$('.close').on('click', function(){
-			$('.model').hide();
-		})
-	</script>
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script src="/layui/layui.js"></script>
+		<script>
+			$('#dialog').on('click', function(){
+				$('.model').show();
+			})
+			$('.close').on('click', function(){
+				$('.model').hide();
+			})
 
+			layui.use('element', function(){
+				var element = layui.element;
+
+			});
+		</script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	</body>
 </html>

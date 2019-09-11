@@ -5,46 +5,35 @@
 		<title>新增权限</title>
 		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
 		<link rel="stylesheet" href="/images/css.css">
-		<link rel="stylesheet" href="/images/boot.css">
 		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
 		<style type="text/css">
 			.layui-table th{text-align: center;font-weight: bold;}
 			.layui-table td{text-align: center;}
+			.layui-table td:nth-child(3){text-align: left;}
+			.layui-table td:nth-child(4){text-align: left;}
+			.treeTable{width: 95%;margin: 10px auto;}
+			.treeTable::-webkit-scrollbar{display: none;}
+			.layui-table-main::-webkit-scrollbar{display: none;}
+			.layui-table-box::-webkit-scrollbar{display: none;}
 		</style>
 	<body>
 		<div class="note">
-			<h4>
-				<span>权限</span>
-				<a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">添加权限</a>
-			</h4>
-			<table class="news_list layui-table" style="width: 96%; margin: 12px auto;">
-				<thead>
-				<tr>
-					<th>排序</th>
-					<th>ID</th>
-					<th>权限名</th>
-					<th>规则</th>
-					<th>层级</th>
-					<th>状态</th>
-					<th>操作</th>
-				</tr>
-				</thead>
-				<tbody>
-				{volist name='rows' id='row'}
-					<tr>
-						<td>{$row['sort']}</td>
-						<td>{$row['id']}</td>
-						<td style="text-align:left">{$row['name_txt']}</td>
-						<td>{$row['pow_url']}</td>
-						<td>{$row['cj']}</td>
-						<td><?php if($row['cj']!=3): ?><a href="{:url('Staffs/pow_state','id='.$row['id'])}">{$row.state}</a><?php else: ?>{$row.state}<?php endif;?></td>
-						<td>
-							<a href="#" class="edit ks">编辑</a>
-							<a href="{:url('Staffs/pow_del','id='.$row['id'])}">删除</a></td>
-					</tr>
-				{/volist}
-				</tbody>
-			</table>
+			<div class="nav">
+				<span class="layui-breadcrumb">
+					<a href="/public/main.html" target="box">首页</a>
+					<a href="javascript:;">基础设置</a>
+					<a><cite>权限列表</cite></a>
+				</span>
+			</div>
+			<div class="handle">
+				<button type="button" class="layui-btn" id="dialog">添加</button>
+			</div>
+			<table id="demo" class="layui-hide" lay-filter="demo"></table>
+
+			<script type="text/html" id="toolbarDemo">
+				<a href="#" class="edit ks">编辑</a>
+				<a href="{:url('Staffs/pow_del','id=')}" class="del">删除</a>
+			</script>
 		</div>
 
 		<!--添加-->
@@ -119,8 +108,7 @@
 					</div>
 					<div class="wrap">
 						<label>权限规则</label>
-						<input type="text" name="pow_url" id="pow_url" value="#
-" required oninvalid="setCustomValidity('规则不能为空') oninput="setCustomValidity('')" placeholder='控制器名/方法名''/>
+						<input type="text" name="pow_url" id="pow_url" value="#" required oninvalid="setCustomValidity('规则不能为空') oninput="setCustomValidity('')" placeholder='控制器名/方法名''/>
 					</div>
 					<div class="wrap">
 						<label>排序</label>
@@ -168,6 +156,8 @@
 			</div>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
+		<script src="/layui/layui.js"></script>
+
 		<script type="text/javascript">
 			//添加
 			$('#dialog').on('click', function(){
@@ -178,7 +168,7 @@
 			})
 
 			//修改
-			$('.edit').on('click', function(){
+			$('.note').on('click', '.edit', function(){
 				$('.model_edit').show();
 			})
 			$('.close_edit').on('click', function(){
@@ -187,7 +177,7 @@
 
 
 			//修改数据
-			$('.ks').click(function () {
+			$('.note').on('click', '.ks', function () {
 				let id=$(this).parents('tr').find('td').eq(1).text();
 				$.ajax({
 					url:'/index/Staffs/pow_up_edit',
@@ -209,14 +199,67 @@
 					}
 				})
 			})
+
+			$('.note').on('click', '.del', function () {
+				let id=$(this).parents('tr').find('td').eq(1).text();
+				$.ajax({
+					url:"{:url('Staffs/pow_del')}",
+					type:'get',
+					data:{'id':id},
+					success:function (data) {
+						console.log(data)
+					},
+					error:function () {
+
+					}
+
+				})
+			})
+
+			// layui.use(['element', 'table'], function () {
+			// 	var element = layui.element;
+			// })
 		</script>
-		<style>
-			ul{margin:0 auto;overflow: hidden;width:100px}
-			ul li{float:left;list-style: none;padding:6px 10px;text-align:center;border:1px solid red;margin:0 4px}
-			.button1{margin:2rem auto;width:600px;}
-			.button1 a{padding:15px 60px;border-radius:4px;margin:0 10px;color:#fff;font-size:1.2em}
-			th{text-align:center}
-		</style>
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+		<script>
+			layui.config({
+				base : '/layui/'
+			}).extend({
+				treetable : 'treetable-lay/treetable',
+			});
+			layui.use(['element', 'table','treetable', 'layer'], function () {
+				var element = layui.element;
+				var treetable = layui.treetable;
+				var layer = layui.layer;
+
+				treetable.render({
+					height:'full-100',
+					id:'demo',
+					treeColIndex: 2,
+					treeSpid : '0',
+					treeIdName: 'id',
+					treePidName: 'parent_id',	//pid字段的名称，父级菜单id
+					treeDefaultClose: false,	//是否默认折叠
+					treeLinkage: false,		//父级展开时是否自动展开所有子级
+					elem: '#demo',	//表格id
+					url: '{:url('powText')}',
+					// toolbar: '#toolbarDemo',
+					page: false,
+					cols: [[
+						{field: 'sort', title: '排序', width:80},
+						{field: 'id', title: 'ID',width:120},
+						{field: 'name_txt', title: '权限名',width:400},
+						{field: 'pow_url' , title: '规则', width:400},
+						{field: 'cj', title: '层级',width:120},
+						{field: 'state', title: '状态', width:180},
+						{title: '操作', 'toolbar': '#toolbarDemo', width:288}
+					]],
+					done: function () {
+						//关闭加载
+						layer.closeAll('loading');
+					}
+				})
+			})
+		</script>
 	</body>
 </html>
