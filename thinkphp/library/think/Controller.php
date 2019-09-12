@@ -43,7 +43,7 @@ class Controller
             }
             return $ms;
         }else{
-            return $ms=2;
+            return $ms=1;
         }
     }
     //无限极分类
@@ -58,6 +58,7 @@ class Controller
             }
         }
         return $md;
+
     }
     public function order_two($datas,$id=0,$number=0)
     {

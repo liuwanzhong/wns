@@ -51,6 +51,7 @@ class Login extends Controller
                     if($o['id']==$b['parent_id']){
                         $rows[$r]['er'][$b['pow_url']]=$b['pow_name'];
                     }
+
                 }
                 $a=$rows;
                 foreach ($a as $k=>$item) {

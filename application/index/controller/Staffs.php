@@ -25,6 +25,10 @@ class Staffs extends Controller {
     }
     //添加管理员
     public function staffs_insert() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data=input();
         array_shift($data);
         $count=db('staffs')->where('staffs_number',$data['staffs_number'])->where('is_del',1)->count();
@@ -75,6 +79,10 @@ class Staffs extends Controller {
     }
     //修改管理员
     public function staffs_update() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data=input();
         array_shift($data);
         $count=db('staffs')->where('staffs_number',$data['staffs_number'])->where('is_del',1)->where("id!=$data[id]")->count();
@@ -156,6 +164,10 @@ class Staffs extends Controller {
     }
     //修改部门
     public function department_edit() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data=input();
         array_shift($data);
         $r=db('department')->update($data);
@@ -189,10 +201,15 @@ class Staffs extends Controller {
         $rows=$this->order($rows);
         $ca=db('pow')->where('is_del',1)->where('cj!=3')->select();
         $c=$this->order_two($ca);
+
         return view('pow',['rows'=>$rows,'ca'=>$c]);
     }
     //添加权限
     public function pow_add() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data=input();
         array_shift($data);
         $count=db('pow')->where('pow_name',$data['pow_name'])->where('is_del',1)->count();
@@ -216,14 +233,19 @@ class Staffs extends Controller {
         }
     }
     //删除权限
-    public function pow_del($id)
+    public function pow_del()
     {
+        $id=input('id');
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $count=db('pow')->where('parent_id',$id)->where('is_del',1)->count();
         if($count>0){
             $this->error('该规则内还有子级,不能删除');
         }
         $r=db('pow')->where('id',$id)->update(['is_del'=>0]);
-        if($r){
+        if($r!==false){
             return redirect('Staffs/pow');
         }else{
             $this->error('删除失败,请联系管理员');
@@ -232,6 +254,10 @@ class Staffs extends Controller {
     //修改权限状态
     public function pow_state($id)
     {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $state=db('pow')->where('id',$id)->find();
         if($state['cj']==3){
             $this->error('该规则不能显示');
@@ -252,6 +278,10 @@ class Staffs extends Controller {
     }
     //修改权限
     public function pow_edit() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data=input();
         $count=db('pow')->where('pow_name',$data['pow_name'])->where("id!=$data[id]")->where('is_del',1)->count();
         if($count>0){
@@ -269,5 +299,17 @@ class Staffs extends Controller {
         }else{
             $this->error('修改失败');
         }
+    }
+
+
+    //权限列表
+    public function powText() {
+        $rows=db('pow')->where('is_del',1)->select();
+        $rows=$this->order($rows);
+        $ca=db('pow')->where('is_del',1)->where('cj!=3')->select();
+        $c=$this->order_two($ca);
+
+        return json(['data' => $rows]);
+//        return view('pow',['rows'=>$rows,'ca'=>$c]);
     }
 }
