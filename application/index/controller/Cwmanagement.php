@@ -378,8 +378,6 @@ class Cwmanagement extends Controller {
             $objActSheet -> getColumnDimension('U') -> setWidth($width[2]);
             $objActSheet -> getColumnDimension('V') -> setWidth($width[2]);
             $objActSheet -> getColumnDimension('W') -> setWidth($width[2]);
-
-
             $outfile = "信息列表.xlsx";
             ob_end_clean();
             header("Content-Type: application/force-download");
@@ -390,7 +388,6 @@ class Cwmanagement extends Controller {
             header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
             header("Pragma: no-cache");
             $objWriter -> save('php://output');
-
         }
     }
 }

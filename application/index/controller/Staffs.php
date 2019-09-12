@@ -30,6 +30,10 @@ class Staffs extends Controller {
             $this->error('警告：越权操作');
         }
         $data=input();
+        if($data['department_id']==0){
+            $msg=["error"=>103,'ts'=>"请选择部门"];
+            return $msg;
+        }
         array_shift($data);
         $count=db('staffs')->where('staffs_number',$data['staffs_number'])->where('is_del',1)->count();
         if ($count>0){

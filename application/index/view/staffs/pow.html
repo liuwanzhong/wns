@@ -29,7 +29,6 @@
 				<button type="button" class="layui-btn" id="dialog">添加</button>
 			</div>
 			<table id="demo" class="layui-hide" lay-filter="demo"></table>
-
 			<script type="text/html" id="toolbarDemo">
 				<a href="#" class="edit ks">编辑</a>
 				<a href="{:url('Staffs/pow_del','id=')}" class="del">删除</a>
@@ -202,6 +201,7 @@
 
 			$('.note').on('click', '.del', function () {
 				let id=$(this).parents('tr').find('td').eq(1).text();
+				console.log(id)
 				$.ajax({
 					url:"{:url('Staffs/pow_del')}",
 					type:'get',
@@ -215,10 +215,6 @@
 
 				})
 			})
-
-			// layui.use(['element', 'table'], function () {
-			// 	var element = layui.element;
-			// })
 		</script>
 
 		<script>

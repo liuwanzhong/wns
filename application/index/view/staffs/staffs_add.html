@@ -18,7 +18,7 @@
 					<tr>
 						<td>所属部门：</td>
 						<td><select name="department_id" id="department_id">
-							<option value="">---请选择所属部门---</option>
+							<option value="0">---请选择所属部门---</option>
 							{volist name='rows' id='row'}
 							<option value="{$row['id']}">{$row['name']}</option>
 							{/volist}
