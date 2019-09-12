@@ -25,6 +25,7 @@
                 <button type="button" class="layui-btn" id="dialog">导入excel表</button>
                 <a href="{:url('Cwmanagement/clink')}" class="layui-btn" id="clink">清除数据</a>
                 <button type="button" class="layui-btn" id="del">删除</button>
+                <input type="button" value="生成入库单" id="rukuorder"/>
             </div>
             <div class="seach">
                 <form action="{:url('Cwmanagement/index')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
@@ -51,20 +52,7 @@
                             <button class="layui-btn save" lay-submit id="btn">查询</button>
                         </div>
                     </div>
-                            <!-- <div class="wrap">-->
-<!--                            <label>搜索条件</label>-->
-<!--                            <label>调拨订单号</label>-->
-<!--                            <input type="text" id="transfers_i" name="transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />-->
-<!--                            <label>时间</label>-->
-<!--                            <div class="layui-input-inline">-->
-<!--                                <input type="text" class="layui-input" id="delivery_time" name="delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">-->
-<!--                            </div>-->
-<!--                            <label>物料名</label>-->
-<!--                            <input type="text" id="material_name" name="material_name" value="" value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>-->
-<!--                            <input type="submit" class="save" id="btn" value="查询"/>-->
-<!--                        </div>-->
-                </form>
-
+                 </form>
             </div>
             <main class="bd_content">
                 <table class="layui-table" style="width: 96%;margin: 12px auto;">
@@ -110,25 +98,24 @@
                     {$list->render()}
                 </div>
             </main>
-
-
         </div>
+
         <!-- 导入 -->
         <div class="model">
-                <div class="head">
-                    <span>导入excel表</span>
-                    <a href="javascript:" class="close">×</a>
-                </div>
-                <div class="content">
-                    <form action="{:url('Cwmanagement/upload_excel')}" method="post" enctype="multipart/form-data">
-                        <div class="wrap">
-                            <input type="file" name="file" value="" required oninvalid="setCustomValidity('
-                                不能为空') oninput="setCustomValidity('')"/>
-                            <input type="submit" class="save" id="btn" value="确定"/>
-                        </div>
-                    </form>
-                </div>
+            <div class="head">
+                <span>导入excel表</span>
+                <a href="javascript:" class="close">×</a>
             </div>
+            <div class="content">
+                <form action="{:url('Cwmanagement/upload_excel')}" method="post" enctype="multipart/form-data">
+                    <div class="wrap">
+                        <input type="file" name="file" value="" required oninvalid="setCustomValidity('
+                            不能为空') oninput="setCustomValidity('')"/>
+                        <input type="submit" class="save" id="btn" value="确定"/>
+                    </div>
+                </form>
+            </div>
+        </div>
         <!-- 详细 -->
         <div class="model_edit">
                 <div class="head">
@@ -260,6 +247,55 @@
 			})
 			$('.close').on('click', function(){
 				$('.model').hide();
+            })
+            // 导出按钮
+            $('#getout').on('click', function(){
+                var data = sessionStorage.session;
+                var num = '1,2';
+                console.log(data);
+
+
+                $.ajax({
+                    url: 'index/Cwmanagement/out_excel',
+                    dataType:"json",
+                    data:{starttime: $('#starttime').datebox('getValue').replace(/-/g,"").substring(2),
+                        endtime: $('#endtime').datebox('getValue').replace(/-/g,"").substring(2),
+                            },
+                    type:'POST',
+                    async:true,
+                    beforeSend:function(){
+
+                            $("body").showLoading();
+                        },//下面就是获取到的下载地址，直接通过document.location函数获取下载
+                    success:function(output){
+
+                        $("body").hideLoading();
+                        alert(output.url);
+                        document.location.href =("data/"+output.url);
+
+                },
+                    error: function(){
+                        $("body").hideLoading();
+                        sweetAlert("错误", "导出excel出错!", "error");
+                        },
+
+                });
+
+
+
+                // $.ajax({
+                //         url:'/index/Cwmanagement/out_excel',
+                //         type:'post',
+                //         data:{'data':num},
+                //         success:function (data) {
+                //             // console.log(data);
+                //             window.location.href = "http://www.li.com/index/Cwmanagement/ceshi";
+                //         },
+                //         error:function(error){
+                //             console.log('错误提示:' + error)
+                //         }
+                //     })
+
 			})
             //详细
 			$('.img_edit').on('click', function(){
@@ -276,7 +312,6 @@
 					type:'post',
 					data:{'id':val},
 					success:function(data){
-					    console.log(data)
                         $('#id').val(data.id)
 						$('#transfers_id').val(data.transfers_id)
 						$('#delivery_id').val(data.delivery_id)
@@ -321,7 +356,6 @@
                             check_all.push(s[i].value);
                         }
                     }
-                    console.log(check_all);
                     $.ajax({
                         url:'/index/Cwmanagement/check_record_del',
                         type:'post',
@@ -357,26 +391,12 @@
                 var laydate = layui.laydate;
                 var element = layui.element;
                 laydate.render({
-                    elem: '#delivery_time'
+                    elem: '#s_delivery_time'
                     ,range: '~'
                     ,done: function(value){
-                        $('#delivery_time').val(value)
+                        $('#s_delivery_time').val(value)
                     }
                 });
-            })
-
-            $.ajax({
-                url:'/index/Cwmanagement/check_out_excel',
-                type:'post',
-                data:{'check_all':check_all},
-                success:function (data) {
-                    if(data.error!=1){
-                        alert('导出成功');
-                    }
-                },
-                error:function(error){
-                    console.log('错误提示:' + error)
-                }
             })
 
             let session=[];
@@ -405,10 +425,11 @@
                     }
                 })
             })
-        $('#bt').click(function () {
 
+        $("#rukuorder").on("click",function(){
+            var orders = sessionStorage.getItem('session');
+            location.href = "/index/Rukuorder/index/id/"+orders;
         })
         </script>
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	</body>
 </html>
