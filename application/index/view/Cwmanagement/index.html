@@ -31,6 +31,7 @@
                         </form>
                     </div>
                     <input type="submit" value="删除" id="del"/>
+                    <input type="button" value="生成入库单" id="rukuorder"/>
                 </div>
 
 			<table class="news_list">
@@ -402,6 +403,11 @@
                     }
                 })
             })
+
+        $("#rukuorder").on("click",function(){
+            var orders = sessionStorage.getItem('session');
+            location.href = "/index/Rukuorder/index/id/"+orders;
+        })
         </script>
 	</body>
 </html>
