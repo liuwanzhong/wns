@@ -50,3 +50,12 @@ $('.items').on('click', '.tit input',function(){
 		}
 	}
 })
+
+
+layui.use('form',function () {
+	let form = layui.form;
+
+	form.on('checkbox(one)', function (data) {
+		console.log(data);
+	})
+})

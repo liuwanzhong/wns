@@ -11,11 +11,12 @@ ul,li{
 }
 .title{
 	line-height: 30px;
-
+}
+.lists{
+	margin-left: 20px;
 }
 .children{
 	display: flex;
-	/* height: 40px; */
 	min-height: 15px;
 	align-items: center;
 	padding: 0;
@@ -24,10 +25,10 @@ ul,li{
 	margin-left: 20px;
 }
 
-input[type=checkbox]{
+.box input[type=checkbox]{
 	display: none;
 }
-label:before{
+.box label:before{
 	content: '';
 	display: inline-block;
 	width: 14px;
@@ -36,7 +37,7 @@ label:before{
 	margin-right: 5px;
 
 }
-label.selted i{
+.box label.selted i{
 	display: inline-block;
 	width: 8px;
 	height: 14px;
@@ -52,7 +53,7 @@ label.selted i{
 	height: 30px;
 	font-size: 14px;
 }
-label{
+.box label{
 	display: inline-block;
 	height: 100%;
 	line-height: 30px;
@@ -60,12 +61,4 @@ label{
 }
 
 
-#btn{
-	border: none;
-	background-color: #009688;
-	color: #fff;
-	height: 35px;
-	width:70px;
-	margin-left: 40px;
-	letter-spacing: 2px;
-}
+

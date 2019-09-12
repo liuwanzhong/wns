@@ -5,7 +5,7 @@
     <title>在库管理</title>
     <link href="/images/index.css" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" href="/images/css.css">
-    <link rel="stylesheet" href="/images/boot.css">
+<!--    <link rel="stylesheet" href="/images/boot.css">-->
     <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
     <style type="text/css">
         .button1{margin:2rem auto;width:600px;}
@@ -18,29 +18,42 @@
 </head>
 <body>
 <div class="note">
-    <h4><a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">添加货物</a></h4>
-    <table class="news_form layui-table" style="width: 96%; margin: 12px auto;">
-        <tr>
-            <th>调拨订单号</th>
-            <th>货物名</th>
-            <th>总库存</th>
-            <th>生产日期</th>
-            <th>操作</th>
-        </tr>
-        {volist name='list' id='v'}
-        <tr>
-            <td>{$v.id}</td>
-            <td>{$v.title}</td>
-            <td>{$v.count}</td>
-            <td><?php if($v['production_time'] == 0){echo '-';}else{echo date("y-m-d",$v['production_time']);}?></td>
-            <td style="width:300px">
-                <a href="#" class="layui-btn layui-btn-sm shows">冻结<input type="hidden" name="myids" value="{$v.id}"></a>
-                <a href="#" class="layui-btn layui-btn-sm frozens">解冻<input type="hidden" name="myids" value="{$v.id}"></a>
-                <a href="#" class="layui-btn layui-btn-sm layui-btn-normal edit">分配</a>
-                <a href="{:url('instor/delete','id='.$v['id'])}" class="layui-btn layui-btn-sm layui-btn-danger">删除</a>
-            </td>
-        </tr>
-        {/volist}
+    <div class="nav">
+        <span class="layui-breadcrumb">
+            <a href="/public/main.html" target="box">首页</a>
+            <a href="javascript:;">在库管理</a>
+            <a><cite>货物列表</cite></a>
+        </span>
+    </div>
+    <div class="handle">
+        <button type="button" class="layui-btn" id="dialog">添加</button>
+    </div>
+    <table class="layui-table" style="width: 96%; margin: 12px auto;">
+        <thead>
+            <tr>
+                <th>调拨订单号</th>
+                <th>货物名</th>
+                <th>总库存</th>
+                <th>生产日期</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {volist name='list' id='v'}
+            <tr>
+                <td>{$v.id}</td>
+                <td>{$v.title}</td>
+                <td>{$v.count}</td>
+                <td><?php if($v['production_time'] == 0){echo '-';}else{echo date("y-m-d",$v['production_time']);}?></td>
+                <td style="width:300px">
+                    <a href="#" class="layui-btn layui-btn-sm shows">冻结<input type="hidden" name="myids" value="{$v.id}"></a>
+                    <a href="#" class="layui-btn layui-btn-sm frozens">解冻<input type="hidden" name="myids" value="{$v.id}"></a>
+                    <a href="#" class="layui-btn layui-btn-sm layui-btn-normal edit">分配</a>
+                    <a href="{:url('instor/delete','id='.$v['id'])}" class="layui-btn layui-btn-sm layui-btn-danger">删除</a>
+                </td>
+            </tr>
+            {/volist}
+        </tbody>
     </table>
     {$list->render()}
 </div>
@@ -129,6 +142,12 @@
 </div>
 
 <script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/layui/layui.js"></script>
+<script>
+    layui.use('element', function () {
+        let element = layui.element;
+    })
+</script>
 
 <script type="text/javascript">
     $('#dialog').on('click', function(){
@@ -241,6 +260,6 @@
 
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>-->
 </body>
 </html>

@@ -5,7 +5,6 @@
 		<title>新增权限</title>
 		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
 		<link rel="stylesheet" href="/images/css.css">
-		<link rel="stylesheet" href="/images/boot.css">
 		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
 		<style type="text/css">
 			.layui-table th{text-align: center;font-weight: bold;}
@@ -13,19 +12,25 @@
 		</style>
 	<body>
 		<div class="note">
-			<h4>
-				<span>地区库房</span>
-				<a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">添加库房</a>
-			</h4>
-			<table class="news_list layui-table" style="width: 96%; margin: 12px auto;">
+			<div class="nav">
+				<span class="layui-breadcrumb">
+					<a href="/public/main.html" target="box">首页</a>
+					<a href="javascript:;">管理</a>
+					<a><cite>货位管理</cite></a>
+				</span>
+			</div>
+			<div class="handle">
+				<button type="button" class="layui-btn" id="dialog">添加</button>
+			</div>
+			<table class="layui-table" style="width: 96%; margin: 12px auto;">
 				<thead>
-				<tr>
-					<th>ID</th>
-					<th>货位名称</th>
-					<th>所属仓库</th>
-					<th>创建时间</th>
-					<th>操作</th>
-				</tr>
+					<tr>
+						<th>ID</th>
+						<th>货位名称</th>
+						<th>所属仓库</th>
+						<th>创建时间</th>
+						<th>操作</th>
+					</tr>
 				</thead>
 				<tbody>
 				{volist name='rows' id='row'}
@@ -110,6 +115,13 @@
 			</div>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
+		<script src="/layui/layui.js"></script>
+		<script>
+			layui.use('element', function () {
+				let element = layui.element;
+			})
+		</script>
+
 		<script type="text/javascript">
 			//添加
 			$('#dialog').on('click', function(){
@@ -143,13 +155,5 @@
 				})
 			})
 		</script>
-		<style>
-			ul{margin:0 auto;overflow: hidden;width:100px}
-			ul li{float:left;list-style: none;padding:6px 10px;text-align:center;border:1px solid red;margin:0 4px}
-			.button1{margin:2rem auto;width:600px;}
-			.button1 a{padding:15px 60px;border-radius:4px;margin:0 10px;color:#fff;font-size:1.2em}
-			th{text-align:center}
-		</style>
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	</body>
 </html>

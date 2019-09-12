@@ -3,80 +3,114 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>后台管理系统</title>
-		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
-		<script src="/images/jquery.js"></script>
 		<link rel="stylesheet" href="/images/css.css">
-        <link rel="stylesheet" href="/images/boot.css">	</head>
+        <link rel="stylesheet" href="/images/boot.css">
+        <link href="/images/index.css" type="text/css" rel="stylesheet"/>
         <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
+        <style>
+            .seach{margin-top: 20px;margin-left: 30px;}
+            .seach .layui-form-label{width: auto;}
+        </style>
 	</head>
 	<body>
-
 		<div class="note">
-                <h4><a href="#" style="background:#75bdb6;padding:5px;border:none;color:#fff" id="dialog">导入excel表</a><a href="{:url('Cwmanagement/clink')}" style="float: right;background:#75bdb6;padding:5px;border:none;color:#fff" id="clink">清除数据</a></h4>
-                <div>
-                    <div>
-                        <form action="{:url('Cwmanagement/index')}" method="post" enctype="multipart/form-data">
-                        <div class="wrap">
-                            <label>搜索条件</label>
-                            <label>调拨订单号</label>
-                            <input type="text" id="transfers_i" name="transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
-                            <label>时间</label>
-                            <div class="layui-input-inline">
-                                <input type="text" class="layui-input" id="delivery_time" name="delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
-                            </div>
-                            <label>物料名</label>
-                            <input type="text" id="material_name" name="material_name" value="" value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
-                            <input type="submit" class="save" id="btn" value="查询"/>
+            <div class="nav">
+				<span class="layui-breadcrumb">
+					<a href="/public/main.html" target="box">首页</a>
+					<a href="javascript:;">入库管理</a>
+					<a><cite>库存列表</cite></a>
+				</span>
+            </div>
+            <div class="handle">
+                <button type="button" class="layui-btn" id="dialog">导入excel表</button>
+                <a href="{:url('Cwmanagement/clink')}" class="layui-btn" id="clink">清除数据</a>
+                <button type="button" class="layui-btn" id="del">删除</button>
+            </div>
+            <div class="seach">
+                <form action="{:url('Cwmanagement/index')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">调拨订单号</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="transfers_i" name="transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
                         </div>
-                        </form>
                     </div>
-                    <input type="submit" value="删除" id="del"/>
-                </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">时间</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="delivery_time" name="delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">物料名</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="material_name" name="material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <button class="layui-btn save" lay-submit id="btn">查询</button>
+                        </div>
+                    </div>
+                            <!-- <div class="wrap">-->
+<!--                            <label>搜索条件</label>-->
+<!--                            <label>调拨订单号</label>-->
+<!--                            <input type="text" id="transfers_i" name="transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />-->
+<!--                            <label>时间</label>-->
+<!--                            <div class="layui-input-inline">-->
+<!--                                <input type="text" class="layui-input" id="delivery_time" name="delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">-->
+<!--                            </div>-->
+<!--                            <label>物料名</label>-->
+<!--                            <input type="text" id="material_name" name="material_name" value="" value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>-->
+<!--                            <input type="submit" class="save" id="btn" value="查询"/>-->
+<!--                        </div>-->
+                </form>
 
-			<table class="news_list">
-				<thead>
-					<tr>
+            </div>
+            <main class="bd_content">
+                <table class="layui-table" style="width: 96%;margin: 12px auto;">
+                    <thead>
+                    <tr>
                         <th><input type="checkbox" id="all"></th>
-						<th>调拨订单编号</th>
-						<th>物料名</th>
-						<th>调拨出库工厂</th>
-						<th>生产日期</th>
-						<th>调出数量</th>
-						<th>调拨入库日期</th>
-						<th>调拨入库数量</th>
+                        <th>调拨订单编号</th>
+                        <th>物料名</th>
+                        <th>调拨出库工厂</th>
+                        <th>生产日期</th>
+                        <th>调出数量</th>
+                        <th>调拨入库日期</th>
+                        <th>调拨入库数量</th>
                         <th>净重</th>
-						<th>操作</th>
-					</tr>
-				</thead>
-				<tbody>
-                {if condition="!empty($list)"}
-				{volist name='list' id='r'}
-					<tr id="check">
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {if condition="!empty($list)"}
+                    {volist name='list' id='r'}
+                    <tr id="check">
                         <input type="hidden" name="id" value="{$r.id}">
                         <td><input type="checkbox" value="{$r.id}"></td>
-						<td>{$r.transfers_id}</td>
-						<td>{$r.material_name}</td>
-						<td>{$r.transfers_factory}</td>
-						<td><?php if($r['production_time']!=0){echo date("Y/m/d",$r['production_time']);}?></td>
-						<td>{$r.Bring_up_num}</td>
-						<td><?php if($r['transfers_into_time']!=0){echo date("Y/m/d",$r['transfers_into_time']);}?></td>
-						<td>{$r.transfers_into_num}</td>
+                        <td>{$r.transfers_id}</td>
+                        <td>{$r.material_name}</td>
+                        <td>{$r.transfers_factory}</td>
+                        <td><?php if($r['production_time']!=0){echo date("Y/m/d",$r['production_time']);}?></td>
+                        <td>{$r.Bring_up_num}</td>
+                        <td><?php if($r['transfers_into_time']!=0){echo date("Y/m/d",$r['transfers_into_time']);}?></td>
+                        <td>{$r.transfers_into_num}</td>
                         <td>{$r.Bring_up_net_weight}</td>
-						<td>
-                            <a href="#" class="btn btn-info img_edit">详细</a>
-                            <a href="{:url('Cwmanagement/check_record_del','id='.$r.id)}" class="btn btn-danger">删除</a>
+                        <td>
+                            <a href="#" class="img_edit">详细</a>
+                            <a href="{:url('Cwmanagement/check_record_del','id='.$r.id)}" class="">删除</a>
 
                         </td>
-					</tr>
-                {/volist}
-                {/if}
-				</tbody>
-			</table>
-            <div style="text-align:center">
-            {if condition="!empty($list)"}
-            {$list->render()}
-            {/if}
-            </div>
+                    </tr>
+                    {/volist}
+                    {/if}
+                    </tbody>
+                </table>
+                <div style="text-align:center; margin-bottom: 200px;">
+                    {$list->render()}
+                </div>
+            </main>
+
 
         </div>
         <!-- 导入 -->
@@ -277,6 +311,7 @@
                 $("#check :checkbox,#all").prop("checked", false);
                 }
             });
+
             let check_all=[];
                 // 删除选中
                 $('#del').click(function(){
@@ -318,8 +353,9 @@
 
         <!-- 时间选择 -->
         <script>
-            layui.use('laydate', function(){
+            layui.use(['element','laydate'], function(){
                 var laydate = layui.laydate;
+                var element = layui.element;
                 laydate.render({
                     elem: '#delivery_time'
                     ,range: '~'
@@ -328,19 +364,20 @@
                     }
                 });
             })
-                    $.ajax({
-                        url:'/index/Cwmanagement/check_out_excel',
-                        type:'post',
-                        data:{'check_all':check_all},
-                        success:function (data) {
-                            if(data.error!=1){
-                                alert('导出成功');
-                            }
-                        },
-                        error:function(error){
-                            console.log('错误提示:' + error)
-                        }
-                    })
+
+            $.ajax({
+                url:'/index/Cwmanagement/check_out_excel',
+                type:'post',
+                data:{'check_all':check_all},
+                success:function (data) {
+                    if(data.error!=1){
+                        alert('导出成功');
+                    }
+                },
+                error:function(error){
+                    console.log('错误提示:' + error)
+                }
+            })
 
             let session=[];
             $('.news_list').on('click','input[type=checkbox]',function () {
