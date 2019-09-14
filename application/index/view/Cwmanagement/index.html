@@ -73,7 +73,7 @@
                     <tbody>
                     {if condition="!empty($list)"}
                     {volist name='list' id='r'}
-                    <tr id="check">
+                    <tr id="check" class="news_list">
                         <input type="hidden" name="id" value="{$r.id}">
                         <td><input type="checkbox" value="{$r.id}"></td>
                         <td>{$r.transfers_id}</td>
@@ -337,7 +337,6 @@
 					}
 				})
             })
-
             //全选或全不选
             $("#all").click(function(){
                 if(this.checked){
@@ -403,7 +402,6 @@
             $('.news_list').on('click','input[type=checkbox]',function () {
                 let ses=JSON.parse(sessionStorage.getItem('session'));
                 session = ses === null ? [] : ses;
-
                 if($(this)[0].checked == true){
                     session.push($(this).val());
                 }else{
