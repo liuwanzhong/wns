@@ -8,8 +8,13 @@
         <link href="/images/index.css" type="text/css" rel="stylesheet"/>
         <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
         <style>
-            .search{margin-top: 20px;margin-left: 30px;}
-            .search .layui-form-label{width: auto;}
+
+            .seach{margin-top: 20px;margin-left: 30px;}
+            .seach .layui-form-label{width: auto;}
+            
+            #factory{
+                display: block;
+            }
         </style>
 	</head>
 	<body>
@@ -48,6 +53,17 @@
                             <input type="text" class="layui-input" id="s_material_name" name="s-material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
                         </div>
                     </div>
+                    <div class="layui-inline">
+                        <label class="layui-form-label">工厂</label>
+                        <div class="layui-input-inline">
+                          <select name="factory" id="factory">
+							<option value="">请选择</option>
+                            {volist name='res' id='r'}
+							<option value="{$r['name']}">{$r['name']}</option>
+							{/volist}
+                          </select>
+                        </div>
+                    </div>
                     <div class="layui-form-item">
                         <div class="layui-input-inline">
                             <button class="layui-btn save" lay-submit>查询</button>
@@ -74,7 +90,7 @@
                     <tbody class="tbd">
                     {if condition="!empty($list)"}
                     {volist name='list' id='r'}
-                    <tr id="check">
+                    <tr id="check" class="news_list">
                         <input type="hidden" name="id" value="{$r.id}">
                         <td><input type="checkbox" value="{$r.id}"></td>
                         <td>{$r.transfers_id}</td>
@@ -226,40 +242,6 @@
 			$('.close').on('click', function(){
 				$('.model').hide();
             })
-            // 导出按钮
-            $('#getout').on('click', function(){
-                var data = sessionStorage.session;
-                var num = '1,2';
-                console.log(data);
-
-
-                $.ajax({
-                    url: 'index/Cwmanagement/out_excel',
-                    dataType:"json",
-                    data:{starttime: $('#starttime').datebox('getValue').replace(/-/g,"").substring(2),
-                        endtime: $('#endtime').datebox('getValue').replace(/-/g,"").substring(2),
-                            },
-                    type:'POST',
-                    async:true,
-                    beforeSend:function(){
-
-                            $("body").showLoading();
-                        },//下面就是获取到的下载地址，直接通过document.location函数获取下载
-                    success:function(output){
-
-                        $("body").hideLoading();
-                        alert(output.url);
-                        document.location.href =("data/"+output.url);
-
-                },
-                    error: function(){
-                        $("body").hideLoading();
-                        sweetAlert("错误", "导出excel出错!", "error");
-                        },
-
-                });
-
-			})
             //详细
 			$('.img_edit').on('click', function(){
 				$('.model_edit').show();
@@ -300,7 +282,6 @@
 					}
 				})
             })
-
             //全选或全不选
             $("#all").click(function(){
                 if(this.checked){
@@ -373,7 +354,6 @@
             $('.new_list').on('click','input[type=checkbox]',function () {
                 let ses=JSON.parse(sessionStorage.getItem('session'));
                 session = ses === null ? [] : ses;
-
                 if($(this)[0].checked == true){
                     session.push($(this).val());
                 }else{

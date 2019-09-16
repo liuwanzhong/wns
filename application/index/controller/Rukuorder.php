@@ -33,30 +33,72 @@ class Rukuorder extends Controller {
     }
     public function insert(){
         $data = input();
+        dump($data);
         Db::startTrans();
+//        foreach($data['transfers_factory'] as $k=>$v){
+//            $rs = db('rukuform_201909')->insert(['factory'=>$v,
+//                'product_name'=>$data['material_name'][$k],
+//                'rk_status_id'=>$data['status'][$k],
+//                'rk_huowei_id'=>$data['huowei'][$k],
+//                'rk_nums'=>$data['nums'][$k],
+//                'product_time'=>$data['intime'][$k],
+//                'product_batch'=>$data['storno'][$k],
+//                'content'=>$data['content'][$k],
+//                'netweight'=>$data['netweight'][$k],
+//                'Grossweight'=>$data['Grossweight'][$k],
+//                'transfers_id'=>$data['transfers_id'][$k],
+//                'rukuid',$id]);
+//        }
+//        if($rs){
+//            echo '提交成功';
+//        }else{
+//            echo '提交失败';
+//        }
+//        exit;
+//        $id = 1;
+//        for ($i=0;$i<count($data['transfers_factory'])-1;$i++){
+//            $rs = db('rukuform_xq')->insert(['factory'=>$data['transfers_factory'][$i],
+//                'product_name'=>$data['material_name'][$i],
+//                'rk_status_id'=>$data['status'][$i],
+//                'rk_huowei_id'=>$data['huowei'][$i],
+//                'rk_nums'=>$data['nums'][$i],
+//                'product_time'=>$data['intime'][$i],
+//                'product_batch'=>$data['storno'][$i],
+//                'content'=>$data['content'][$i],
+//                'netweight'=>$data['netweight'][$i],
+//                'Grossweight'=>$data['Grossweight'][$i],
+//                'transfers_id'=>$data['transfers_id'][$i],
+//                'rukuid'=>$id]);
+//        }
+//        if($id && $rs){
+//            echo '1';
+//        }else{
+//            echo '2';
+//        }
+//        exit;
         try{
             $id = db('rukuform')->insertGetId(['shipmentnum'=>$data['shipmentnum'],'userintime'=>$data['userintime'],'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id']]);
-            foreach($data['transfers_factory'] as $k=>$v){
-                $rs = db('rukuform_201909')->insert(['factory'=>$v,
-                    'product_name'=>$data['material_name'][$k],
-                    'rk_status_id'=>$data['status'][$k],
-                    'rk_huowei_id'=>$data['huowei'][$k],
-                    'rk_nums'=>$data['nums'][$k],
-                    'product_time'=>$data['intime'][$k],
-                    'product_batch'=>$data['storno'][$k],
-                    'content'=>$data['content'][$k],
-                    'netweight'=>$data['netweight'][$k],
-                    'Grossweight'=>$data['Grossweight'][$k],
-                    'transfers_id'=>$data['transfers_id'][$k],
-                    'rukuid',$id]);
+            for ($i=0;$i<count($data['transfers_factory']);$i++){
+            $rs = db('rukuform_xq')->insert(['factory'=>$data['transfers_factory'][$i],
+                'product_name'=>$data['material_name'][$i],
+                'rk_status_id'=>$data['status'][$i],
+                'rk_huowei_id'=>$data['huowei'][$i],
+                'rk_nums'=>$data['nums'][$i],
+                'product_time'=>$data['intime'][$i],
+                'product_batch'=>$data['storno'][$i],
+                'content'=>$data['content'][$i],
+                'netweight'=>$data['netweight'][$i],
+                'Grossweight'=>$data['Grossweight'][$i],
+                'transfers_id'=>$data['transfers_id'][$i],
+                'rukuid'=>$id]);
             }
             if($id && $rs) {
-                echo '111';
+                echo '提交成功';
                 // 提交事务
                 Db::commit();
             }
         } catch (\Exception $e) {
-            echo $e->getMessage();
+            echo '提交失败';
             // 回滚事务
             Db::rollback();
         }
