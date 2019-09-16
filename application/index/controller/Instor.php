@@ -1,59 +1,46 @@
 <?php
-
 namespace app\index\controller;
-
-
 use think\Controller;
 use think\Db;
 use think\Request;
-
 class Instor extends Controller
 {
-    //构造函数，更新货物库存
-    public function _initialize() {
-//        //查询订单表
-//        $orders = db('cw_management')->field('material_name,count(material_name) as nums,transfers_into_net_weight,production_time')->group('material_name ')->select();
-//        //查询库存表
-//        $goods = db('goods')->where('is_del',1)->select();
-//        //开事物
-//        Db::startTrans();
-//        try{
-//            //遍历订单表
-//            foreach($orders as $order){
-//                //遍历库存表
-//                foreach($goods as $good){
-//                    //如果相同，就更新
-//                    if($good['title'] == $order['material_name']){
-//                        $data['title'] = $order['material_name'];
-//                        $data['count'] = $order['nums'];
-//                        $data['goods_feel'] = $data['count'] - $good['goods_frozen'];
-//                        $data['weight'] = $order['transfers_into_net_weight'];
-//                        $data['production_time'] = $order['production_time'];
-//                        db('goods')->where('id',$good['id'])->update($data);
-//                        break;
-//                    }else{//不同就新增
-//                        $data['title'] = $order['material_name'];
-//                        $data['count'] = $order['nums'];
-//                        $data['goods_feel'] = $order['nums'];
-//                        $data['weight'] = $order['transfers_into_net_weight'];
-//                        $data['production_time'] = $order['production_time'];
-//                        db('goods')->insert($data);
-//                        break;
-//                    }
-//                }
-//            }
-//            Db::commit();
-//        } catch (\Exception $e) {
-//            dump($e->getMessage());
-//            Db::rollback();
-//        }
-    }
     //货物列表
     public function index(){
-        $list = db('cw_management')->field('transfers_id as id,material_name as title,sum(transfers_into_num) as count,transfers_into_net_weight as weight,production_time')
-            ->group('material_name ')->paginate(20);
-//        $list = db('goods')->where('is_del',1)->select();
+        $orders = db('rukuform_xq')->field('a.*,b.title,c.name')
+            ->alias('a')
+            ->join('kc_status b','b.id = a.rk_status_id','left')
+            ->join('cabinet c','c.id = a.rk_huowei_id','left')
+            ->where('a.is_del',0)->where('b.is_del',0)->where('c.is_del',1)->where('state',1)->select();
+        foreach($orders as &$v){
+            $v['ckname'] = db('rukuform')->field('a.id,a.ck_id,b.name')
+                ->alias('a')
+                ->join('warehouse b','a.ck_id = b.id')
+                ->where('a.is_del',0)->where('b.is_del',1)
+                ->where('a.id',$v['rukuid'])->find()['name'];
+//            dump($v);
+        }
+//        dump($orders);exit;
+        return view('index2',['orders'=>$orders]);
+    }
+    public function index2(){
+        $list = db('rukuform')->field('a.*,b.name')->alias('a')
+            ->join('warehouse b','b.id = a.ck_id','left')
+            ->where('a.is_del',0)->where('a.state',1)->where('b.is_del',1)->paginate(20);
         return view('index',['list'=>$list]);
+    }
+    //查看入库产品
+    public function show($id){
+        $main = db('rukuform')->where('is_del',0)->where('id',$id)->find();
+        $main['ck_id'] = db('warehouse')->where('is_del',1)->where('id',$main['ck_id'])->find()['name'];
+//        dump($main['ck_id']);exit();
+        $orders = db('rukuform_xq')->field('a.*,b.title,c.name')
+            ->alias('a')
+            ->join('kc_status b','b.id = a.rk_status_id','left')
+            ->join('cabinet c','c.id = a.rk_huowei_id','left')
+            ->where('a.rukuid',$id)->where('a.is_del',0)->where('b.is_del',0)->where('c.is_del',1)->select();
+//        dump($orders);exit;
+        return view('show',['main'=>$main,'orders'=>$orders]);
     }
     //添加数据
     public function insert(Request $request){
