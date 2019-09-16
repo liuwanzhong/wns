@@ -8,8 +8,8 @@
         <link href="/images/index.css" type="text/css" rel="stylesheet"/>
         <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
         <style>
-            .seach{margin-top: 20px;margin-left: 30px;}
-            .seach .layui-form-label{width: auto;}
+            .search{margin-top: 20px;margin-left: 30px;}
+            .search .layui-form-label{width: auto;}
         </style>
 	</head>
 	<body>
@@ -25,37 +25,38 @@
                 <button type="button" class="layui-btn" id="dialog">导入excel表</button>
                 <a href="{:url('Cwmanagement/clink')}" class="layui-btn" id="clink">清除数据</a>
                 <button type="button" class="layui-btn" id="del">删除</button>
-                <input type="button" value="生成入库单" id="rukuorder"/>
+                <button type="button" class="layui-btn" id="rukuorder">生成入库单</button>
+<!--                <input type="button" value="生成入库单" id="rukuorder"/>-->
             </div>
-            <div class="seach">
+            <div class="search">
                 <form action="{:url('Cwmanagement/index')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
                     <div class="layui-form-item">
                         <label class="layui-form-label">调拨订单号</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="transfers_i" name="transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+                            <input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
                         </div>
                     </div>
                     <div class="layui-form-item">
                         <label class="layui-form-label">时间</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="delivery_time" name="delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+                            <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
                         </div>
                     </div>
                     <div class="layui-form-item">
                         <label class="layui-form-label">物料名</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="material_name" name="material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
+                            <input type="text" class="layui-input" id="s_material_name" name="s-material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
                         </div>
                     </div>
                     <div class="layui-form-item">
                         <div class="layui-input-inline">
-                            <button class="layui-btn save" lay-submit id="btn">查询</button>
+                            <button class="layui-btn save" lay-submit>查询</button>
                         </div>
                     </div>
                  </form>
             </div>
             <main class="bd_content">
-                <table class="layui-table" style="width: 96%;margin: 12px auto;">
+                <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
                     <thead>
                     <tr>
                         <th><input type="checkbox" id="all"></th>
@@ -70,7 +71,7 @@
                         <th>操作</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="tbd">
                     {if condition="!empty($list)"}
                     {volist name='list' id='r'}
                     <tr id="check">
@@ -87,7 +88,6 @@
                         <td>
                             <a href="#" class="img_edit">详细</a>
                             <a href="{:url('Cwmanagement/check_record_del','id='.$r.id)}" class="">删除</a>
-
                         </td>
                     </tr>
                     {/volist}
@@ -109,8 +109,7 @@
             <div class="content">
                 <form action="{:url('Cwmanagement/upload_excel')}" method="post" enctype="multipart/form-data">
                     <div class="wrap">
-                        <input type="file" name="file" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                        <input type="file" name="file" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         <input type="submit" class="save" id="btn" value="确定"/>
                     </div>
                 </form>
@@ -127,112 +126,91 @@
                         <input type="hidden" name="id" id="id">
                         <div class="wrap">
                             <label>调拨订单号</label>
-                            <input type="text" id="transfers_id" name="transfers_id" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_id" name="transfers_id" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>交付单号</label>
-                            <input type="text" id="delivery_id" name="delivery_id" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="delivery_id" name="delivery_id" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>交货单实际出库日期</label>
-                            <input type="text" id="delivery_time" name="delivery_time" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
+                            <input type="text" id="delivery_time" name="delivery_time" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
                         </div>
                         <div class="wrap">
                             <label>调拨出库工厂</label>
-                            <input type="text" id="transfers_factory" name="transfers_factory" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_factory" name="transfers_factory" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>物料名称</label>
-                            <input type="text" id="material_name" name="material_name" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="material_name" name="material_name" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>生产日期</label>
-                            <input type="text" id="production_time" name="production_time" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
+                            <input type="text" id="production_time" name="production_time" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
                         </div>
                         <div class="wrap">
                             <label>装运类型</label>
-                            <input type="text" id="transport_type" name="transport_type" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="transport_type" name="transport_type" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>集装箱号/车皮号</label>
-                            <input type="text" id="container_id" name="container_id" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="container_id" name="container_id" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>在途净重</label>
-                            <input type="text" id="zt_net_weight" name="zt_net_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="zt_net_weight" name="zt_net_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>在途毛重</label>
-                            <input type="text" id="zt_Gross_weight" name="zt_Gross_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="zt_Gross_weight" name="zt_Gross_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>在途数量</label>
-                            <input type="text" id="zt_num" name="zt_num" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="zt_num" name="zt_num" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>调出数量</label>
-                            <input type="text" id="Bring_up_num" name="Bring_up_num" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="Bring_up_num" name="Bring_up_num" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>调拨入库时间</label>
-                            <input type="text" id="transfers_into_time" name="transfers_into_time" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
+                            <input type="text" id="transfers_into_time" name="transfers_into_time" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
                         </div>
                         <div class="wrap">
                             <label>调拨入库地点</label>
-                            <input type="text" id="transfers_into_addres" name="transfers_into_addres" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_into_addres" name="transfers_into_addres" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>调拨出库地点</label>
-                            <input type="text" id="transfers_out" name="transfers_out" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_out" name="transfers_out" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>调出毛重</label>
-                            <input type="text" id="Bring_up_Gross_weight" name="Bring_up_Gross_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="Bring_up_Gross_weight" name="Bring_up_Gross_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>调出净重</label>
-                            <input type="text" id="Bring_up_net_weight" name="Bring_up_net_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="Bring_up_net_weight" name="Bring_up_net_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>调拨入库数量</label>
-                            <input type="text" id="transfers_into_num" name="transfers_into_num" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_into_num" name="transfers_into_num" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>调拨入库毛重</label>
-                            <input type="text" id="transfers_into_Gross_weight" name="transfers_into_Gross_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_into_Gross_weight" name="transfers_into_Gross_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>调拨入库净重</label>
-                            <input type="text" id="transfers_into_net_weight" name="transfers_into_net_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_into_net_weight" name="transfers_into_net_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
                         <div class="wrap">
                             <label>备注</label>
-                            <input type="text" id="note" name="note" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
+                            <input type="text" id="note" name="note" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
                         </div>
 
                         <div class="wrap btn">
-                            <input type="submit" class="save" id="btn" value="修改"/>
+                            <input type="submit" class="save" id="btn_update" value="修改"/>
                         </div>
                     </form>
                 </div>
@@ -280,21 +258,6 @@
                         },
 
                 });
-
-
-
-                // $.ajax({
-                //         url:'/index/Cwmanagement/out_excel',
-                //         type:'post',
-                //         data:{'data':num},
-                //         success:function (data) {
-                //             // console.log(data);
-                //             window.location.href = "http://www.li.com/index/Cwmanagement/ceshi";
-                //         },
-                //         error:function(error){
-                //             console.log('错误提示:' + error)
-                //         }
-                //     })
 
 			})
             //详细
@@ -350,38 +313,45 @@
             let check_all=[];
                 // 删除选中
                 $('#del').click(function(){
-                    var s=$("input:checkbox:checked");
-                    for (let i in s) {
-                        if(s[i].checked){
-                            check_all.push(s[i].value);
-                        }
+                    let list=$('.tbd').find("input:checkbox:checked");
+                    if(list.length === 0){
+                        layer.alert('请选择要删除的数据',{icon:5});
+                        return false;
                     }
-                    $.ajax({
-                        url:'/index/Cwmanagement/check_record_del',
-                        type:'post',
-                        data:{'check_all':check_all},
-                        success:function (data) {
-                            if(data.error==1){
-                                layer.alert(data.ts, {
-                                    icon: 6,
-                                    yes:function(){
-                                        location.href='/index/Cwmanagement/index';
-                                    }
-                                });
-                            }else{
-                                layer.alert(data.ts, {
-                                    icon: 6,
-                                    yes:function(){
-                                        location.href='/index/Cwmanagement/index';
-                                    }
-                                });
+                    else {
+                        for (let i in list) {
+                            if(list[i].checked){
+                                check_all.push(list[i].value);
                             }
-                            console.log(data);
-                        },
-                        error:function(error){
-                            console.log('错误提示:' + error)
                         }
-                    })
+                        $.ajax({
+                            url:'/index/Cwmanagement/check_record_del',
+                            type:'post',
+                            data:{'check_all':check_all},
+                            success:function (data) {
+                                if(data.error==1){
+                                    layer.alert(data.ts, {
+                                        icon: 6,
+                                        yes:function(){
+                                            location.href='/index/Cwmanagement/index';
+                                        }
+                                    });
+                                    sessionStorage.removeItem('session');
+                                }else{
+                                    layer.alert(data.ts, {
+                                        icon: 5,
+                                        yes:function(){
+                                            location.href='/index/Cwmanagement/index';
+                                        }
+                                    });
+                                }
+                                console.log(data);
+                            },
+                            error:function(error){
+                                console.log('错误提示:' + error)
+                            }
+                        })
+                    }
                 })
         </script>
 
@@ -400,7 +370,7 @@
             })
 
             let session=[];
-            $('.news_list').on('click','input[type=checkbox]',function () {
+            $('.new_list').on('click','input[type=checkbox]',function () {
                 let ses=JSON.parse(sessionStorage.getItem('session'));
                 session = ses === null ? [] : ses;
 
@@ -419,17 +389,20 @@
 
             $(function () {
                 let list = JSON.parse(sessionStorage.getItem('session'));
-                $('.news_list input[type=checkbox]').each(function () {
-                    if(list.includes($(this).val()) ){
-                        $(this).prop('checked',true);
-                    }
-                })
+                if(list != null){
+                    $('.new_list input[type=checkbox]').each(function () {
+                        if(list.includes($(this).val()) ){
+                            $(this).prop('checked',true);
+                        }
+                    })
+                }
             })
 
         $("#rukuorder").on("click",function(){
             var orders = sessionStorage.getItem('session');
             location.href = "/index/Rukuorder/index/id/"+orders;
         })
+
         </script>
 	</body>
 </html>

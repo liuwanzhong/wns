@@ -3,62 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="/images/index.css" />
+    <link rel="stylesheet" href="/layui/css/layui.css" />
+    <style>
+        .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
+        .submit{margin-left: 30px;margin-top: 30px;}
+        .container{display: block;overflow-x: hidden;height: 580px;}
+        .container::-webkit-scrollbar{width: 0;}
+        input[type="date"]::-webkit-inner-spin-button {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-<h1>入库单</h1>
-<form method="post" action="{:url('Rukuorder/insert')}">
-<p>装运单号:<input type="text" name="shipmentnum"></p>
-<p>入库日期:<input type="date" name="userintime"></p>
-<p>运输方式:<input type="text" name="transport"></p>
-<p>车牌号码:<input type="text" name="carid"></p>
-<p>装卸工:<input type="text" name="stevedore"></p>
-<p>入库仓库:<select name="ck_id" id="table" onchange="showtable(this.value)"><option value="0">请选择仓库</option>
-    <?php foreach($cks as $ck): ?>
-    <option value="<?=$ck['id']?>"><?=$ck['name']?></option>
-    <?php endforeach; ?>
-</select></p>
-<table class="table" border="1">
-    <tr>
-        <th>出库工厂</th>
-        <th>产品名称</th>
-        <th>入库状态</th>
-        <th>入库货位</th>
-        <th>实收数量</th>
-        <th>产品日期</th>
-        <th>产品批次</th>
-        <th>备注</th>
-        <th>毛重</th>
-        <th>净重</th>
-        <th>订单编号</th>
-    </tr>
-    {volist name='rows' id='v'}
-    <tr>
-        <input type="hidden" name="min" value="{$v.Grossweight}">
-        <input type="hidden" name="gross_min" value="{$v.netweight}">
-        <th><input type="text" value="{$v.transfers_factory}" name="transfers_factory[]" readonly></th>
-        <th><input type="text" value="{$v.material_name}" name="material_name[]" readonly></th>
-        <th class="status"><select name="status[]">
-            <option value="0">请选择入库状态</option>
-            <?php foreach($status as $statu): ?>
-            <option value="<?=$statu['id']?>"><?=$statu['title']?></option>
-            <?php endforeach ?>
-        </select></th>
-        <th class="huowei"><select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select></th>
-        <th><input type="number" value="{$v.countnum}" class="countnum" id="blur" name="nums[]"></th>
-        <th><input type="date" name="intime[]"></th>
-        <th><input type="text" name="storno[]" placeholder="请输入批次"></th>
-        <th><textarea name="content[]"></textarea></th>
-        <th><div class="groos"><input name="Grossweight[]" value="{$v.Grossweight}" readonly></div></th>
-        <th><div class="num"><input name="netweight[]" value="{$v.netweight}" readonly></div></th>
-        <th><input type="text" name="transfers_id[]" value="{$v.transfers_id}" readonly></th>
-    </tr>
-    {/volist}
-</table>
-    <input type="submit" value="提交">
-</form>
+<div class="note">
+    <div class="nav">
+        <span class="layui-breadcrumb">
+            <a href="/public/main.html" target="box">首页</a>
+            <a href="javascript:;">入库管理</a>
+            <a><cite>入库单</cite></a>
+        </span>
+    </div>
+
+    <form method="post" class="layui-form" action="{:url('Rukuorder/insert')}">
+        <div class="form_box">
+            <div class="layui-form-item">
+                <label class="layui-form-label">装运单号:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="shipmentnum" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">入库日期:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="userintime" autocomplete="off" class="layui-input" id="time">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">运输方式:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="transport" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">车牌号码:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="carid" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">装卸工:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="stevedore" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">入库仓库:</label>
+                <div class="layui-input-inline">
+                    <select name="ck_id" lay-filter="ck_id" id="table" onchange="showtable(this.value)">
+                        <option value="0">请选择仓库</option>
+                        <?php foreach($cks as $ck): ?>
+                        <option value="<?=$ck['id']?>"><?=$ck['name']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <table class="layui-table" style="width: 96%; margin: 12px auto;">
+                <thead>
+                    <tr>
+                        <th>出库工厂</th>
+                        <th>产品名称</th>
+                        <th>入库状态</th>
+                        <th>入库货位</th>
+                        <th>实收数量</th>
+                        <th>产品日期</th>
+                        <th>产品批次</th>
+                        <th>备注</th>
+                        <th>毛重</th>
+                        <th>净重</th>
+                        <th>订单编号</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                
+                <tbody class="tbd">
+                    {volist name='rows' id='v'}
+                    <tr>
+                        <input type="hidden" name="min" value="{$v.Grossweight}">
+                        <input type="hidden" name="gross_min" value="{$v.netweight}">
+                        <td>
+                            <input type="hidden" value="{$v.transfers_factory}" name="transfers_factory[]" readonly>
+                            {$v.transfers_factory}
+                        </td>
+                        <td>
+                            <input type="hidden" value="{$v.material_name}" name="material_name[]" readonly>
+                            {$v.material_name}
+                        </td>
+                        <td class="status">
+                            <select name="status[]">
+                                <option value="0">请选择</option>
+                                <?php foreach($status as $statu): ?>
+                                <option value="<?=$statu['id']?>"><?=$statu['title']?></option>
+                                <?php endforeach ?>
+                            </select>
+                        </td>
+                        <td class="huowei">
+                            <select name='huowei[]' class='showhuowei'>
+                                <option value='0'>请选择货位</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" value="{$v.countnum}" class="countnum layui-input" id="blur" name="nums[]">
+                        </td>
+                        <td><input type="date" name="intime[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd"></td>
+                        <td><input type="text" name="storno[]" class="layui-input" placeholder="请输入批次"></td>
+                        <td><textarea name="content[]" class="layui-textarea"></textarea></td>
+                        <td>
+                            <input type="hidden"class="groos" name="Grossweight[]" value="{$v.Grossweight}" readonly>
+                            {$v.Grossweight}
+                        </td>
+                        <td>
+                            <input type="hidden" class="num" name="netweight[]" value="{$v.netweight}" readonly>
+                            {$v.netweight}
+                        </td>
+                        <td>
+                            <input type="hidden" name="transfers_id[]" value="{$v.transfers_id}" readonly>
+                            {$v.transfers_id}
+                        </td>
+                        <td>
+                            <button type="button" class="layui-btn layui-btn-sm add">
+                                <i class="layui-icon">&#xe654;</i>
+                            </button>
+                        </td>
+                    </tr>
+                    {/volist}
+                </tbody>
+            </table>
+        </div>
+        
+        <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
+        <!-- <input type="submit" value="提交"> -->
+    </form>
+
+    
+</div>
+
 <script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/layui/layui.js"></script>
 <script type="text/javascript">
-    function showtable(){
+    layui.use(['element', 'form','laydate'], function () {
+        let element = layui.element;
+        let form = layui.form;
+        let laydate = layui.laydate;
+        laydate.render({
+            elem: '#time',
+            type: 'date'
+        })
+
+        $('.layui-table').on('click', '.add', function(){
+            let _tr = $(this).parents('tr');
+            let child = _tr[0].children;
+            let status = child[4].children[0];
+            let str = '';
+            for(let i = 0; i<status.length; i++){
+                str += `<option value="${status[i].value}">${status[i].text}</option>`
+            }
+            let html = `<tr>
+                            <input type="hidden" name="min" value="${child[0].value}">
+                            <input type="hidden" name="gross_min" value="${child[1].value}">
+                            <td>
+                                <input type="hidden" value="${child[2].innerText}" name="transfers_factory[]" readonly>
+                                ${child[2].innerText}
+                            </td>
+                            <td>
+                                <input type="hidden" value="${child[3].innerText}" name="material_name[]" readonly>
+                                ${child[3].innerText}
+                            </td>
+                            <td class="status">
+                                <select name="status[]" lay-filter="test">
+                                    ${str}
+                                </select>
+                            </td>
+                            <td class="huowei"><select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select></td>
+                            <td>
+                                <input type="number" value="0" class="countnum layui-input" id="blur" name="nums[]">
+                            </td>
+                            <td><input type="date" name="intime[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd"></td>
+                            <td><input type="text" name="storno[]" class="layui-input" placeholder="请输入批次"></td>
+                            <td><textarea name="content[]" class="layui-textarea"></textarea></td>
+                            <td>
+                                <input type="hidden"class="groos" name="Grossweight[]" value="0" readonly>
+                                
+                            </td>
+                            <td>
+                                <input type="hidden" class="num" name="netweight[]" value="0" readonly>
+                            </td>
+                            <td>
+                                <input type="hidden" name="transfers_id[]" value="${child[12].innerText}" readonly>
+                                ${child[12].innerText}
+                            </td>
+                            <td width="95px;">
+                                <button type="button" class="layui-btn layui-btn-sm add">
+                                    <i class="layui-icon">&#xe654;</i>
+                                </button>
+                                <button type="button" class="layui-btn layui-btn-sm remove">
+                                    <i class="layui-icon">&#xe640;</i>
+                                </button>
+                            </td>
+                        </tr>`;
+            $('.tbd').append(html);
+            form.render();
+
+        })
+        
+        form.on('select(ck_id)', function(data){
+            let id = data.elem.value;
+            if(id != 0){
+                $('.showhuowei').empty();
+                $.ajax({
+                    type: "get",//请求方式有post，get请求方式，这里是post请求
+                    url: '/index/table/show/id/' + id,//请求的方法的路径
+                    dataType: 'json',//请求参数的格式为json.另外还有text等
+                    success: function(data){
+                        var data = JSON.parse(data);
+                        console.log(data);
+                        $('.showhuowei').append("<option value='0'>请选择货位</option>");
+                        for (var i=0;i<data.length;i++)
+                        {
+                            $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
+                        }
+                        $(".forzentitle").val(data.title);
+                        $('.frozencount').val(data.goods_feel);
+                        $(".editfrozenid").val(data.id);
+                        form.render();
+                    }
+                })
+            }
+            
+        })
+    })
+
+    function showtable(val){
         var id=$('#table').val();
         $('.showhuowei').remove();
         if($('#table').val() != 0){
@@ -85,7 +272,10 @@
             console.log(111);
         })
     }
-    $('.countnum').blur(function () {
+    
+    // 修改商品数量
+    $('.tbd').on('blur', '.countnum', function(){
+        console.log(1)
         let parent =$(this).parents('tr');
         //净重
         let min = $(this).parents('tr').find('input[name=min]').val();
@@ -97,10 +287,18 @@
             data:{'min':min,'max':max,'groos_min':gross_min},
             success:function (data) {
                 console.log(data)
-                parent.find('.groos').children().val(data.groos)
-                parent.find('.num').children().val(data.number)
+                parent.find('.groos').val(data.groos)
+                parent.find('.num').val(data.number)
+                parent.find('.groos').parent().text(data.groos)
+                parent.find('.num').parent().text(data.number)
             }
         })
+    })
+    
+
+    $('.tbd').on('click','.remove', function(){
+        let p = $(this).parents('tr');
+        p.remove();
     })
 </script>
 </body>

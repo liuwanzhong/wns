@@ -43,6 +43,7 @@ class Cwmanagement extends Controller {
 
         $list = db('cw_management')
             -> where("$search")
+            ->where('is_del',0)
             -> order('id desc')
             -> paginate(100);
         return view("index", ['list' => $list, 'data' => $data]);
@@ -283,13 +284,14 @@ class Cwmanagement extends Controller {
 
     // 删除选中
     public function check_record_del() {
+        $time=time();
         $ms = $this -> qx();
         if ($ms == 0) {
             $this -> error('警告：越权操作');
         }
         $id = input('id');
         if (!empty($id)) {
-            $r = db('cw_management') -> where('id', $id) -> delete();
+            $r = db('cw_management') -> where('id', $id) -> update(['del_time'=>$time,'is_del'=>1]);
             if ($r) {
                 return redirect('cwmanagement/index');
             } else {
@@ -305,7 +307,7 @@ class Cwmanagement extends Controller {
             }
 
 
-            $r = db('cw_management') -> where("id in($da)") -> delete();
+            $r = db('cw_management') -> where("id in($da)") -> update(['del_time'=>$time,'is_del'=>1]);
             if ($r) {
                 $msg = ["error" => 1, 'ts' => "删除成功"];
             } else {
