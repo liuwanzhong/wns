@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="utf-8"/>
+	<title>新增权限</title>
+	<link rel="stylesheet" href="/images/css.css">
+	<link rel="stylesheet" href="/images/boot.css">
+	<link href="/images/index.css" type="text/css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
+	<style type="text/css">
+		.layui-table th{text-align: center;font-weight: bold;}
+		.layui-table td{text-align: center;}
+	</style>
+	</head>
+	<body>
+		<div class="note">
+			<div class="nav">
+				<span class="layui-breadcrumb">
+					<a href="/public/main.html" target="box">首页</a>
+					<a href="javascript:;">管理</a>
+					<a><cite>入库审核</cite></a>
+				</span>
+			</div>
+			<div class="seach">
+				<form action="{:url('Rukuorder/warehousing')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+					<div class="layui-form-item">
+						<label class="layui-form-label">工厂</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">时间</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="delivery_time" name="s_delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">单号</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-inline">
+							<button class="layui-btn save" lay-submit>查询</button>
+						</div>
+					</div>
+				</form>
+			</div>
+			<table class="layui-table" style="width: 96%; margin: 12px auto;">
+				<thead>
+				<tr>
+					<th>ID</th>
+					<th>审核</th>
+					<th>出库工厂</th>
+					<th>装运单号</th>
+					<th>仓库</th>
+					<th>入库日期</th>
+					<th>总数量</th>
+					<th>操作</th>
+				</tr>
+				</thead>
+				<tbody>
+				{volist name='rows' id='row'}
+				<tr>
+					<td>{$row.id}</td>
+					<td>已审核</td>
+					<td>{$row.x_name}</td>
+					<td>{$row.shipmentnum}</td>
+					<td>{$row.w_name}</td>
+					<td>{$row.userintime|date="Y-m-d",###}</td>
+					<td>{$row.count}</td>
+					<td>
+						<a href="#" class="edit xq">详情</a>
+						<a href="{:url('Rukuorder/warehousing_del','id='.$row.id)}">删除</a>
+					</td>
+				</tr>
+				{/volist}
+				</tbody>
+			</table>
+			<div style="text-align:center; margin-bottom: 200px;">
+				{$rows->render()}
+			</div>
+		</div>
+		<script src="/static/jquery-1.9.1.min.js"></script>
+		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/layui/layui.js"></script>
+		<script type="text/javascript">
+			//详情
+			$('.xq').on('click',function () {
+				let id=$(this).parents('tr').find('td').eq(0).text();
+				location.href='/index/Rukuorder/warehousing_show?id='+id;
+			})
+		</script>
+	</body>
+</html>
