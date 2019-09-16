@@ -6,12 +6,12 @@
 </head>
 <body>
 <h1>入库单</h1>
-<p>装运单号:<input type="text" name="shipmentnum" value="{$rows['shipmentnum']}"></p>
-<p>入库日期:<input type="text" name="userintime" value="{$rows.userintime|date='Y-m-d',###}"></p>
-<p>运输方式:<input type="text" name="transport" value="{$rows['transport']}"></p>
-<p>车牌号码:<input type="text" name="carid" value="{$rows['carid']}"></p>
-<p>装卸工:<input type="text" name="stevedore" value="{$rows['stevedore']}"></p>
-<p>仓库:<input type="text" name="stevedore" value="{$rows['w_name']}"></p>
+<p>装运单号:{$rows['shipmentnum']}</p>
+<p>入库日期:{$rows.userintime|date='Y-m-d',###}</p>
+<p>运输方式:{$rows['transport']}</p>
+<p>车牌号码:{$rows['carid']}</p>
+<p>装卸工:{$rows['stevedore']}</p>
+<p>仓库:{$rows['w_name']}</p>
 <table class="table" border="1">
     <tr>
         <th>出库工厂</th>
@@ -42,7 +42,6 @@
     </tr>
     {/volist}
 </table>
-<a href="{:url('Rukuorder/to_examine_yes','id='.$id)}">审核通过</a>
 <a href="{:url('Rukuorder/to_examine')}">返回</a>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script type="text/javascript">

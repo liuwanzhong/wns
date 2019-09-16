@@ -32,7 +32,7 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">调拨订单号</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="transfers_i" name="transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+                            <input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
                         </div>
                     </div>
                     <div class="layui-form-item">
@@ -44,7 +44,7 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">物料名</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="material_name" name="material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
+                            <input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
                         </div>
                     </div>
                     <div class="layui-form-item">
@@ -99,7 +99,6 @@
                 </div>
             </main>
         </div>
-
         <!-- 导入 -->
         <div class="model">
             <div class="head">
@@ -137,7 +136,7 @@
                         </div>
                         <div class="wrap">
                             <label>交货单实际出库日期</label>
-                            <input type="text" id="delivery_time" name="delivery_time" value="" required oninvalid="setCustomValidity('
+                            <input type="text" id="delivery_ti" name="delivery_time" value="" required oninvalid="setCustomValidity('
                             不能为空') oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
                         </div>
                         <div class="wrap">
@@ -280,22 +279,6 @@
                         },
 
                 });
-
-
-
-                // $.ajax({
-                //         url:'/index/Cwmanagement/out_excel',
-                //         type:'post',
-                //         data:{'data':num},
-                //         success:function (data) {
-                //             // console.log(data);
-                //             window.location.href = "http://www.li.com/index/Cwmanagement/ceshi";
-                //         },
-                //         error:function(error){
-                //             console.log('错误提示:' + error)
-                //         }
-                //     })
-
 			})
             //详细
 			$('.img_edit').on('click', function(){
@@ -315,7 +298,7 @@
                         $('#id').val(data.id)
 						$('#transfers_id').val(data.transfers_id)
 						$('#delivery_id').val(data.delivery_id)
-						$('#delivery_time').val(data.delivery_time)
+						$('#delivery_ti').val(data.delivery_time)
 						$('#transfers_factory').val(data.transfers_factory)
 						$('#material_name').val(data.material_name)
 						$('#production_time').val(data.production_time)

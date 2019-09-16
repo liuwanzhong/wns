@@ -21,7 +21,7 @@
     <tr>
         <th>出库工厂</th>
         <th>产品名称</th>
-        <th>入库状态</th>
+        <th>入库属性</th>
         <th>入库货位</th>
         <th>实收数量</th>
         <th>产品日期</th>
@@ -31,6 +31,7 @@
         <th>净重</th>
         <th>订单编号</th>
     </tr>
+    <input type="hidden" name="cd" value="{$id}">
     {volist name='rows' id='v'}
     <tr>
         <input type="hidden" name="min" value="{$v.Grossweight}">
@@ -54,7 +55,7 @@
     </tr>
     {/volist}
 </table>
-    <input type="submit" value="提交">
+    <input type="submit" value="提交" id="del">
 </form>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script type="text/javascript">
@@ -96,11 +97,14 @@
             url:'/index/Rukuorder/blur',
             data:{'min':min,'max':max,'groos_min':gross_min},
             success:function (data) {
-                console.log(data)
                 parent.find('.groos').children().val(data.groos)
                 parent.find('.num').children().val(data.number)
             }
         })
+    })
+    //生成时删除sessionstorage
+    $('#del').click(function () {
+        sessionStorage.removeItem('session')
     })
 </script>
 </body>

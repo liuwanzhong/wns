@@ -24,21 +24,26 @@
 			<div class="seach">
 				<form action="{:url('Rukuorder/warehousing')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
 					<div class="layui-form-item">
+						<label class="layui-form-label">日期</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+						</div>
+					</div>
+					<div class="layui-form-item">
 						<label class="layui-form-label">工厂</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+							<input type="text" class="layui-input" id="" name="s_delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
-						<label class="layui-form-label">时间</label>
+						<label class="layui-form-label">产品属性</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="delivery_time" name="s_delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
-						</div>
-					</div>
-					<div class="layui-form-item">
-						<label class="layui-form-label">单号</label>
-						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
+							<select name="s_material_name" id="">
+								<option value="0">---请选择产品属性---</option>
+								{volist name='status' id='st'}
+								<option value="{$st.id}">{$st.title}</option>
+								{/volist}
+							</select>
 						</div>
 					</div>
 					<div class="layui-form-item">
@@ -52,45 +57,43 @@
 				<thead>
 				<tr>
 					<th>ID</th>
-					<th>审核</th>
-					<th>出库工厂</th>
-					<th>装运单号</th>
-					<th>仓库</th>
-					<th>入库日期</th>
-					<th>总数量</th>
-					<th>操作</th>
+					<th>工厂</th>
+					<th>产品名称</th>
+					<th>入库属性</th>
+					<th>入库仓库</th>
+					<th>入库货位</th>
+					<th>入库时间</th>
+					<th>产品时间</th>
+					<th>数量</th>
+					<th>毛重</th>
+					<th>净重</th>
 				</tr>
 				</thead>
-				<tbody>
 				{volist name='rows' id='row'}
 				<tr>
 					<td>{$row.id}</td>
-					<td>已审核</td>
-					<td>{$row.x_name}</td>
-					<td>{$row.shipmentnum}</td>
+					<td>{$row.factory}</td>
+					<td>{$row.product_name}</td>
+					<td>{$row.k_name}</td>
 					<td>{$row.w_name}</td>
-					<td>{$row.userintime|date="Y-m-d",###}</td>
-					<td>{$row.count}</td>
-					<td>
-						<a href="#" class="edit xq">详情</a>
-						<a href="{:url('Rukuorder/warehousing_del','id='.$row.id)}">删除</a>
-					</td>
+					<td>{$row.c_name}</td>
+					<td>{$row.time|date="Y-m-d",###}</td>
+					<td>{$row.product_time}</td>
+					<td>{$row.rk_nums}</td>
+					<td>{$row.netweight}</td>
+					<td>{$row.Grossweight}</td>
 				</tr>
 				{/volist}
+				<tbody>
 				</tbody>
 			</table>
-			<div style="text-align:center; margin-bottom: 200px;">
-				{$rows->render()}
-			</div>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script type="text/javascript">
-			//详情
-			$('.xq').on('click',function () {
-				let id=$(this).parents('tr').find('td').eq(0).text();
-				location.href='/index/Rukuorder/warehousing_show?id='+id;
+			layui.use('form',function(){
+				let form = layui.form;
 			})
 		</script>
 	</body>
