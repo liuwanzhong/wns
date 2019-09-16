@@ -31,10 +31,13 @@
     <table class="layui-table" style="width: 96%; margin: 12px auto;">
         <thead>
             <tr>
-                <th>调拨订单号</th>
-                <th>货物名</th>
-                <th>总库存</th>
-                <th>生产日期</th>
+                <th>ID</th>
+                <th>装运单号</th>
+                <th>运输方式</th>
+                <th>运输车牌号</th>
+                <th>装卸工</th>
+                <th>仓库</th>
+                <th>入库日期</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -42,11 +45,14 @@
             {volist name='list' id='v'}
             <tr>
                 <td>{$v.id}</td>
-                <td>{$v.title}</td>
-                <td>{$v.count}</td>
-                <td><?php if($v['production_time'] == 0){echo '-';}else{echo date("y-m-d",$v['production_time']);}?></td>
+                <td>{$v.shipmentnum}</td>
+                <td>{$v.transport}</td>
+                <td>{$v.carid}</td>
+                <td>{$v.stevedore}</td>
+                <td>{$v.name}</td>
+                <td>{$v.userintime}</td>
                 <td style="width:300px">
-                    <a href="#" class="layui-btn layui-btn-sm shows">冻结<input type="hidden" name="myids" value="{$v.id}"></a>
+                    <a href="{:url('instor/show','id='.$v['id'])}" class="layui-btn layui-btn-sm shows">查看</a>
                     <a href="#" class="layui-btn layui-btn-sm frozens">解冻<input type="hidden" name="myids" value="{$v.id}"></a>
                     <a href="#" class="layui-btn layui-btn-sm layui-btn-normal edit">分配</a>
                     <a href="{:url('instor/delete','id='.$v['id'])}" class="layui-btn layui-btn-sm layui-btn-danger">删除</a>
@@ -85,33 +91,6 @@
     </div>
 </div>
 
-<div class="model modeleditcount">
-    <div class="head">
-        <span>冻结货物</span>
-        <a href="javascript:" class="close">×</a>
-    </div>
-    <div class="content">
-        <form action="{:url('instor/editfrozen')}" method="post">
-            <input type="hidden" name="editfrozenid" class="editfrozenid">
-            <div class="wrap">
-                <label>货物名称</label>
-                <input type="text" name="title" class="forzentitle" readonly>
-            </div>
-            <div class="wrap">
-                <label>可冻结数量</label>
-                <input type="number" name="goods_feel" class="frozencount"/>
-            </div>
-            <div class="wrap">
-                <label>冻结数量</label>
-                <input type="number" name="goods_frozen" placeholder="只能填数字" />
-            </div>
-            <div class="wrap btn">
-                <input type="submit" class="save" value="确定"/>
-                <input type="reset" class="reset" value="重置"/>
-            </div>
-        </form>
-    </div>
-</div>
 
 <div class="model modeleditfeelcount">
     <div class="head">
@@ -155,25 +134,6 @@
     })
     $('.close').on('click', function(){
         $('.modeladd').hide();
-    })
-    $('.shows').on('click', function() {
-        //从隐藏域中拿到userID
-        var id = $(this).children().val();
-        $.ajax({
-            type: "get",//请求方式有post，get请求方式，这里是post请求
-            url: '/index/instor/frozen/id/' + id,//请求的方法的路径
-            dataType: 'json',//请求参数的格式为json.另外还有text等
-            success: function(data){
-                var data = JSON.parse(data);
-                $(".forzentitle").val(data.title);
-                $('.frozencount').val(data.goods_feel);
-                $(".editfrozenid").val(data.id);
-            }
-        })
-        $('.modeleditcount').show();
-    })
-    $('.close').on('click', function(){
-        $('.modeleditcount').hide();
     })
 
     $('.frozens').on('click', function() {
@@ -257,6 +217,7 @@
         // $(this).removeClass('edit_rule');
         // $('.room_imgs').append(html);
     })
+
 
 </script>
 
