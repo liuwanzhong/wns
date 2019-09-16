@@ -11,6 +11,7 @@ class Cwmanagement extends Controller {
     // 仓储信息显示
     public function index() {
         $data = input();
+        // var_dump($data);exit;
         // 调拨订单号
         $search = '';
         if (!empty($data['s_transfers_id'])) {
@@ -40,12 +41,36 @@ class Cwmanagement extends Controller {
             }
             $search .= $material_name;
         }
-
+        // 工厂
+        if (!empty($data['factory'])) {
+            $factory = $data['factory'];
+            if (!empty($search)) {
+                $factory = ' and transfers_factory like ' . "'%" . $factory . '%' . "'";
+            } else {
+                $factory = ' transfers_factory like ' . "'%" . $factory . '%' . "'";
+            }
+            $search .= $factory;
+        }
+        // 未删除
+        if(!empty($search)){
+            $del='and is_del = 0';
+        }else{
+            $del='is_del = 0';
+        }
+        $search .= $del;
+        // 查询所有数据
         $list = db('cw_management')
             -> where("$search")
             -> order('id desc')
             -> paginate(100);
-        return view("index", ['list' => $list, 'data' => $data]);
+        // 查询工厂
+        $res = db('cw_management')
+            ->where('is_del',0)
+            ->field('transfers_factory as name')
+            ->group('transfers_factory')
+            ->select();
+        
+        return view("index", ['list' => $list, 'data' => $data,'res'=>$res]);
     }
 
     // 导入excel页面
@@ -64,7 +89,7 @@ class Cwmanagement extends Controller {
         //加载第三方类文件
         Loader ::import("PHPExcel.PHPExcel");
         //防止乱码
-        header("Content-type:text/html;charset=utf-8");
+        header("Content-type:application/vnd.ms-excel");
         //实例化主文件
         //$model = new \PHPExcel();
         //接收前台传过来的execl文件
@@ -107,7 +132,7 @@ class Cwmanagement extends Controller {
             $arr['transfers_into_net_weight']   = $v[20];//调拨入库净重
             $arr['note']                        = $v[21];//备注
             $arr['is_del']                      = 0;//软删除
-            $arr['state_time']                  = time();//创建时间
+            $arr['create_time']                  = time();//创建时间
             if (!empty($v[4])) {//无物料名数据不写入
                 $res[] = $arr;
             }
@@ -115,128 +140,10 @@ class Cwmanagement extends Controller {
         set_time_limit(0);
         $res = Db ::name('cw_management') -> insertAll($res);
         if ($res) {
-            echo "成功";
+            return redirect('cwmanagement/index');
         } else {
-            echo "失败";
+            $this -> error('添加失败');
         }
-    }
-
-    // 导出
-    public function out_excel() {
-
-        $xlsData = Db('cw_management')
-            ->where("id in (1,2)")
-            -> select();
-
-
-        Vendor('PHPExcel.PHPExcel');//调用类库,路径是基于vendor文件夹的
-        Vendor('PHPExcel.PHPExcel.Worksheet.Drawing');
-        Vendor('PHPExcel.PHPExcel.Writer.Excel2007');
-        $objExcel = new \PHPExcel();
-        //set document Property
-        $objWriter = \PHPExcel_IOFactory ::createWriter($objExcel, 'Excel2007');
-
-        $objActSheet = $objExcel -> getActiveSheet();
-        $key         = ord("A");
-        $letter      = explode(',', "A,B,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w");
-        $arrHeader   = array('id', '调拨订单号', '交付单号', '交货单实际出库日期', '调拨出库工厂', '物料名称', '生产日期', '装运类型', '集装箱号/车皮号', '在途净重', '在途毛重', '在途数量', '调出数量', '调拨入库时间', '调拨入库地点', '调拨出库地点', '调出毛重', '调出净重', '调拨入库工厂', '调拨入库数量', '调拨入库毛重', '调拨入库净重', '备注');
-        //填充表头信息
-        $lenth = count($arrHeader);
-        for ($i = 0; $i < $lenth; $i++) {
-            $objActSheet -> setCellValue("$letter[$i]1", "$arrHeader[$i]");
-        };
-        //填充表格信息
-        foreach ($xlsData as $k => $v) {
-            $k += 2;
-            $objActSheet -> setCellValue('A' . $k, $v['id']);
-            $objActSheet -> setCellValue('B' . $k, $v['transfers_id']);
-            $objActSheet -> setCellValue('C' . $k, $v['delivery_id']);
-            $objActSheet -> setCellValue('D' . $k, $v['delivery_time']);
-            $objActSheet -> setCellValue('E' . $k, $v['transfers_factory']);
-            $objActSheet -> setCellValue('F' . $k, $v['material_name']);
-            $objActSheet -> setCellValue('G' . $k, $v['production_time']);
-            $objActSheet -> setCellValue('H' . $k, $v['transport_type']);
-            $objActSheet -> setCellValue('I' . $k, $v['container_id']);
-            $objActSheet -> setCellValue('J' . $k, $v['zt_net_weight']);
-            $objActSheet -> setCellValue('K' . $k, $v['zt_Gross_weight']);
-            $objActSheet -> setCellValue('L' . $k, $v['zt_num']);
-            $objActSheet -> setCellValue('M' . $k, $v['Bring_up_num']);
-            $objActSheet -> setCellValue('N' . $k, $v['transfers_into_time']);
-            $objActSheet -> setCellValue('O' . $k, $v['transfers_into_addres']);
-            $objActSheet -> setCellValue('P' . $k, $v['transfers_out']);
-            $objActSheet -> setCellValue('Q' . $k, $v['Bring_up_Gross_weight']);
-            $objActSheet -> setCellValue('R' . $k, $v['Bring_up_net_weight']);
-            $objActSheet -> setCellValue('S' . $k, $v['transfers_into_factory']);
-            $objActSheet -> setCellValue('T' . $k, $v['transfers_into_num']);
-            $objActSheet -> setCellValue('U' . $k, $v['transfers_into_Gross_weight']);
-            $objActSheet -> setCellValue('V' . $k, $v['transfers_into_net_weight']);
-            $objActSheet -> setCellValue('W' . $k, $v['note']);
-            // 表格高度
-            $objActSheet -> getRowDimension($k) -> setRowHeight(20);
-        }
-
-        $width = array(10, 15, 20, 25, 30);
-        //设置表格的宽度
-            $objActSheet -> getColumnDimension('A') -> setWidth($width[1]);
-            $objActSheet -> getColumnDimension('B') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('C') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('D') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('E') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('F') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('G') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('H') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('I') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('J') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('K') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('L') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('M') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('N') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('O') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('P') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('Q') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('R') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('S') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('T') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('U') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('V') -> setWidth($width[2]);
-            $objActSheet -> getColumnDimension('W') -> setWidth($width[2]);
-
-
-            $objPHPExcel->getActiveSheet()->setTitle('qwe');
-            $objPHPExcel->setActiveSheetIndex(0);
-            $filename=urlencode('qwe');
-           //  $objPHPExcel->getActiveSheet()->setTitle('三年级2班');
-           //  $objPHPExcel->setActiveSheetIndex(0);
-           //  $filename=date('Y-m-dHis');
-           //生成xlsx文件
-           header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-           header('Content-Disposition: attachment;filename="'.$filename.'.xlsx"');
-           header('Cache-Control: max-age=0');
-           $objWriter=PHPExcel_IOFactory::createWriter($objPHPExcel,'Excel2007');
-           //生成xls文件
-           //  header('Content-Type: application/vnd.ms-excel');
-           //  header('Content-Disposition: attachment;filename="'.$filename.'.xls"');
-           //  header('Cache-Control: max-age=0');
-           //  $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-           //生成xlsx文件并存入当前文件目录
-            function saveExcelToLocalFile($objWriter,$filename){
-               // make sure you have permission to write to directory
-               $filePath = 'tmp/'.$filename.'.xlsx';
-               $objWriter->save($filePath);
-               return $filePath;
-           }
-           //返回已经存好的文件目录地址提供下载
-            $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
-            $response = array(
-                'success' => true,
-                'url' => saveExcelToLocalFile($objWriter,$filename)
-            );
-            echo json_encode($response);exit;
-    }
-
-    // 记录审核
-    public function record_audit($id) {
-
     }
 
     // 详细信息回显

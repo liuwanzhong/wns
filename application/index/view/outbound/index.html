@@ -29,88 +29,51 @@
                 <button type="button" class="layui-btn" id="dialog">导入excel表</button>
                 <a href="{:url('Cwmanagement/clink')}" class="layui-btn" id="clink">清除数据</a>
                 <button type="button" class="layui-btn" id="del">删除</button>
-                <input type="button" value="生成入库单" id="rukuorder"/>
-            </div>
-            <div class="seach">
-                <form action="{:url('Cwmanagement/index')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">调拨订单号</label>
-                        <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="transfers_i" name="transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
-                        </div>
-                    </div>
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">时间</label>
-                        <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="delivery_time" name="delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
-                        </div>
-                    </div>
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">物料名</label>
-                        <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="material_name" name="material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
-                        </div>
-                    </div>
-                    <div class="layui-inline">
-                        <label class="layui-form-label">工厂</label>
-                        <div class="layui-input-inline">
-                          <select name="factory" id="factory">
-							<option value="">请选择</option>
-                            {volist name='res' id='r'}
-							<option value="{$r['name']}">{$r['name']}</option>
-							{/volist}
-                          </select>
-                        </div>
-                    </div>
-                    <div class="layui-form-item">
-                        <div class="layui-input-inline">
-                            <button class="layui-btn save" lay-submit id="btn">查询</button>
-                        </div>
-                    </div>
-                 </form>
             </div>
             <main class="bd_content">
                 <table class="layui-table" style="width: 96%;margin: 12px auto;">
                     <thead>
                     <tr>
-                        <th><input type="checkbox" id="all"></th>
-                        <th>调拨订单编号</th>
+                        <th>发货日期</th>
+                        <th>工厂编号</th>
+                        <th>工厂名</th>
+                        <th>装运单号</th>
+                        <th>交货单号</th>
+                        <th>售达方代码</th>
+                        <th>售达方名称</th>
+                        <th>送达方代码</th>
+                        <th>送达方名称</th>
+                        <th>物料代码</th>
                         <th>物料名</th>
-                        <th>调拨出库工厂</th>
-                        <th>生产日期</th>
-                        <th>调出数量</th>
-                        <th>调拨入库日期</th>
-                        <th>调拨入库数量</th>
-                        <th>净重</th>
-                        <th>操作</th>
+                        <th>交货数量</th>
+                        <th>详细批次</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {if condition="!empty($list)"}
-                    {volist name='list' id='r'}
-                    <tr id="check" class="news_list">
-                        <input type="hidden" name="id" value="{$r.id}">
-                        <td><input type="checkbox" value="{$r.id}"></td>
-                        <td>{$r.transfers_id}</td>
-                        <td>{$r.material_name}</td>
-                        <td>{$r.transfers_factory}</td>
-                        <td><?php if($r['production_time']!=0){echo date("Y/m/d",$r['production_time']);}?></td>
-                        <td>{$r.Bring_up_num}</td>
-                        <td><?php if($r['transfers_into_time']!=0){echo date("Y/m/d",$r['transfers_into_time']);}?></td>
-                        <td>{$r.transfers_into_num}</td>
-                        <td>{$r.Bring_up_net_weight}</td>
-                        <td>
-                            <a href="#" class="img_edit">详细</a>
-                            <a href="{:url('Cwmanagement/check_record_del','id='.$r.id)}" class="">删除</a>
-
-                        </td>
-                    </tr>
-                    {/volist}
-                    {/if}
+                        {if condition="!empty($list)"}
+                        {volist name='list' id='r'}
+                        <tr id="check" class="news_list">
+                            <input type="hidden" name="id" value="{$r.id}">
+                            <td><?php if($r['delivery_time']!=0){echo date("Y/m/d",$r['delivery_time']);}?></td>
+                            <td>{$r.factory_id}</td>
+                            <td>{$r.factory_name}</td>
+                            <td>{$r.transport_id}</td>
+                            <td>{$r.Delivery_id}</td>
+                            <td>{$r.reachout_id}</td>
+                            <td>{$r.reachout_name}</td>
+                            <td>{$r.reachby_id}</td>
+                            <td>{$r.reachby_name}</td>
+                            <td>{$r.material_id}</td>
+                            <td>{$r.material_name}</td>
+                            <td>{$r.Delivery_num}</td>
+                            <td>{$r.detailed}</td>
+                        </tr>
+                        {/volist}
+                        {/if}
                     </tbody>
                 </table>
                 <div style="text-align:center; margin-bottom: 200px;">
-                    {$list->render()}
+                        {$list->render()}
                 </div>
             </main>
         </div>
@@ -122,7 +85,7 @@
                 <a href="javascript:" class="close">×</a>
             </div>
             <div class="content">
-                <form action="{:url('Cwmanagement/upload_excel')}" method="post" enctype="multipart/form-data">
+                <form action="{:url('Outbound/upload_excel')}" method="post" enctype="multipart/form-data">
                     <div class="wrap">
                         <input type="file" name="file" value="" required oninvalid="setCustomValidity('
                             不能为空') oninput="setCustomValidity('')"/>
@@ -263,107 +226,7 @@
 			$('.close').on('click', function(){
 				$('.model').hide();
             })
-            //详细
-			$('.img_edit').on('click', function(){
-				$('.model_edit').show();
-			})
-            $('.close_edit').on('click', function(){
-				$('.model_edit').hide();
-			})
-            //详细回显
-			$('.img_edit').click(function(){
-				let val = $(this).parents('tr').find('input[type=hidden]').val();
-				$.ajax({
-					url:'/index/Cwmanagement/record_edit',
-					type:'post',
-					data:{'id':val},
-					success:function(data){
-                        $('#id').val(data.id)
-						$('#transfers_id').val(data.transfers_id)
-						$('#delivery_id').val(data.delivery_id)
-						$('#delivery_time').val(data.delivery_time)
-						$('#transfers_factory').val(data.transfers_factory)
-						$('#material_name').val(data.material_name)
-						$('#production_time').val(data.production_time)
-						$('#transport_type').val(data.transport_type)
-						$('#container_id').val(data.container_id)
-						$('#zt_net_weight').val(data.zt_net_weight)
-						$('#zt_Gross_weight').val(data.zt_Gross_weight)
-						$('#zt_num').val(data.zt_num)
-						$('#Bring_up_num').val(data.Bring_up_num)
-						$('#transfers_into_time').val(data.transfers_into_time)
-						$('#transfers_into_addres').val(data.transfers_into_addres)
-						$('#transfers_out').val(data.transfers_out)
-						$('#Bring_up_Gross_weight').val(data.Bring_up_Gross_weight)
-						$('#Bring_up_net_weight').val(data.Bring_up_net_weight)
-						$('#transfers_into_factory').val(data.transfers_into_factory)
-						$('#transfers_into_num').val(data.transfers_into_num)
-						$('#transfers_into_Gross_weight').val(data.transfers_into_Gross_weight)
-						$('#transfers_into_net_weight').val(data.transfers_into_net_weight)
-					}
-				})
-            })
-            //全选或全不选
-            $("#all").click(function(){
-                if(this.checked){
-                $("#check :checkbox,#all").prop("checked", true);
-                }else{
-                $("#check :checkbox,#all").prop("checked", false);
-                }
-            });
-
-            let check_all=[];
-                // 删除选中
-                $('#del').click(function(){
-                    var s=$("input:checkbox:checked");
-                    for (let i in s) {
-                        if(s[i].checked){
-                            check_all.push(s[i].value);
-                        }
-                    }
-                    $.ajax({
-                        url:'/index/Cwmanagement/check_record_del',
-                        type:'post',
-                        data:{'check_all':check_all},
-                        success:function (data) {
-                            if(data.error==1){
-                                layer.alert(data.ts, {
-                                    icon: 6,
-                                    yes:function(){
-                                        location.href='/index/Cwmanagement/index';
-                                    }
-                                });
-                            }else{
-                                layer.alert(data.ts, {
-                                    icon: 6,
-                                    yes:function(){
-                                        location.href='/index/Cwmanagement/index';
-                                    }
-                                });
-                            }
-                            console.log(data);
-                        },
-                        error:function(error){
-                            console.log('错误提示:' + error)
-                        }
-                    })
-                })
-        </script>
-
-        <!-- 时间选择 -->
-        <script>
-            layui.use(['element','laydate'], function(){
-                var laydate = layui.laydate;
-                var element = layui.element;
-                laydate.render({
-                    elem: '#s_delivery_time'
-                    ,range: '~'
-                    ,done: function(value){
-                        $('#s_delivery_time').val(value)
-                    }
-                });
-            })
-
+            
             let session=[];
             $('.news_list').on('click','input[type=checkbox]',function () {
                 let ses=JSON.parse(sessionStorage.getItem('session'));
