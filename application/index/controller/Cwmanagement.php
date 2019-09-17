@@ -53,9 +53,9 @@ class Cwmanagement extends Controller {
         }
         // 未删除
         if(!empty($search)){
-            $del='and is_del = 0';
+            $del=' and is_del = 0';
         }else{
-            $del='is_del = 0';
+            $del=' is_del = 0';
         }
         $search .= $del;
         // 查询所有数据
@@ -179,6 +179,10 @@ class Cwmanagement extends Controller {
             $this -> error('警告：越权操作');
         }
         $data = input();
+        $data['transfers_into_time'] = strtotime($data['transfers_into_time']);
+        $data['delivery_time'] = strtotime($data['delivery_time']);
+        $data['production_time'] = strtotime($data['production_time']);
+        $data['updata_time'] = time();
         unset($data['/index/cwmanagement/record_update_html']);
         $r = db('cw_management') -> where('id', $id) -> update($data);
         if ($r) {
@@ -228,7 +232,7 @@ class Cwmanagement extends Controller {
     public function clink() {
         $time = time();
         $res  = db('cw_management')
-            -> where("state_time <= ($time-15552000) and is_del = 1")
+            -> where("create_time <= ($time-15552000) and is_del = 1")
             -> delete();
         if ($res) {
             return redirect('cwmanagement/index');
