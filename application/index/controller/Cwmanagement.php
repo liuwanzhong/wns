@@ -53,14 +53,15 @@ class Cwmanagement extends Controller {
         }
         // 未删除
         if(!empty($search)){
-            $del='and is_del = 0';
+            $del=' and is_del = 0';
         }else{
-            $del='is_del = 0';
+            $del=' is_del = 0';
         }
         $search .= $del;
         // 查询所有数据
         $list = db('cw_management')
             -> where("$search")
+            ->where('is_del',0)
             -> order('id desc')
             -> paginate(100);
         // 查询工厂
@@ -69,7 +70,7 @@ class Cwmanagement extends Controller {
             ->field('transfers_factory as name')
             ->group('transfers_factory')
             ->select();
-        
+
         return view("index", ['list' => $list, 'data' => $data,'res'=>$res]);
     }
 
@@ -190,13 +191,14 @@ class Cwmanagement extends Controller {
 
     // 删除选中
     public function check_record_del() {
+        $time=time();
         $ms = $this -> qx();
         if ($ms == 0) {
             $this -> error('警告：越权操作');
         }
         $id = input('id');
         if (!empty($id)) {
-            $r = db('cw_management') -> where('id', $id) -> delete();
+            $r = db('cw_management') -> where('id', $id) -> update(['del_time'=>$time,'is_del'=>1]);
             if ($r) {
                 return redirect('cwmanagement/index');
             } else {
@@ -211,8 +213,8 @@ class Cwmanagement extends Controller {
                 $da = mb_substr($da, 3);
             }
 
-
-            $r = db('cw_management') -> where("id in($da)") -> delete();
+            $time=time();
+            $r = db('cw_management') -> where("id in($da)") -> update(['del_time'=>$time,'is_del'=>1]);
             if ($r) {
                 $msg = ["error" => 1, 'ts' => "删除成功"];
             } else {
@@ -224,11 +226,15 @@ class Cwmanagement extends Controller {
     }
     // 清除6个月的信息
     public function clink() {
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
         $time = time();
         $res  = db('cw_management')
-            -> where("state_time <= ($time-15552000) and is_del = 1")
+            -> where("del_time <= ($time-15552000) and is_del = 1")
             -> delete();
-        if ($res) {
+        if ($res!==false) {
             return redirect('cwmanagement/index');
         } else {
             $this -> error('删除失败');

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>入库单</h1>
+<p>装运单号:{$rows['shipmentnum']}</p>
+<p>入库日期:{$rows.userintime|date='Y-m-d',###}</p>
+<p>运输方式:{$rows['transport']}</p>
+<p>车牌号码:{$rows['carid']}</p>
+<p>装卸工:{$rows['stevedore']}</p>
+<p>仓库:{$rows['w_name']}</p>
+<table class="table" border="1">
+    <tr>
+        <th>出库工厂</th>
+        <th>产品名称</th>
+        <th>产品属性</th>
+        <th>入库货位</th>
+        <th>实收数量</th>
+        <th>产品日期</th>
+        <th>产品批次</th>
+        <th>备注</th>
+        <th>毛重</th>
+        <th>净重</th>
+        <th>订单编号</th>
+    </tr>
+    {volist name='cats' id='ca'}
+    <tr>
+        <td>{$ca.factory}</td>
+        <td>{$ca.product_name}</td>
+        <td>{$ca.w_name}</td>
+        <td>{$ca.c_name}</td>
+        <td>{$ca.rk_nums}</td>
+        <td>{$ca.product_time}</td>
+        <td>{$ca.product_batch}</td>
+        <td>{$ca.content}</td>
+        <td>{$ca.netweight}</td>
+        <td>{$ca.Grossweight}</td>
+        <td>{$ca.transfers_id}</td>
+    </tr>
+    {/volist}
+</table>
+<a href="{:url('Rukuorder/to_examine')}">返回</a>
+<script src="/static/jquery-1.9.1.min.js"></script>
+<script type="text/javascript">
+</script>
+</body>
+</html>

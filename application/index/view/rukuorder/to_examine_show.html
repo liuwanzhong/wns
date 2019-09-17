@@ -6,22 +6,25 @@
 </head>
 <body>
 <h1>入库单</h1>
-<form method="post" action="{:url('Rukuorder/insert')}">
-<p>装运单号:<input type="text" name="shipmentnum"></p>
-<p>入库日期:<input type="date" name="userintime"></p>
-<p>运输方式:<input type="text" name="transport"></p>
-<p>车牌号码:<input type="text" name="carid"></p>
-<p>装卸工:<input type="text" name="stevedore"></p>
-<p>入库仓库:<select name="ck_id" id="table" onchange="showtable(this.value)"><option value="0">请选择仓库</option>
-    <?php foreach($cks as $ck): ?>
-    <option value="<?=$ck['id']?>"><?=$ck['name']?></option>
-    <?php endforeach; ?>
-</select></p>
+<form method="post" action="{:url('Rukuorder/to_examine_up')}">
+    <input type="hidden" name="id" value="{$rows['id']}">
+    <p>装运单号:<input type="text" name="shipmentnum" value="{$rows['shipmentnum']}"></p>
+    <p>入库日期:<input type="text" name="userintime" value="{$rows.userintime|date='Y-m-d',###}"></p>
+    <p>运输方式:<input type="text" name="transport" value="{$rows['transport']}"></p>
+    <p>车牌号码:<input type="text" name="carid" value="{$rows['carid']}"></p>
+    <p>装卸工:<input type="text" name="stevedore" value="{$rows['stevedore']}"></p>
+    <p>入库仓库:
+    <select name="ck_id" id="table" onchange="showtable(this.value)"><option value="0">请选择仓库</option>
+        <?php foreach($cks as $ck): ?>
+        <option value="<?=$ck['id']?>"><?=$ck['name']?></option>
+        <?php endforeach; ?>
+    </select>
+</p>
 <table class="table" border="1">
     <tr>
         <th>出库工厂</th>
         <th>产品名称</th>
-        <th>入库属性</th>
+        <th>产品属性</th>
         <th>入库货位</th>
         <th>实收数量</th>
         <th>产品日期</th>
@@ -31,31 +34,34 @@
         <th>净重</th>
         <th>订单编号</th>
     </tr>
-    <input type="hidden" name="cd" value="{$id}">
-    {volist name='rows' id='v'}
+    {volist name='cats' id='v'}
     <tr>
-        <input type="hidden" name="min" value="{$v.j}">
-        <input type="hidden" name="gross_min" value="{$v.m}">
-        <th><input type="text" value="{$v.transfers_factory}" name="transfers_factory[]" readonly></th>
-        <th><input type="text" value="{$v.material_name}" name="material_name[]" readonly></th>
-        <th class="status"><select name="status[]">
-            <option value="0">请选择入库状态</option>
-            <?php foreach($status as $statu): ?>
-            <option value="<?=$statu['id']?>"><?=$statu['title']?></option>
-            <?php endforeach ?>
-        </select></th>
+        <input type="hidden" name="min" value="{$v.Grossweight}">
+        <input type="hidden" name="cd[]" value="{$v.id}">
+        <input type="hidden" name="gross_min" value="{$v.netweight}">
+        <th><input type="text" value="{$v.factory}" name="transfers_factory[]" readonly></th>
+        <th><input type="text" value="{$v.product_name}" name="material_name[]" readonly></th>
+        <th class="status">
+            <select name="status[]">
+                <option value="0">请选择产品属性</option>
+                <?php foreach($status as $statu): ?>
+                <option value="<?=$statu['id']?>" <?php if($v['rk_status_id']==$statu['id']){echo 'selected';} ?>><?=$statu['title']?></option>
+                <?php endforeach ?>
+            </select>
+        </th>
         <th class="huowei"><select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select></th>
-        <th><input type="number" value="{$v.countnum}" class="countnum" id="blur" name="nums[]"></th>
+        <th><input type="number" value="{$v.rk_nums}" class="countnum" id="blur" name="nums[]"></th>
         <th><input type="date" name="intime[]"></th>
         <th><input type="text" name="storno[]" placeholder="请输入批次"></th>
-        <th><textarea name="content[]"></textarea></th>
+        <th><textarea name="content[]">{$v.content}</textarea></th>
         <th><div class="groos"><input name="Grossweight[]" value="{$v.Grossweight}" readonly></div></th>
         <th><div class="num"><input name="netweight[]" value="{$v.netweight}" readonly></div></th>
         <th><input type="text" name="transfers_id[]" value="{$v.transfers_id}" readonly></th>
     </tr>
     {/volist}
 </table>
-<input type="submit" value="提交">
+    <input type="submit" value="提交" id="del">
+    <a href="{:url('Rukuorder/to_examine')}">返回</a>
 </form>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script type="text/javascript">
@@ -86,27 +92,6 @@
             console.log(111);
         })
     }
-    $('.countnum').blur(function () {
-        let parent =$(this).parents('tr');
-        //净重
-        let min = $(this).parents('tr').find('input[name=gross_min]').val();
-        //毛重
-        let gross_min = $(this).parents('tr').find('input[name=min]').val();
-        let max = $(this).val()
-        console.log("毛重:"+gross_min,'净重'+min,'数量'+max);
-        $.ajax({
-            url:'/index/Rukuorder/blur',
-            data:{'min':min,'max':max,'groos_min':gross_min},
-            success:function (data) {
-                parent.find('.groos').children().val(data.number)
-                parent.find('.num').children().val(data.groos)
-            }
-        })
-    })
-    //生成时删除sessionstorage
-    $('#del').click(function () {
-        sessionStorage.removeItem('session')
-    })
 </script>
 </body>
 </html>

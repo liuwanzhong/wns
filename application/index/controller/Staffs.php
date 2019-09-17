@@ -61,6 +61,10 @@ class Staffs extends Controller {
         if($id==1){
             $this->error('警告--越权操作,超级管理员不能删除');
         }
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $r=db('staffs')->where('id',$id)->update(['is_del'=>0]);
         if($r){
             return redirect('staffs');
