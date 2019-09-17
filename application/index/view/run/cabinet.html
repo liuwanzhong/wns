@@ -40,8 +40,8 @@
 						<td>{$row['w_name']}</td>
 						<td>{$row['state_time']}</td>
 						<td>
-							<a href="#" class="edit ks">编辑</a>
-							<a href="{:url('Run/warehouse_del','id='.$row['id'])}">删除</a>
+							<a href="#" class="edit ks" title="编辑"><i class="ico">&#xe619;</i></a>
+							<a href="{:url('Run/warehouse_del','id='.$row['id'])}" title="删除"><i class="ico">&#xe605;</i></a>
 						</td>
 					</tr>
 				{/volist}

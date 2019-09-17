@@ -43,8 +43,8 @@
                 <td>{$v.content}</td>
                 <td>{$v.create_time}</td>
                 <td style="width:300px">
-                    <a href="#" class="layui-btn layui-btn-sm layui-btn-normal edits">编辑<input type="hidden" name="myids" value="{$v.id}"></a>
-                    <a href="{:url('Run/delete','id='.$v['id'])}" class="layui-btn layui-btn-sm layui-btn-danger">删除</a>
+                    <a href="#" class="edits" title="编辑" style="margin-right: 15px;"><i class="ico">&#xe619;</i><input type="hidden" name="myids" value="{$v.id}"></a>
+                    <a href="{:url('Run/delete','id='.$v['id'])}" class="" title="删除"><i class="ico">&#xe605;</i></a>
                 </td>
             </tr>
             {/volist}

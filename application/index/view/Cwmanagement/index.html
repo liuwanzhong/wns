@@ -8,13 +8,9 @@
         <link href="/images/index.css" type="text/css" rel="stylesheet"/>
         <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
         <style>
+            .search{margin-top: 20px;margin-left: 30px;}
+            .search .layui-form-label{width: auto;}
 
-            .seach{margin-top: 20px;margin-left: 30px;}
-            .seach .layui-form-label{width: auto;}
-            
-            #factory{
-                display: block;
-            }
         </style>
 	</head>
 	<body>
@@ -23,7 +19,7 @@
 				<span class="layui-breadcrumb">
 					<a href="/public/main.html" target="box">首页</a>
 					<a href="javascript:;">入库管理</a>
-					<a><cite>库存列表</cite></a>
+					<a><cite>在途台账</cite></a>
 				</span>
             </div>
             <div class="handle">
@@ -31,7 +27,6 @@
                 <a href="{:url('Cwmanagement/clink')}" class="layui-btn" id="clink">清除数据</a>
                 <button type="button" class="layui-btn" id="del">删除</button>
                 <button type="button" class="layui-btn" id="rukuorder">生成入库单</button>
-<!--                <input type="button" value="生成入库单" id="rukuorder"/>-->
             </div>
             <div class="search">
                 <form action="{:url('Cwmanagement/index')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
@@ -53,7 +48,7 @@
                             <input type="text" class="layui-input" id="s_material_name" name="s-material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
                         </div>
                     </div>
-                    <div class="layui-inline">
+                    <div class="layui-form-item">
                         <label class="layui-form-label">工厂</label>
                         <div class="layui-input-inline">
                           <select name="factory" id="factory">
@@ -102,8 +97,8 @@
                         <td>{$r.transfers_into_num}</td>
                         <td>{$r.Bring_up_net_weight}</td>
                         <td>
-                            <a href="#" class="img_edit">详细</a>
-                            <a href="{:url('Cwmanagement/check_record_del','id='.$r.id)}" class="">删除</a>
+                            <a href="#" class="img_edit" title="详细" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
+                            <a href="{:url('Cwmanagement/check_record_del','id='.$r.id)}" class="" title="删除"><i class="ico">&#xe605;</i></a>
                         </td>
                     </tr>
                     {/volist}
@@ -284,10 +279,17 @@
             })
             //全选或全不选
             $("#all").click(function(){
+                let arr = [];
                 if(this.checked){
-                $("#check :checkbox,#all").prop("checked", true);
+                    $("#check :checkbox,#all").prop("checked", true);
+                    let checks = $('.tbd ').find('input:checkbox');
+                    checks.each(function () {
+                        arr.push($(this)[0].value);
+                    })
+                    sessionStorage.setItem('session',JSON.stringify(arr));
                 }else{
-                $("#check :checkbox,#all").prop("checked", false);
+                    $("#check :checkbox,#all").prop("checked", false);
+                    sessionStorage.removeItem('session');
                 }
             });
 
@@ -338,9 +340,10 @@
 
         <!-- 时间选择 -->
         <script>
-            layui.use(['element','laydate'], function(){
+            layui.use(['element','laydate','form'], function(){
                 var laydate = layui.laydate;
                 var element = layui.element;
+                let form = layui.form;
                 laydate.render({
                     elem: '#s_delivery_time'
                     ,range: '~'
@@ -351,7 +354,7 @@
             })
 
             let session=[];
-            $('.new_list').on('click','input[type=checkbox]',function () {
+            $('.tbd').on('click','input[type=checkbox]',function () {
                 let ses=JSON.parse(sessionStorage.getItem('session'));
                 session = ses === null ? [] : ses;
                 if($(this)[0].checked == true){
