@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="utf-8"/>
+        <meta charset="UTF-8">
 		<title>后台管理系统</title>
 		<link rel="stylesheet" href="/images/css.css">
         <link rel="stylesheet" href="/images/boot.css">
@@ -125,7 +125,7 @@
             <div class="content">
                 <form action="{:url('Cwmanagement/upload_excel')}" method="post" enctype="multipart/form-data">
                     <div class="wrap">
-                        <input type="file" name="file" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                        <input type="file" name="file" value="" />
                         <input type="submit" class="save" id="btn" value="确定"/>
                     </div>
                 </form>
@@ -142,87 +142,87 @@
                         <input type="hidden" name="id" id="id">
                         <div class="wrap">
                             <label>调拨订单号</label>
-                            <input type="text" id="transfers_id" name="transfers_id" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_id" name="transfers_id" value="" />
                         </div>
                         <div class="wrap">
                             <label>交付单号</label>
-                            <input type="text" id="delivery_id" name="delivery_id" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="delivery_id" name="delivery_id" value="" />
                         </div>
                         <div class="wrap">
                             <label>交货单实际出库日期</label>
-                            <input type="text" id="delivery_time" name="delivery_time" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
+                            <input type="text" id="delivery_time" name="delivery_time" value=""  placeholder="xxxx/x/x"/>
                         </div>
                         <div class="wrap">
                             <label>调拨出库工厂</label>
-                            <input type="text" id="transfers_factory" name="transfers_factory" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_factory" name="transfers_factory" value="" />
                         </div>
                         <div class="wrap">
                             <label>物料名称</label>
-                            <input type="text" id="material_name" name="material_name" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="material_name" name="material_name" value="" />
                         </div>
                         <div class="wrap">
                             <label>生产日期</label>
-                            <input type="text" id="production_time" name="production_time" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
+                            <input type="text" id="production_time" name="production_time" value=""  placeholder="xxxx/x/x"/>
                         </div>
                         <div class="wrap">
                             <label>装运类型</label>
-                            <input type="text" id="transport_type" name="transport_type" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="transport_type" name="transport_type" value="" />
                         </div>
                         <div class="wrap">
                             <label>集装箱号/车皮号</label>
-                            <input type="text" id="container_id" name="container_id" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="container_id" name="container_id" value="" />
                         </div>
                         <div class="wrap">
                             <label>在途净重</label>
-                            <input type="text" id="zt_net_weight" name="zt_net_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="zt_net_weight" name="zt_net_weight" value="" />
                         </div>
                         <div class="wrap">
                             <label>在途毛重</label>
-                            <input type="text" id="zt_Gross_weight" name="zt_Gross_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="zt_Gross_weight" name="zt_Gross_weight" value="" />
                         </div>
                         <div class="wrap">
                             <label>在途数量</label>
-                            <input type="text" id="zt_num" name="zt_num" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="zt_num" name="zt_num" value="" />
                         </div>
                         <div class="wrap">
                             <label>调出数量</label>
-                            <input type="text" id="Bring_up_num" name="Bring_up_num" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="Bring_up_num" name="Bring_up_num" value="" />
                         </div>
                         <div class="wrap">
                             <label>调拨入库时间</label>
-                            <input type="text" id="transfers_into_time" name="transfers_into_time" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
+                            <input type="text" id="transfers_into_time" name="transfers_into_time" value=""  placeholder="xxxx/x/x"/>
                         </div>
                         <div class="wrap">
                             <label>调拨入库地点</label>
-                            <input type="text" id="transfers_into_addres" name="transfers_into_addres" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_into_addres" name="transfers_into_addres" value="" />
                         </div>
                         <div class="wrap">
                             <label>调拨出库地点</label>
-                            <input type="text" id="transfers_out" name="transfers_out" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_out" name="transfers_out" value="" />
                         </div>
                         <div class="wrap">
                             <label>调出毛重</label>
-                            <input type="text" id="Bring_up_Gross_weight" name="Bring_up_Gross_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="Bring_up_Gross_weight" name="Bring_up_Gross_weight" value="" />
                         </div>
                         <div class="wrap">
                             <label>调出净重</label>
-                            <input type="text" id="Bring_up_net_weight" name="Bring_up_net_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="Bring_up_net_weight" name="Bring_up_net_weight" value="" />
                         </div>
                         <div class="wrap">
                             <label>调拨入库数量</label>
-                            <input type="text" id="transfers_into_num" name="transfers_into_num" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_into_num" name="transfers_into_num" value="" />
                         </div>
                         <div class="wrap">
                             <label>调拨入库毛重</label>
-                            <input type="text" id="transfers_into_Gross_weight" name="transfers_into_Gross_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_into_Gross_weight" name="transfers_into_Gross_weight" value="" />
                         </div>
                         <div class="wrap">
                             <label>调拨入库净重</label>
-                            <input type="text" id="transfers_into_net_weight" name="transfers_into_net_weight" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="transfers_into_net_weight" name="transfers_into_net_weight" value="" />
                         </div>
                         <div class="wrap">
                             <label>备注</label>
-                            <input type="text" id="note" name="note" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                            <input type="text" id="note" name="note" value="" />
                         </div>
 
                         <div class="wrap btn">

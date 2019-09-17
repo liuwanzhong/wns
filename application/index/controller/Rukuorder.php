@@ -79,7 +79,9 @@ class Rukuorder extends Controller {
         try{
             $id = db('rukuform')->insertGetId(['shipmentnum'=>$data['shipmentnum'],'userintime'=>$data['userintime'],'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id']]);
             for ($i=0;$i<count($data['transfers_factory']);$i++){
-            $rs = db('rukuform_xq')->insert(['factory'=>$data['transfers_factory'][$i],
+            $rs = db('rukuform_xq')
+                ->insert([
+                'factory'=>$data['transfers_factory'][$i],
                 'product_name'=>$data['material_name'][$i],
                 'rk_status_id'=>$data['status'][$i],
                 'rk_huowei_id'=>$data['huowei'][$i],
