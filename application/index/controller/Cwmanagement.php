@@ -179,6 +179,10 @@ class Cwmanagement extends Controller {
             $this -> error('警告：越权操作');
         }
         $data = input();
+        $data['transfers_into_time'] = strtotime($data['transfers_into_time']);
+        $data['delivery_time'] = strtotime($data['delivery_time']);
+        $data['production_time'] = strtotime($data['production_time']);
+        $data['updata_time'] = time();
         unset($data['/index/cwmanagement/record_update_html']);
         $r = db('cw_management') -> where('id', $id) -> update($data);
         if ($r) {
@@ -212,8 +216,6 @@ class Cwmanagement extends Controller {
             if (strpos($da, $key) !== false) {
                 $da = mb_substr($da, 3);
             }
-
-            $time=time();
             $r = db('cw_management') -> where("id in($da)") -> update(['del_time'=>$time,'is_del'=>1]);
             if ($r) {
                 $msg = ["error" => 1, 'ts' => "删除成功"];

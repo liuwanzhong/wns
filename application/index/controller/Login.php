@@ -25,8 +25,7 @@ class Login extends Controller
     {
         $data=input();
         $pwd=md5(md5($data['password']));
-        $pwd=$data['password'];
-        $row= db('staffs')
+        $row=db('staffs')
             ->where('is_del',1)
             ->where('staffs_number',$data['username'])
             ->where('password',$pwd)

@@ -227,3 +227,6 @@ nav dd a:hover{background:#161a1e;color:#fff;}
 	display: inline-block;
 	margin-right: 5px;
 }
+
+/*入库单*/
+.form_box{display: flex; flex-wrap: wrap;}

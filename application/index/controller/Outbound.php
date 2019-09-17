@@ -57,7 +57,7 @@ class Outbound extends Controller {
             $arr['Delivery_id']                = $v[4];//交货单号
             $arr['reachout_id']               =$v[5];//售达方代码
             $arr['reachout_name']              = $v[6];//售达方名称
-            $arr['reachby_id|']                = $v[7];//送达方代码
+            $arr['reachby_id']                = $v[7];//送达方代码
             $arr['reachby_name']               = $v[8];//送达方名称
             $arr['material_id']                       = $v[9];//物料代码
             $arr['material_name']             = $v[10];//物料名
