@@ -133,7 +133,6 @@ class Rukuorder extends Controller {
             ->select();
         $cks = db('warehouse')->where('is_del',1)->select();
         $status=db('kc_status')->where('is_del',0)->select();
-        dump($cats);
         return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'status'=>$status,'cks'=>$cks]);
     }
     //修改订单

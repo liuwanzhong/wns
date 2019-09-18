@@ -4,16 +4,14 @@
 		<meta charset="utf-8"/>
 		<title>后台管理系统</title>
 		<link rel="stylesheet" href="/images/css.css">
-        <link rel="stylesheet" href="/images/boot.css">
+<!--        <link rel="stylesheet" href="/images/boot.css">-->
         <link href="/images/index.css" type="text/css" rel="stylesheet"/>
         <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
         <style>
             .seach{margin-top: 20px;margin-left: 30px;}
             .seach .layui-form-label{width: auto;}
-            
-            #factory{
-                display: block;
-            }
+            /*.layui-table tr td{white-space: nowrap;}*/
+
         </style>
 	</head>
 	<body>
@@ -21,8 +19,8 @@
             <div class="nav">
 				<span class="layui-breadcrumb">
 					<a href="/public/main.html" target="box">首页</a>
-					<a href="javascript:;">入库管理</a>
-					<a><cite>库存列表</cite></a>
+					<a href="javascript:;">出库管理</a>
+					<a><cite>系统订单</cite></a>
 				</span>
             </div>
             <div class="handle">
@@ -30,22 +28,23 @@
                 <a href="{:url('Cwmanagement/clink')}" class="layui-btn" id="clink">清除数据</a>
                 <button type="button" class="layui-btn" id="del">删除</button>
             </div>
-            <main class="bd_content">
-                <table class="layui-table" style="width: 96%;margin: 12px auto;">
+            <main class="bd_content" style="margin-top: 30px;">
+
+                <table class="layui-table" style="width: 96%; margin: 12px auto;">
                     <thead>
                     <tr>
                         <th>发货日期</th>
-                        <th>工厂编号</th>
+                        <th class="out_num">工厂编号</th>
                         <th>工厂名</th>
                         <th>装运单号</th>
                         <th>交货单号</th>
                         <th>售达方代码</th>
                         <th>售达方名称</th>
-                        <th>送达方代码</th>
+                        <th class="out_num">送达方代码</th>
                         <th>送达方名称</th>
                         <th>物料代码</th>
                         <th>物料名</th>
-                        <th>交货数量</th>
+                        <th class="out_num">交货数量</th>
                         <th>详细批次</th>
                     </tr>
                     </thead>
@@ -257,6 +256,11 @@
             var orders = sessionStorage.getItem('session');
             location.href = "/index/Rukuorder/index/id/"+orders;
         })
+            
+            
+            layui.use('element', function () {
+
+            })
         </script>
 	</body>
 </html>

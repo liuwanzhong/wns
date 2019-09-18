@@ -72,9 +72,9 @@
 					<td><?php if(!empty($row['userintime'])){echo date('Y-m-d',$row['userintime']);} ?></td>
 					<td>{$row.count}</td>
 					<td>
-						<a href="#" class="edit xq">详情</a>
-						<a href="{:url('Rukuorder/to_examine_yes','id='.$row.id)}" class="edit ks">审核通过</a>
-						<a href="{:url('Rukuorder/to_examine_del','id='.$row.id)}">删除</a>
+						<a href="#" class="edit xq" style="margin-right: 15px;"><i class="ico" title="详情">&#xe619;</i></a>
+						<a href="{:url('Rukuorder/to_examine_yes','id='.$row.id)}" class="edit ks" title="审核通过"><i class="ico">&#xe602;</i></a>
+						<a href="{:url('Rukuorder/to_examine_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
 					</td>
 				</tr>
 				{/volist}
@@ -88,6 +88,18 @@
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script type="text/javascript">
+			layui.use(['element', 'laydate'],function () {
+				let element = layui.element,
+					laydate = layui.laydate;
+				laydate.render({
+					elem: '#delivery_time'
+					,range: '~'
+					,done: function(value){
+						$('#s_delivery_time').val(value)
+					}
+				})
+			})
+
 			//详情
 			$('.xq').on('click',function () {
 				let id=$(this).parents('tr').find('td').eq(0).text();
