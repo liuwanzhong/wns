@@ -110,8 +110,8 @@
                             </select>
                         </td>
                         <td class="huowei">
-                            <select name='huowei[]' class='showhuowei'>
-                                <option value='0'>请选择货位</option>
+                            <select name='huowei[]' class='showhuowei' lay-verify="" lay-search>
+                                <option value=''>请选择货位</option>
                             </select>
                         </td>
                         <td>
@@ -122,11 +122,11 @@
                         <td><textarea name="content[]" class="layui-textarea"></textarea></td>
                         <td>
                             <input type="hidden"class="groos" name="Grossweight[]" value="{$v.Grossweight}" readonly>
-                            {$v.Grossweight}
+                            <span>{$v.Grossweight}</span>
                         </td>
                         <td>
                             <input type="hidden" class="num" name="netweight[]" value="{$v.netweight}" readonly>
-                            {$v.netweight}
+                            <span>{$v.netweight}</span>
                         </td>
                         <td>
                             <input type="hidden" name="transfers_id[]" value="{$v.transfers_id}" readonly>
@@ -143,7 +143,7 @@
             </table>
         </div>
 
-        <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
+        <button class="layui-btn submit" lay-submit lay-filter="formDemo" id="del">立即提交</button>
     </form>
 </div>
 <script src="/static/jquery-1.9.1.min.js"></script>
@@ -182,7 +182,7 @@
                                     ${str}
                                 </select>
                             </td>
-                            <td class="huowei"><select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select></td>
+                            <td class="huowei"><select name='huowei[]' class='showhuowei' lay-search><option value=''>请选择货位</option></select></td>
                             <td>
                                 <input type="number" value="0" class="countnum layui-input" id="blur" name="nums[]">
                             </td>
@@ -191,10 +191,11 @@
                             <td><textarea name="content[]" class="layui-textarea"></textarea></td>
                             <td>
                                 <input type="hidden"class="groos" name="Grossweight[]" value="0" readonly>
-
+                                <span></span>
                             </td>
                             <td>
                                 <input type="hidden" class="num" name="netweight[]" value="0" readonly>
+                                <span></span>
                             </td>
                             <td>
                                 <input type="hidden" name="transfers_id[]" value="${child[12].innerText}" readonly>
@@ -225,7 +226,7 @@
                     success: function(data){
                         var data = JSON.parse(data);
                         console.log(data);
-                        $('.showhuowei').append("<option value='0'>请选择货位</option>");
+                        $('.showhuowei').append("<option value=''>请选择货位</option>");
                         for (var i=0;i<data.length;i++)
                         {
                             $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
@@ -283,17 +284,17 @@
             url:'/index/Rukuorder/blur',
             data:{'min':min,'max':max,'groos_min':gross_min},
             success:function (data) {
-                parent.find('.groos').children().val(data.number)
-                parent.find('.num').children().val(data.groos)
+                console.log(data)
+                parent.find('.groos').val(data.number)
+                parent.find('.num').val(data.groos)
+                parent.find('.num').next().text(data.number)
+                parent.find('.groos').next().text(data.groos)
             }
         })
     })
     //生成时删除sessionstorage
     $('#del').click(function () {
         sessionStorage.removeItem('session')
-                console.log(data)
-                parent.find('.groos').val(data.groos)
-                parent.find('.num').val(data.number)
         })
 
     $('.tbd').on('click','.remove', function(){

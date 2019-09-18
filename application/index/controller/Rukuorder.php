@@ -138,6 +138,7 @@ class Rukuorder extends Controller {
             ->select();
         $cks = db('warehouse')->where('is_del',1)->select();
         $status=db('kc_status')->where('is_del',0)->select();
+<<<<<<< HEAD
         $cabinet=db('cabinet')->where('is_del',1)->select();
         if(!empty($rows['userintime'])){
             $rows['userintime']=date("Y-m-d",$rows['userintime']);
@@ -147,6 +148,9 @@ class Rukuorder extends Controller {
             $cats[$k]['j']=$row['netweight']/$row['rk_nums'];
         }
         return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'status'=>$status,'cks'=>$cks,'cabinet'=>$cabinet]);
+=======
+        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'status'=>$status,'cks'=>$cks]);
+>>>>>>> dbdcd83f812b9ef18f4ecbd5eea74f88618e5b8d
     }
     //修改订单
     public function to_examine_up() {

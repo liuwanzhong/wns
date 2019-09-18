@@ -3,13 +3,13 @@
 .icon {font-family: 'IcoMoon';}
 
 @font-face {
-	font-family: 'iconfont';  /* project id 1405487 */
-	src: url('//at.alicdn.com/t/font_1405487_pa7zcxe7o1.eot');
-	src: url('//at.alicdn.com/t/font_1405487_pa7zcxe7o1.eot?#iefix') format('embedded-opentype'),
-	url('//at.alicdn.com/t/font_1405487_pa7zcxe7o1.woff2') format('woff2'),
-	url('//at.alicdn.com/t/font_1405487_pa7zcxe7o1.woff') format('woff'),
-	url('//at.alicdn.com/t/font_1405487_pa7zcxe7o1.ttf') format('truetype'),
-	url('//at.alicdn.com/t/font_1405487_pa7zcxe7o1.svg#iconfont') format('svg');
+    font-family: 'iconfont';  /* project id 1405487 */
+    src: url('//at.alicdn.com/t/font_1405487_9ywmg08sjbt.eot');
+    src: url('//at.alicdn.com/t/font_1405487_9ywmg08sjbt.eot?#iefix') format('embedded-opentype'),
+    url('//at.alicdn.com/t/font_1405487_9ywmg08sjbt.woff2') format('woff2'),
+    url('//at.alicdn.com/t/font_1405487_9ywmg08sjbt.woff') format('woff'),
+    url('//at.alicdn.com/t/font_1405487_9ywmg08sjbt.ttf') format('truetype'),
+    url('//at.alicdn.com/t/font_1405487_9ywmg08sjbt.svg#iconfont') format('svg');
 }
 .ico{font-family: 'iconfont'; font-size: 20px;font-style: normal; color: #09f;}
 a{text-decoration:none;color:#444;}
@@ -230,3 +230,9 @@ nav dd a:hover{background:#161a1e;color:#fff;}
 
 /*入库单*/
 .form_box{display: flex; flex-wrap: wrap;}
+
+@media only screen and (max-width: 1360px) {
+    .ckgc{width: 50px;}
+    .ddbh{width: 50px;}
+    .out_num{width: 71px;}
+}
