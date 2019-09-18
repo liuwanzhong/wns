@@ -139,9 +139,9 @@ class Rukuorder extends Controller {
         $cks = db('warehouse')->where('is_del',1)->select();
         $status=db('kc_status')->where('is_del',0)->select();
         $cabinet=db('cabinet')->where('is_del',1)->select();
-        if(!empty($rows['userintime'])){
-            $rows['userintime']=date("Y-m-d",$rows['userintime']);
-        }
+//        if(!empty($rows['userintime'])){
+//            $rows['userintime']=date("Y-m-d",$rows['userintime']);
+//        }
         foreach ($cats as $k=>$row) {
             $cats[$k]['m']=$row['Grossweight']/$row['rk_nums'];
             $cats[$k]['j']=$row['netweight']/$row['rk_nums'];
@@ -150,37 +150,53 @@ class Rukuorder extends Controller {
     }
     //修改订单
     public function to_examine_up() {
-        $data=input();
-        $userintime=strtotime($data['userintime']);
+        $data       = input();
+        $userintime = strtotime($data['userintime']);
         array_shift($data);
-        try{
-            $r=db('rukuform')
-                ->where('id',$data['id'])
-                ->update(['shipmentnum'=>$data['shipmentnum'],'userintime'=>$userintime,'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id']]);
-            for ($i=0;$i<count($data['transfers_factory']);$i++){
-                $rs = db('rukuform_xq')->where('id',$data['cd'][$i])->update(['factory'=>$data['transfers_factory'][$i],
-                                                 'product_name'=>$data['material_name'][$i],
-                                                 'rk_status_id'=>$data['status'][$i],
-                                                 'rk_huowei_id'=>$data['huowei'][$i],
-                                                 'rk_nums'=>$data['nums'][$i],
-                                                 'product_time'=>$data['intime'][$i],
-                                                 'product_batch'=>$data['storno'][$i],
-                                                 'content'=>$data['content'][$i],
-                                                 'netweight'=>$data['netweight'][$i],
-                                                 'Grossweight'=>$data['Grossweight'][$i],
-                                                 'transfers_id'=>$data['transfers_id'][$i]]);
+//        try{
+        $r = db('rukuform')
+            -> where('id', $data['id'])
+            -> update(['shipmentnum' => $data['shipmentnum'], 'userintime' => $userintime, 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id']]);
+        for ($i = 0; $i < count($data['transfers_factory']); $i++) {
+            if (empty($data['cd'][$i])) {
+                $fs=db('rukuform_xq') -> insert(['factory'       => $data['transfers_factory'][$i],
+                                             'product_name'  => $data['material_name'][$i],
+                                             'rk_status_id'  => $data['status'][$i],
+                                             'rk_huowei_id'  => $data['huowei'][$i],
+                                             'rk_nums'       => $data['nums'][$i],
+                                             'product_time'  => $data['intime'][$i],
+                                             'product_batch' => $data['storno'][$i],
+                                             'content'       => $data['content'][$i],
+                                             'netweight'     => $data['netweight'][$i],
+                                             'Grossweight'   => $data['Grossweight'][$i],
+                                             'transfers_id'  => $data['transfers_id'][$i],
+                                             'rukuid'        => $data['id']]);
+            }else{
+                $rs = db('rukuform_xq') -> where('id', $data['cd'][$i])
+                    -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id'  => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i], 'product_time'  => $data['intime'][$i], 'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'     => $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
             }
-            if($r && $rs) {
-                // 提交事务
-                Db::commit();
-                $this->error('操作成功','to_examine');
-            }
-        } catch (\Exception $e) {
-            $this->error('添加入库订单失败,请联系管理员');
-            // 回滚事务
-            Db::rollback();
+
+//            }
+//            for($c=0;$c<count($data['transfers_factory']);$c++){
+//
+//            }
+//            if($r && $rs) {
+//                // 提交事务
+//                Db::commit();
+//                $this->error('操作成功','to_examine');
+//            }
+//        } catch (\Exception $e) {
+//            $this->error('添加入库订单失败,请联系管理员');
+//            // 回滚事务
+//            Db::rollback();
+//        }
+//            return redirect('to_examine');
         }
-        return redirect('to_examine');
+        if($r  || $rs){
+            return redirect('to_examine');
+        }else{
+            $this->error('添加入库订单失败,请联系管理员');
+        }
     }
     //审核
     public function to_examine_yes() {
