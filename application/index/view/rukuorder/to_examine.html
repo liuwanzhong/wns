@@ -32,7 +32,7 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">时间</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="delivery_time" name="s_delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
@@ -92,6 +92,18 @@
 			$('.xq').on('click',function () {
 				let id=$(this).parents('tr').find('td').eq(0).text();
 				location.href='/index/Rukuorder/to_examine_show?id='+id;
+			})
+			layui.use(['element','laydate','form'], function(){
+				var laydate = layui.laydate;
+				var element = layui.element;
+				let form = layui.form;
+				laydate.render({
+					elem: '#s_delivery_time'
+					,range: '~'
+					,done: function(value){
+						$('#s_delivery_time').val(value)
+					}
+				});
 			})
 		</script>
 	</body>

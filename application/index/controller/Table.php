@@ -19,7 +19,9 @@ class Table extends Controller {
         return view('index',['list'=>$list,'status'=>$status,'cks'=>$cks]);
     }
     public function show($id){
-        $list = db('cabinet')->where('is_del',1)->where('warehouse_id',$id)->select();
+        $list = db('cabinet')
+            ->where('cabinet.is_del',1)
+            ->where('cabinet.warehouse_id',$id)->select();
         return json_encode($list);
     }
 }

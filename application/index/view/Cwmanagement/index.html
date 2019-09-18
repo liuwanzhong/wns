@@ -76,7 +76,7 @@
                         <th>调拨出库工厂</th>
                         <th>生产日期</th>
                         <th>调出数量</th>
-                        <th>调拨入库日期</th>
+                        <th>调拨出库日期</th>
                         <th>调拨入库数量</th>
                         <th>净重</th>
                         <th>操作</th>
@@ -93,7 +93,7 @@
                         <td>{$r.transfers_factory}</td>
                         <td><?php if($r['production_time']!=0){echo date("Y/m/d",$r['production_time']);}?></td>
                         <td>{$r.Bring_up_num}</td>
-                        <td><?php if($r['transfers_into_time']!=0){echo date("Y/m/d",$r['transfers_into_time']);}?></td>
+                        <td><?php if($r['delivery_time']!=0){echo date("Y/m/d",$r['transfers_into_time']);}?></td>
                         <td>{$r.transfers_into_num}</td>
                         <td>{$r.Bring_up_net_weight}</td>
                         <td>
@@ -301,8 +301,7 @@
                     if(list.length === 0){
                         layer.alert('请选择要删除的数据',{icon:5});
                         return false;
-                    }
-                    else {
+                    }else {
                         for (let i in list) {
                             if(list[i].checked){
                                 check_all.push(list[i].value);

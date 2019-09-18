@@ -87,12 +87,12 @@
                         <th>操作</th>
                     </tr>
                 </thead>
-
                 <tbody class="tbd">
+                <input type="hidden" name="cd" value="{$id}">
                     {volist name='rows' id='v'}
                     <tr>
-                        <input type="hidden" name="min" value="{$v.Grossweight}">
-                        <input type="hidden" name="gross_min" value="{$v.netweight}">
+                        <input type="hidden" name="min" value="{$v.m}">
+                        <input type="hidden" name="gross_min" value="{$v.j}">
                         <td>
                             <input type="hidden" value="{$v.transfers_factory}" name="transfers_factory[]" readonly>
                             {$v.transfers_factory}
@@ -110,8 +110,8 @@
                             </select>
                         </td>
                         <td class="huowei">
-                            <select name='huowei[]' class='showhuowei'>
-                                <option value='0'>请选择货位</option>
+                            <select name='huowei[]' class='showhuowei' lay-search>
+                                <option value=''>请选择货位</option>
                             </select>
                         </td>
                         <td>
@@ -121,12 +121,12 @@
                         <td><input type="text" name="storno[]" class="layui-input" placeholder="请输入批次"></td>
                         <td><textarea name="content[]" class="layui-textarea"></textarea></td>
                         <td>
-                            <input type="hidden"class="groos" name="Grossweight[]" value="{$v.Grossweight}" readonly>
-                            {$v.Grossweight}
+                            <input type="hidden" class="groos" name="Grossweight[]" value="{$v.Grossweight}" readonly>
+                            <span>{$v.Grossweight}</span>
                         </td>
                         <td>
                             <input type="hidden" class="num" name="netweight[]" value="{$v.netweight}" readonly>
-                            {$v.netweight}
+                            <span>{$v.netweight}</span>
                         </td>
                         <td>
                             <input type="hidden" name="transfers_id[]" value="{$v.transfers_id}" readonly>
@@ -142,7 +142,6 @@
                 </tbody>
             </table>
         </div>
-
         <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
     </form>
 </div>
@@ -182,7 +181,7 @@
                                     ${str}
                                 </select>
                             </td>
-                            <td class="huowei"><select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select></td>
+                            <td class="huowei"><select name='huowei[]' class='showhuowei' lay-search><option value=''>请选择货位</option></select></td>
                             <td>
                                 <input type="number" value="0" class="countnum layui-input" id="blur" name="nums[]">
                             </td>
@@ -190,11 +189,12 @@
                             <td><input type="text" name="storno[]" class="layui-input" placeholder="请输入批次"></td>
                             <td><textarea name="content[]" class="layui-textarea"></textarea></td>
                             <td>
-                                <input type="hidden"class="groos" name="Grossweight[]" value="0" readonly>
-
+                                <input type="hidden"class="groos" name="Grossweight[]" value="${child[10].innerText}" readonly>
+                                <span>${child[10].innerText}</span>
                             </td>
                             <td>
-                                <input type="hidden" class="num" name="netweight[]" value="0" readonly>
+                                <input type="hidden" class="num" name="netweight[]" value="${child[11].innerText}" readonly>
+                                <span>${child[11].innerText}</span>
                             </td>
                             <td>
                                 <input type="hidden" name="transfers_id[]" value="${child[12].innerText}" readonly>
@@ -225,7 +225,7 @@
                     success: function(data){
                         var data = JSON.parse(data);
                         console.log(data);
-                        $('.showhuowei').append("<option value='0'>请选择货位</option>");
+                        $('.showhuowei').append("<option value=''>请选择货位</option>");
                         for (var i=0;i<data.length;i++)
                         {
                             $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
@@ -241,59 +241,28 @@
         })
     })
 
-    function showtable(val){
-        var id=$('#table').val();
-        $('.showhuowei').remove();
-        if($('#table').val() != 0){
-            $.ajax({
-                type: "get",//请求方式有post，get请求方式，这里是post请求
-                url: '/index/table/show/id/' + id,//请求的方法的路径
-                dataType: 'json',//请求参数的格式为json.另外还有text等
-                success: function(data){
-                    var data = JSON.parse(data);
-                    console.log(data);
-                    $('.huowei').append("<select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select>");
-                    for (var i=0;i<data.length;i++)
-                    {
-                        $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
-                    }
-                    $(".forzentitle").val(data.title);
-                    $('.frozencount').val(data.goods_feel);
-                    $(".editfrozenid").val(data.id);
-                }
-            })
-        }
-        $('.countnum').live('input propertychange', function()
-        {
-            console.log(111);
-        })
-    }
-
     // 修改商品数量
     $('.tbd').on('blur', '.countnum', function(){
-        console.log(1)
         let parent =$(this).parents('tr');
         //净重
         let min = $(this).parents('tr').find('input[name=gross_min]').val();
         //毛重
         let gross_min = $(this).parents('tr').find('input[name=min]').val();
         let max = $(this).val()
-        console.log("毛重:"+gross_min,'净重'+min,'数量'+max);
         $.ajax({
             url:'/index/Rukuorder/blur',
             data:{'min':min,'max':max,'groos_min':gross_min},
             success:function (data) {
-                parent.find('.groos').children().val(data.number)
-                parent.find('.num').children().val(data.groos)
+                parent.find('.num').next().text(data.number)
+                parent.find('.groos').next().text(data.groos)
+                parent.find('.groos').val(data.groos)
+                parent.find('.num').val(data.number)
             }
         })
     })
     //生成时删除sessionstorage
     $('#del').click(function () {
         sessionStorage.removeItem('session')
-                console.log(data)
-                parent.find('.groos').val(data.groos)
-                parent.find('.num').val(data.number)
         })
 
     $('.tbd').on('click','.remove', function(){

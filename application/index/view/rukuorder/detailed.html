@@ -3,10 +3,8 @@
 	<head>
 	<meta charset="utf-8"/>
 	<title>新增权限</title>
-	<link rel="stylesheet" href="/images/css.css">
-	<link rel="stylesheet" href="/images/boot.css">
-	<link href="/images/index.css" type="text/css" rel="stylesheet"/>
-	<link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
+		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
+		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
 	<style type="text/css">
 		.layui-table th{text-align: center;font-weight: bold;}
 		.layui-table td{text-align: center;}
@@ -22,17 +20,17 @@
 				</span>
 			</div>
 			<div class="seach">
-				<form action="{:url('Rukuorder/warehousing')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+				<form action="{:url('Rukuorder/detailed')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
 					<div class="layui-form-item">
-						<label class="layui-form-label">日期</label>
+						<label class="layui-form-label">工厂</label>
 						<div class="layui-input-inline">
 							<input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
 						</div>
 					</div>
 					<div class="layui-form-item">
-						<label class="layui-form-label">工厂</label>
+						<label class="layui-form-label">日期</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="" name="s_delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
@@ -53,13 +51,15 @@
 					</div>
 				</form>
 			</div>
-			<table class="layui-table" style="width: 96%; margin: 12px auto;">
+			<button id="dc">导出</button>
+			<table class="layui-table new_list" style="width: 96%; margin: 12px auto;">
 				<thead>
 				<tr>
+					<th><input type="checkbox" id="all"></th>
 					<th>ID</th>
 					<th>工厂</th>
 					<th>产品名称</th>
-					<th>入库属性</th>
+					<th>产品属性</th>
 					<th>入库仓库</th>
 					<th>入库货位</th>
 					<th>入库时间</th>
@@ -69,8 +69,10 @@
 					<th>毛重</th>
 				</tr>
 				</thead>
+				<tbody class="tbd">
 				{volist name='rows' id='row'}
-				<tr>
+				<tr id="check" class="news_list">
+					<td><input type="checkbox" value="{$row.id}"></td>
 					<td>{$row.id}</td>
 					<td>{$row.factory}</td>
 					<td>{$row.product_name}</td>
@@ -84,7 +86,6 @@
 					<td>{$row.Grossweight}</td>
 				</tr>
 				{/volist}
-				<tbody>
 				</tbody>
 			</table>
 		</div>
@@ -94,6 +95,74 @@
 		<script type="text/javascript">
 			layui.use('form',function(){
 				let form = layui.form;
+			})
+			layui.use(['element','laydate','form'], function(){
+				var laydate = layui.laydate;
+				var element = layui.element;
+				let form = layui.form;
+				laydate.render({
+					elem: '#s_delivery_time'
+					,range: '~'
+					,done: function(value){
+						$('#s_delivery_time').val(value)
+					}
+				});
+			})
+			//全选
+			$("#all").click(function(){
+				let arr = [];
+				if(this.checked){
+					$("#check :checkbox,#all").prop("checked", true);
+					let checks = $('.tbd ').find('input:checkbox');
+					checks.each(function () {
+						arr.push($(this)[0].value);
+					})
+					sessionStorage.setItem('session_dc',JSON.stringify(arr));
+				}else{
+					$("#check :checkbox,#all").prop("checked", false);
+					sessionStorage.removeItem('session_dc');
+				}
+			});
+			let session=[];
+			$('.tbd').on('click','input[type=checkbox]',function () {
+				let ses=JSON.parse(sessionStorage.getItem('session_dc'));
+				session = ses === null ? [] : ses;
+				if($(this)[0].checked == true){
+					session.push($(this).val());
+				}else{
+					let val = $(this).val();
+					for (let i in session){
+						if(session[i] == val){
+							session.splice(i,1);
+						}
+					}
+				}
+				sessionStorage.setItem('session_dc',JSON.stringify(session));
+			})
+			$(function () {
+				let list = JSON.parse(sessionStorage.getItem('session_dc'));
+				if(list != null){
+					$('.new_list input[type=checkbox]').each(function () {
+						if(list.includes($(this).val()) ){
+							$(this).prop('checked',true);
+						}
+					})
+				}
+			})
+			$('#dc').on('click', function() {
+				// alert(1);
+				var data = sessionStorage.session_dc;
+				var params = {id: data};
+				console.log(params);
+				$.post("{:url('Rukuorder/outExcel')}", params, function (res) {
+					console.log(res);
+					if (res.status) {
+						window.location.href = ("{:Url('index/Rukuorder/download')}?file=" + res.url);
+					} else {
+						layer.msg('系统错误，操作失败');
+
+					}
+				}, 'json')
 			})
 		</script>
 	</body>

@@ -9,18 +9,19 @@
 <form method="post" action="{:url('Rukuorder/to_examine_up')}">
     <input type="hidden" name="id" value="{$rows['id']}">
     <p>装运单号:<input type="text" name="shipmentnum" value="{$rows['shipmentnum']}"></p>
-    <p>入库日期:<input type="text" name="userintime" value="{$rows.userintime|date='Y-m-d',###}"></p>
+    <p>入库日期:<input type="date" name="userintime" value="{$rows['userintime']}"></p>
     <p>运输方式:<input type="text" name="transport" value="{$rows['transport']}"></p>
     <p>车牌号码:<input type="text" name="carid" value="{$rows['carid']}"></p>
     <p>装卸工:<input type="text" name="stevedore" value="{$rows['stevedore']}"></p>
     <p>入库仓库:
     <select name="ck_id" id="table" onchange="showtable(this.value)"><option value="0">请选择仓库</option>
         <?php foreach($cks as $ck): ?>
-        <option value="<?=$ck['id']?>"><?=$ck['name']?></option>
+        <option value="<?=$ck['id']?>" <?php if($rows['ck_id']==$ck['id']){echo 'selected';} ?>><?=$ck['name']?></option>
         <?php endforeach; ?>
     </select>
 </p>
 <table class="table" border="1">
+    <thead>
     <tr>
         <th>出库工厂</th>
         <th>产品名称</th>
@@ -34,11 +35,13 @@
         <th>净重</th>
         <th>订单编号</th>
     </tr>
+    </thead>
     {volist name='cats' id='v'}
+    <tbody class="tbd">
     <tr>
-        <input type="hidden" name="min" value="{$v.Grossweight}">
+        <input type="hidden" name="min" value="{$v.j}">
         <input type="hidden" name="cd[]" value="{$v.id}">
-        <input type="hidden" name="gross_min" value="{$v.netweight}">
+        <input type="hidden" name="gross_min" value="{$v.m}">
         <th><input type="text" value="{$v.factory}" name="transfers_factory[]" readonly></th>
         <th><input type="text" value="{$v.product_name}" name="material_name[]" readonly></th>
         <th class="status">
@@ -46,19 +49,31 @@
                 <option value="0">请选择产品属性</option>
                 <?php foreach($status as $statu): ?>
                 <option value="<?=$statu['id']?>" <?php if($v['rk_status_id']==$statu['id']){echo 'selected';} ?>><?=$statu['title']?></option>
-                <?php endforeach ?>
+                <?php endforeach; ?>
             </select>
         </th>
-        <th class="huowei"><select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select></th>
+<!--        <th class="huowei"><select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select></th>-->
+        <th class="huowei">
+            <select name='huowei[]' class='showhuowei'>
+                <?php if($v['rk_status_id']==0): ?>
+                    <option value='0'>请选择货位</option>
+                <?php else:?>
+                    <?php foreach($cabinet as $s): ?>
+                        <option value='{$v.rk_huowei_id}' <?php if($s['id']==$v['rk_huowei_id']){echo 'selected';} ?>>{$s.name}</option>
+                    <?php endforeach;?>
+                <?php endif; ?>
+            </select>
+        </th>
         <th><input type="number" value="{$v.rk_nums}" class="countnum" id="blur" name="nums[]"></th>
-        <th><input type="date" name="intime[]"></th>
-        <th><input type="text" name="storno[]" placeholder="请输入批次"></th>
+        <th><input type="date" name="intime[]" value="{$v.product_time}"></th>
+        <th><input type="text" name="storno[]" placeholder="请输入批次" value="{$v.product_batch}"></th>
         <th><textarea name="content[]">{$v.content}</textarea></th>
         <th><div class="groos"><input name="Grossweight[]" value="{$v.Grossweight}" readonly></div></th>
         <th><div class="num"><input name="netweight[]" value="{$v.netweight}" readonly></div></th>
         <th><input type="text" name="transfers_id[]" value="{$v.transfers_id}" readonly></th>
     </tr>
     {/volist}
+    </tbody>
 </table>
     <input type="submit" value="提交" id="del">
     <a href="{:url('Rukuorder/to_examine')}">返回</a>
@@ -75,7 +90,6 @@
                 dataType: 'json',//请求参数的格式为json.另外还有text等
                 success: function(data){
                     var data = JSON.parse(data);
-                    console.log(data);
                     $('.huowei').append("<select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select>");
                     for (var i=0;i<data.length;i++)
                     {
@@ -87,11 +101,25 @@
                 }
             })
         }
-        $('.countnum').live('input propertychange', function()
-        {
-            console.log(111);
-        })
     }
+    // 修改商品数量
+    $('.tbd').on('blur', '.countnum', function(){
+        let parent =$(this).parents('tr');
+        //净重
+        let min = $(this).parents('tr').find('input[name=gross_min]').val();
+        //毛重
+        let gross_min = $(this).parents('tr').find('input[name=min]').val();
+        let max = $(this).val()
+        $.ajax({
+            url:'/index/Rukuorder/blur',
+            data:{'min':min,'max':max,'groos_min':gross_min},
+            success:function (data) {
+                console.log(data)
+                parent.find('.num').next().text(data.number)
+                parent.find('.groos').next().text(data.groos)
+            }
+        })
+    })
 </script>
 </body>
 </html>

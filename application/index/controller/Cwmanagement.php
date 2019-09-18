@@ -11,7 +11,6 @@ class Cwmanagement extends Controller {
     // 仓储信息显示
     public function index() {
         $data = input();
-        // var_dump($data);exit;
         // 调拨订单号
         $search = '';
         if (!empty($data['s_transfers_id'])) {
@@ -33,6 +32,7 @@ class Cwmanagement extends Controller {
         }
         // 物料名
         if (!empty($data['s_material_name'])) {
+            $data['s_material_name']=addslashes($data['s_material_name']);
             $material_name = $data['s_material_name'];
             if (!empty($search)) {
                 $material_name = ' and material_name like ' . "'%" . $material_name . '%' . "'";
@@ -110,28 +110,27 @@ class Cwmanagement extends Controller {
         unset($sheetContent[0]);
         foreach ($sheetContent as $k => $v) {
             // $arr['id'] = $v[0];
-            $arr['transfers_id']                = $v[0];//调拨订单号
-            $arr['delivery_id']                 = $v[1];//交付单号
-            $arr['delivery_time']               = strtotime($v[2]);//交货单实际出库日期
-            $arr['transfers_factory']           = $v[3];//调拨出库工厂
-            $arr['material_name']               = $v[4];//物料名称
-            $arr['production_time']             = strtotime($v[5]);//生产日期
-            $arr['transport_type']              = $v[6];//装运类型
-            $arr['container_id']                = $v[7];//集装箱号/车皮号
-            $arr['zt_net_weight']               = $v[8];//在途净重
-            $arr['zt_Gross_weight']             = $v[9];//在途毛重
-            $arr['zt_num']                      = $v[10];//在途数量
-            $arr['Bring_up_num']                = $v[11];//调出数量
-            $arr['transfers_into_time']         = strtotime($v[12]);//调拨入库时间
-            $arr['transfers_into_addres']       = $v[13];//调拨入库地点
-            $arr['transfers_out']               = $v[14];//调拨出库地点
-            $arr['Bring_up_Gross_weight']       = $v[15];//调出毛重
-            $arr['Bring_up_net_weight']         = $v[16];//调出净重
-            $arr['transfers_into_factory']      = $v[17];//调拨入库工厂
-            $arr['transfers_into_num']          = $v[18];//调拨入库数量
-            $arr['transfers_into_Gross_weight'] = $v[19];//调拨入库毛重
-            $arr['transfers_into_net_weight']   = $v[20];//调拨入库净重
-            $arr['note']                        = $v[21];//备注
+            $arr['transfers_id']                = $v[2];//调拨订单号
+            $arr['delivery_id']                 = $v[3];//交付单号
+            $arr['delivery_time']               = strtotime($v[4]);//交货单实际出库日期
+            $arr['transfers_factory']           = $v[5];//调拨出库工厂
+            $arr['material_name']               = $v[6];//物料名称
+            $arr['production_time']             = strtotime($v[7]);//生产日期
+            $arr['transport_type']              = $v[8];//装运类型
+            $arr['container_id']                = $v[9];//集装箱号/车皮号
+            $arr['zt_net_weight']               = $v[10];//在途净重
+            $arr['zt_Gross_weight']             = $v[11];//在途毛重
+            $arr['zt_num']                      = $v[12];//在途数量
+            $arr['Bring_up_num']                = $v[13];//调出数量
+            $arr['transfers_into_time']         = strtotime($v[14]);//调拨入库时间
+            $arr['transfers_into_addres']       = $v[20];//调拨出库地点
+            $arr['Bring_up_Gross_weight']       = $v[22];//调出毛重
+            $arr['Bring_up_net_weight']         = $v[23];//调出净重
+            $arr['transfers_into_factory']      = $v[25];//调拨入库工厂
+            $arr['transfers_into_num']          = $v[27];//调拨入库数量
+            $arr['transfers_into_Gross_weight'] = $v[28];//调拨入库毛重
+            $arr['transfers_into_net_weight']   = $v[29];//调拨入库净重
+            $arr['note']                        = $v[30];//备注
             $arr['is_del']                      = 0;//软删除
             $arr['create_time']                  = time();//创建时间
             if (!empty($v[4])) {//无物料名数据不写入
