@@ -23,8 +23,13 @@ class Rukuorder extends Controller {
         $cd=str_replace(array("[\""),"",$cd);
         $cd=str_replace(array("\"]"),"",$cd);
         foreach ($rows as $k=>$row) {
-            $rows[$k]['m']=$row['Grossweight']/$row['countnum'];
-            $rows[$k]['j']=$row['netweight']/$row['countnum'];
+            if($row['countnum']!=0){
+                $rows[$k]['m']=$row['Grossweight']/$row['countnum'];
+                $rows[$k]['j']=$row['netweight']/$row['countnum'];
+            }else{
+                $rows[$k]['m']=$row['Grossweight'];
+                $rows[$k]['j']=$row['netweight'];
+            }
         }
         return view('index',['rows'=>$rows,'status'=>$status,'cks'=>$cks,'id'=>$cd]);
     }
@@ -34,9 +39,9 @@ class Rukuorder extends Controller {
         $min=input('min');//净重
         $max=input('max');//数量
         //净重
-        $number=floor($min*$max*1000)/1000;
+        $number=sprintf("%.3f",$min*$max);
         //毛重
-        $groos=floor($groos_min*$max*1000)/1000;
+        $groos=sprintf("%.3f",$groos_min*$max);
         return ['number'=>$number,'groos'=>$groos];
     }
     //添加入库订单
@@ -63,13 +68,13 @@ class Rukuorder extends Controller {
             if($id && $rs && $del) {
                 // 提交事务
                 Db::commit();
-                return redirect('index');
             }
         } catch (\Exception $e) {
             $this->error('添加入库订单失败,请联系管理员');
             // 回滚事务
             Db::rollback();
         }
+        $this->success('生成订单成功','index');
     }
 
 
@@ -133,14 +138,20 @@ class Rukuorder extends Controller {
             ->select();
         $cks = db('warehouse')->where('is_del',1)->select();
         $status=db('kc_status')->where('is_del',0)->select();
-        dump($cats);
-        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'status'=>$status,'cks'=>$cks]);
+        $cabinet=db('cabinet')->where('is_del',1)->select();
+        if(!empty($rows['userintime'])){
+            $rows['userintime']=date("Y-m-d",$rows['userintime']);
+        }
+        foreach ($cats as $k=>$row) {
+            $cats[$k]['m']=$row['Grossweight']/$row['rk_nums'];
+            $cats[$k]['j']=$row['netweight']/$row['rk_nums'];
+        }
+        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'status'=>$status,'cks'=>$cks,'cabinet'=>$cabinet]);
     }
     //修改订单
     public function to_examine_up() {
         $data=input();
         $userintime=strtotime($data['userintime']);
-//        dump($data);
         array_shift($data);
         try{
             $r=db('rukuform')
@@ -280,6 +291,37 @@ class Rukuorder extends Controller {
 
     //入库明细
     public function detailed() {
+        $data=input();
+        $search = '';
+        //工厂名
+        if (!empty($data['s_transfers_id'])) {
+            $data['s_transfers_id']=addslashes($data['s_transfers_id']);
+            $search = 'rukuform_xq.factory like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+        }
+        // 时间转换
+        if (!empty($data['s_delivery_time'])) {
+            $time = explode('~', $data['s_delivery_time']);
+            foreach ($time as $key) {
+                $time[] = strtotime($key);
+                array_shift($time);
+            }
+            if (!empty($search)) {
+                $time = ' and rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            } else {
+                $time = 'rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            }
+            $search .= $time;
+        }
+        // 物料名
+        if (!empty($data['s_material_name'])) {
+            $material_name = $data['s_material_name'];
+            if (!empty($search)) {
+                $material_name = ' and rukuform_xq.rk_status_id like ' . "'%" . $material_name . '%' . "'";
+            } else {
+                $material_name = ' rukuform_xq.rk_status_id like ' . "'%" . $material_name . '%' . "'";
+            }
+            $search .= $material_name;
+        }
         $rows=db('rukuform_xq')
             ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id','left')
             ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
@@ -287,10 +329,111 @@ class Rukuorder extends Controller {
             ->join('warehouse','rukuform.ck_id=warehouse.id','left')
             ->where('rukuform_xq.is_del',0)
             ->where('rukuform_xq.state',1)
+            ->where("$search")
             ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
             ->select();
         //产品属性
         $status=db('kc_status')->where('is_del',0)->select();
         return view('detailed',['rows'=>$rows,'status'=>$status]);
+    }
+    //导出入库明细
+    public function outExcel(){
+        $data = input();
+        unset($data['/index/rukuorder/outexcel_html']);
+        $id=$data['id'];
+        $da=str_replace('"', '', $id);
+        $da=trim($da,'[');
+        $da=trim($da,']');
+        // $data=db('rukuform_xq')->where("id in ($da)")->select();
+        $data=db('rukuform_xq')
+            ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id','left')
+            ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
+            ->join('rukuform','rukuform_xq.rukuid=rukuform.id','left')
+            ->join('warehouse','rukuform.ck_id=warehouse.id','left')
+            ->where("rukuform_xq.id in ($da)")
+            ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
+            ->select();
+        // echo "<pre>";
+        // print_r($data);exit;
+        if(!empty($data)){
+            Vendor('PHPExcel.PHPExcel');
+            Vendor('PHPExcel.PHPExcel.IOFactory');
+            $phpExcel = new \PHPExcel();
+            $phpExcel->setActiveSheetIndex(0)
+                ->setCellValue('A1', '工厂')
+                ->setCellValue('B1', '产品名')
+                ->setCellValue('C1', '产品属性')
+                ->setCellValue('D1', '入库仓库')
+                ->setCellValue('E1', '入库货位')
+                ->setCellValue('F1', '入库时间')
+                ->setCellValue('G1', '产品时间')
+                ->setCellValue('H1', '数量')
+                ->setCellValue('I1', '净重')
+                ->setCellValue('J1', '毛重');
+            $len = count($data);
+            for($i = 0 ; $i < $len ; $i++){
+                $v = $data[$i];
+                $rownum = $i+2;
+                $phpExcel->getActiveSheet()->setCellValue('A' . $rownum, $v['factory']);
+                $phpExcel->getActiveSheet()->setCellValue('B' . $rownum, $v['product_name']);
+                $phpExcel->getActiveSheet()->setCellValue('C' . $rownum, $v['k_name']);
+                $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['w_name']);
+                $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['c_name']);
+                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, date('Y-m-d',$v['time']));
+                $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['product_time']);
+                $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['rk_nums']);
+                $phpExcel->getActiveSheet()->setCellValue('I' . $rownum, $v['netweight']);
+                $phpExcel->getActiveSheet()->setCellValue('J' . $rownum, $v['Grossweight']);
+            }
+            $phpExcel->setActiveSheetIndex(0);
+            $filename=date('Y-m-d',time()).'.xlsx';
+            $objWriter=\PHPExcel_IOFactory::createWriter($phpExcel,'Excel2007');
+            $filePath =$filename;
+            $objWriter->save($filePath);
+            if(!file_exists($filePath)){
+                $response = array(
+                    'status' => 'false',
+                    'url' => '',
+                    'token'=>''
+                );
+            }else{
+                $response = array(
+                    'status' => true,
+                    'url' => $filename,
+                );
+            }
+        }else{
+            $response = array(
+                'status' => 'false',
+                'url' => '',
+                'token'=>''
+            );
+        }
+        exit(json_encode($response));
+    }
+    public function download(){
+        $fileName = date('Y-m-d',time()).'.xlsx';
+        $path = 'D:/PHPTutorial/www/work/wns/public/'.$fileName;
+        // echo $path;exit;
+        if(!file_exists($path)){
+            header("HTTP/1.0 404 Not Found");
+            exit;
+        }else{
+            $file = @fopen($path,"r");
+            if(!$file){
+                header("HTTP/1.0 505 Internal server error");
+                exit;
+            }
+            header("Content-type: application/octet-stream");
+            header("Accept-Ranges: bytes");
+            header("Accept-Length: ".filesize($path));
+            header("Content-Disposition: attachment; filename=" . $fileName);
+            while(!feof($file)){
+                echo fread($file,2048);
+            }
+            fclose($file);
+            unlink($path);
+            exit();
+        }
     }
 }

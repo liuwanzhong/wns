@@ -226,7 +226,7 @@
                         </div>
                     </form>
                 </div>
-            </div>
+        </div>
         <script src="/static/jquery-1.9.1.min.js"></script>
         <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
         <script src="/layui/layui.js"></script>
@@ -387,6 +387,18 @@
             location.href = "/index/Rukuorder/index/id/"+orders;
         })
 
+        $('#dc').on('click', function(){
+            var data = sessionStorage.session;
+            var params = {id:data};
+            $.post("{:url('Cwmanagement/outExcel')}",params,function(res){
+                // alert(res.status);
+                if(res.status){
+                    window.location.href = ("{:Url('index/Cwmanagement/download')}?file="+res.url);
+                }else{
+                    layer.msg('系统错误，操作失败');
+                }
+            },'json')
+        })
         </script>
 	</body>
 </html>

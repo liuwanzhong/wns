@@ -20,7 +20,8 @@ class Instor extends Controller
                 ->where('a.id',$v['rukuid'])->find()['name'];
 //            dump($v);
         }
-//        dump($orders);exit;
+        echo db('rukuform_xq')->getlastSql();
+       dump($orders);exit;
         return view('index2',['orders'=>$orders]);
     }
     public function index2(){
