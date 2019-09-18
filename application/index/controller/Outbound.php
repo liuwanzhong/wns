@@ -20,6 +20,37 @@ class Outbound extends Controller {
     public function system_order(){
 
     }
+    // 详细信息回显
+    public function record_edit($id){
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
+        $row = db('system_order') -> where('id', $id) -> find();
+        if ($row['delivery_time'] != 0) {
+            $row['delivery_time'] = date("Y/m/d", $row['delivery_time']);
+        } else {
+            $arr['delivery_time'] = '暂无时间';
+        }
+        return $row;
+    }
+    // 详细信息修改
+    public function detailed_edit($id){
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
+        $data = input();
+        $data['delivery_time'] = strtotime($data['delivery_time']);
+        $data['updata_time'] = time();
+        unset($data['/index/outbound/detailed_edit_html']);
+        $r = db('system_order') -> where('id', $id) -> update($data);
+        if ($r) {
+            return redirect('Outbound/index');
+        } else {
+            $this -> error('修改失败,请联系管理员');
+        }
+    }
     // 导入excel
     public function upload_excel(){
         $ms = $this -> qx();
@@ -49,6 +80,8 @@ class Outbound extends Controller {
         $objContent   = $objReader -> load($file['tmp_name']);
         $sheetContent = $objContent -> getSheet(0) -> toArray();
         unset($sheetContent[0]);
+        // unset($sheetContent[1]);
+        // var_dump($sheetContent);exit;
         foreach ($sheetContent as $k => $v) {
             $arr['delivery_time']                   = strtotime($v[0]);//发货日期
             $arr['factory_id']               = $v[1];//工厂编号
@@ -65,7 +98,7 @@ class Outbound extends Controller {
             $arr['detailed']              =$v[12];//详细批次
             $arr['is_del']                      = 0;//软删除
             $arr['create_time']                  = time();//创建时间
-            if (!empty($v[0])) {//无订单编号数据不写入
+            if (!empty($v[0]) && $v[0]!=0) {//无发货日期数据不写入
                 $res[] = $arr;
             }
         }
@@ -77,8 +110,53 @@ class Outbound extends Controller {
             $this -> error('导入失败');
         }
     }
+    // 生成出库单
+    public function make_outbound_order(){
+        $cd=input('id');
+        $id=str_replace(array("[","]","\""),"",$cd);
+        $id=explode(',',$id);
+        // 发货日期
+        $fh=$rows = db('system_order')
+        ->field('delivery_time')
+        ->where('is_del',0)
+        ->where('id','in',$id)
+        ->group('delivery_time')
+        ->select();
+        $cfh=count($fh);
+        if($cfh!=1){
+            $this -> error('发货日期不一致');
+        }
+        // 装运单号
+        $zy=$rows = db('system_order')
+        ->field('transport_id')
+        ->where('is_del',0)
+        ->where('id','in',$id)
+        ->group('transport_id')
+        ->select();
+        $czy=count($zy);
+        // var_dump($zy);exit;
+        if($czy!=1){
+            $this -> error('装运单号不一致');
+        }
+        // 售达方
+        $sd=$rows = db('system_order')
+        ->field('reachby_name')
+        ->where('is_del',0)
+        ->where('id','in',$id)
+        ->group('reachby_name')
+        ->select();
+        // var_dump($sd);exit;
+        $rows = db('system_order')
+            ->field('')
+            ->where('is_del',0)
+            ->where('id','in',$id)
+            ->group('material_name')
+            ->select();
+        return view('make_outbound_order',['rows'=>$rows,'fh'=>$fh,'zy'=>$zy,'sd'=>$sd]);
+    }
     // 出库订单
-    public function outbound_order(){
-
+    public function insert(){
+        $cd=input();
+        var_dump($cd);
     }
 }

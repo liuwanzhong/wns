@@ -150,8 +150,8 @@ class Rukuorder extends Controller {
     }
     //修改订单
     public function to_examine_up() {
-        $data       = input();
-        $userintime = strtotime($data['userintime']);
+        $data=input();
+        $userintime=strtotime($data['userintime']);
         array_shift($data);
 //        try{
         $r = db('rukuform')
@@ -406,7 +406,8 @@ class Rukuorder extends Controller {
             $objWriter->save($filePath);
             if(!file_exists($filePath)){
                 $response = array(
-                    'status' => '1',
+
+                    'status' => 'false',
                     'url' => '',
                     'token'=>''
                 );
@@ -419,7 +420,7 @@ class Rukuorder extends Controller {
             }
         }else{
             $response = array(
-                'status' => '2',
+                'status' => 'false',
                 'url' => '',
                 'token'=>''
             );

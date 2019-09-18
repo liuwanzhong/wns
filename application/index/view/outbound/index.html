@@ -25,15 +25,25 @@
             </div>
             <div class="handle">
                 <button type="button" class="layui-btn" id="dialog">导入excel表</button>
-                <a href="{:url('Cwmanagement/clink')}" class="layui-btn" id="clink">清除数据</a>
-                <button type="button" class="layui-btn" id="del">删除</button>
+                <button type="button" class="layui-btn" id="outorder">生成出库单</button>
             </div>
+<<<<<<< HEAD
+            <main class="bd_content">
+                <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
+=======
             <main class="bd_content" style="margin-top: 30px;">
 
                 <table class="layui-table" style="width: 96%; margin: 12px auto;">
+>>>>>>> dbdcd83f812b9ef18f4ecbd5eea74f88618e5b8d
                     <thead>
                     <tr>
+                        <th><input type="checkbox" id="all"></th>
                         <th>发货日期</th>
+<<<<<<< HEAD
+                        <th>工厂名</th>
+                        <th>装运单号</th>
+                        <th>交货单号</th>
+=======
                         <th class="out_num">工厂编号</th>
                         <th>工厂名</th>
                         <th>装运单号</th>
@@ -41,31 +51,31 @@
                         <th>售达方代码</th>
                         <th>售达方名称</th>
                         <th class="out_num">送达方代码</th>
+>>>>>>> dbdcd83f812b9ef18f4ecbd5eea74f88618e5b8d
                         <th>送达方名称</th>
-                        <th>物料代码</th>
                         <th>物料名</th>
                         <th class="out_num">交货数量</th>
                         <th>详细批次</th>
+                        <th>操作</th>
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="tbd">
                         {if condition="!empty($list)"}
                         {volist name='list' id='r'}
                         <tr id="check" class="news_list">
                             <input type="hidden" name="id" value="{$r.id}">
+                            <td><input type="checkbox" value="{$r.id}"></td>
                             <td><?php if($r['delivery_time']!=0){echo date("Y/m/d",$r['delivery_time']);}?></td>
-                            <td>{$r.factory_id}</td>
                             <td>{$r.factory_name}</td>
                             <td>{$r.transport_id}</td>
                             <td>{$r.Delivery_id}</td>
-                            <td>{$r.reachout_id}</td>
-                            <td>{$r.reachout_name}</td>
-                            <td>{$r.reachby_id}</td>
                             <td>{$r.reachby_name}</td>
-                            <td>{$r.material_id}</td>
                             <td>{$r.material_name}</td>
                             <td>{$r.Delivery_num}</td>
                             <td>{$r.detailed}</td>
+                            <td>
+                                <a href="#" class="img_edit" title="详细" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
+                            </td>
                         </tr>
                         {/volist}
                         {/if}
@@ -91,129 +101,72 @@
                         <input type="submit" class="save" id="btn" value="确定"/>
                     </div>
                 </form>
+                <span>无发货日期数据无法导入</span>
             </div>
         </div>
         <!-- 详细 -->
         <div class="model_edit">
-                <div class="head">
-                    <span>修改商品</span>
-                    <a href="javascript:" class="close_edit">×</a>
-                </div>
-                <div class="content" style="height:550px;width:800px;overflow:auto;">
-                    <form action="{:url('Cwmanagement/record_update')}" method="post" enctype="multipart/form-data">
-                        <input type="hidden" name="id" id="id">
-                        <div class="wrap">
-                            <label>调拨订单号</label>
-                            <input type="text" id="transfers_id" name="transfers_id" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>交付单号</label>
-                            <input type="text" id="delivery_id" name="delivery_id" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>交货单实际出库日期</label>
-                            <input type="text" id="delivery_time" name="delivery_time" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
-                        </div>
-                        <div class="wrap">
-                            <label>调拨出库工厂</label>
-                            <input type="text" id="transfers_factory" name="transfers_factory" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>物料名称</label>
-                            <input type="text" id="material_name" name="material_name" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>生产日期</label>
-                            <input type="text" id="production_time" name="production_time" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
-                        </div>
-                        <div class="wrap">
-                            <label>装运类型</label>
-                            <input type="text" id="transport_type" name="transport_type" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>集装箱号/车皮号</label>
-                            <input type="text" id="container_id" name="container_id" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>在途净重</label>
-                            <input type="text" id="zt_net_weight" name="zt_net_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>在途毛重</label>
-                            <input type="text" id="zt_Gross_weight" name="zt_Gross_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>在途数量</label>
-                            <input type="text" id="zt_num" name="zt_num" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>调出数量</label>
-                            <input type="text" id="Bring_up_num" name="Bring_up_num" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>调拨入库时间</label>
-                            <input type="text" id="transfers_into_time" name="transfers_into_time" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')" placeholder="xxxx/x/x"/>
-                        </div>
-                        <div class="wrap">
-                            <label>调拨入库地点</label>
-                            <input type="text" id="transfers_into_addres" name="transfers_into_addres" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>调拨出库地点</label>
-                            <input type="text" id="transfers_out" name="transfers_out" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>调出毛重</label>
-                            <input type="text" id="Bring_up_Gross_weight" name="Bring_up_Gross_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>调出净重</label>
-                            <input type="text" id="Bring_up_net_weight" name="Bring_up_net_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>调拨入库数量</label>
-                            <input type="text" id="transfers_into_num" name="transfers_into_num" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>调拨入库毛重</label>
-                            <input type="text" id="transfers_into_Gross_weight" name="transfers_into_Gross_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>调拨入库净重</label>
-                            <input type="text" id="transfers_into_net_weight" name="transfers_into_net_weight" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-                        <div class="wrap">
-                            <label>备注</label>
-                            <input type="text" id="note" name="note" value="" required oninvalid="setCustomValidity('
-                            不能为空') oninput="setCustomValidity('')"/>
-                        </div>
-
-                        <div class="wrap btn">
-                            <input type="submit" class="save" id="btn" value="修改"/>
-                        </div>
-                    </form>
-                </div>
+            <div class="head">
+                <span>修改商品</span>
+                <a href="javascript:" class="close_edit">×</a>
             </div>
+            <div class="content" style="height:550px;width:800px;overflow:auto;">
+                <form action="{:url('Outbound/detailed_edit')}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="id" id="id" >
+                    <div class="wrap">
+                        <label>发货日期</label>
+                        <input type="text" id="delivery_time" name="delivery_time" value="" placeholder="xxxx/x/x"/ />
+                    </div>
+                    <div class="wrap">
+                        <label>工厂编号</label>
+                        <input type="text" id="factory_id" name="factory_id" value="" />
+                    </div>
+                    <div class="wrap">
+                        <label>工厂名</label>
+                        <input type="text" id="factory_name" name="factory_name" value=""  >
+                    </div>
+                    <div class="wrap">
+                        <label>装运单号</label>
+                        <input type="text" id="transport_id" name="transport_id" value=""/>
+                    </div>
+                    <div class="wrap">
+                        <label>交货单号</label>
+                        <input type="text" id="Delivery_id" name="Delivery_id" value="" />
+                    </div>
+                    <div class="wrap">
+                        <label>售达方代码</label>
+                        <input type="text" id="reachout_id" name="reachout_id" value="" />
+                    </div>
+                    <div class="wrap">
+                        <label>售达方名称</label>
+                        <input type="text" id="reachout_name" name="reachout_name" value="" />
+                    </div>
+                    <div class="wrap">
+                        <label>送达方代码</label>
+                        <input type="text" id="reachby_id" name="reachby_id" value="" />
+                    </div>
+                    <div class="wrap">
+                        <label>送达方名称</label>
+                        <input type="text" id="reachby_name" name="reachby_name" value="" />
+                    </div>
+                    <div class="wrap">
+                        <label>物料名</label>
+                        <input type="text" id="material_name" name="material_name" value="" />
+                    </div>
+                    <div class="wrap">
+                        <label>交货数量</label>
+                        <input type="text" id="Delivery_num" name="Delivery_num" value="" />
+                    </div>
+                    <div class="wrap">
+                        <label>详细批次</label>
+                        <input type="text" id="detailed" name="detailed" value="" />
+                    </div>
+                    <div class="wrap btn">
+                        <input type="submit" class="save" id="btn_update" value="修改"/>
+                    </div>
+                </form>
+            </div>
+        </div>
         <script src="/static/jquery-1.9.1.min.js"></script>
         <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
         <script src="/layui/layui.js"></script>
@@ -225,42 +178,118 @@
 			$('.close').on('click', function(){
 				$('.model').hide();
             })
-            
-            let session=[];
-            $('.news_list').on('click','input[type=checkbox]',function () {
-                let ses=JSON.parse(sessionStorage.getItem('session'));
-                session = ses === null ? [] : ses;
+            //详细
+			$('.img_edit').on('click', function(){
+				$('.model_edit').show();
+			})
+            $('.close_edit').on('click', function(){
+				$('.model_edit').hide();
+			})
+            $('.img_edit').click(function(){
+				let val = $(this).parents('tr').find('input[type=hidden]').val();
+                // alert(val);exit;
+				$.ajax({
+					url:'/index/Outbound/record_edit',
+					type:'post',
+					data:{'id':val},
+					success:function(data){
+                        $('#id').val(data.id)
+						$('#delivery_time').val(data.delivery_time)
+						$('#factory_id').val(data.factory_id)
+						$('#factory_name').val(data.factory_name)
+						$('#transport_id').val(data.transport_id)
+						$('#Delivery_id').val(data.Delivery_id)
+						$('#reachout_id').val(data.reachout_id)
+						$('#reachout_name').val(data.reachout_name)
+						$('#reachby_id').val(data.reachby_id)
+						$('#reachby_name').val(data.reachby_name)
+						$('#material_name').val(data.material_name)
+						$('#Delivery_num').val(data.Delivery_num)
+						$('#zt_num').val(data.zt_num)
+						$('#detailed').val(data.detailed)
+					}
+				})
+            })
+
+            //全选或全不选
+            $("#all").click(function(){
+                let arr = [];
+                if(this.checked){
+                    $("#check :checkbox,#all").prop("checked", true);
+                    let checks = $('.tbd ').find('input:checkbox');
+                    checks.each(function () {
+                        arr.push($(this)[0].value);
+                    })
+                    sessionStorage.setItem('out_session',JSON.stringify(arr));
+                }else{
+                    $("#check :checkbox,#all").prop("checked", false);
+                    sessionStorage.removeItem('out_session');
+                }
+            });
+
+            // 出库单生成
+            $("#outorder").on("click",function(){
+                var orders = sessionStorage.getItem('out_session');
+                location.href = "/index/Outbound/make_outbound_order/id/"+orders;
+            })
+
+
+
+            let out_session=[];
+            $('.tbd').on('click','input[type=checkbox]',function () {
+                let ses=JSON.parse(sessionStorage.getItem('out_session'));
+                out_session = ses === null ? [] : ses;
                 if($(this)[0].checked == true){
-                    session.push($(this).val());
+                    out_session.push($(this).val());
                 }else{
                     let val = $(this).val();
-                    for (let i in session){
-                        if(session[i] == val){
-                            session.splice(i,1);
+                    for (let i in out_session){
+                        if(out_session[i] == val){
+                            out_session.splice(i,1);
                         }
                     }
                 }
-                sessionStorage.setItem('session',JSON.stringify(session));
+                sessionStorage.setItem('out_session',JSON.stringify(out_session));
             })
 
             $(function () {
-                let list = JSON.parse(sessionStorage.getItem('session'));
-                $('.news_list input[type=checkbox]').each(function () {
-                    if(list.includes($(this).val()) ){
-                        $(this).prop('checked',true);
-                    }
-                })
+                let list = JSON.parse(sessionStorage.getItem('out_session'));
+                if(list != null){
+                    $('.new_list input[type=checkbox]').each(function () {
+                        if(list.includes($(this).val()) ){
+                            $(this).prop('checked',true);
+                        }
+                    })
+                }
             })
 
         $("#rukuorder").on("click",function(){
-            var orders = sessionStorage.getItem('session');
+            var orders = sessionStorage.getItem('out_session');
             location.href = "/index/Rukuorder/index/id/"+orders;
         })
+<<<<<<< HEAD
+
+        $('#outExcel').on('click', function(){
+            alert(1);
+            var data = sessionStorage.session;
+            var params = {id:data};
+            $.post("{:url('Cwmanagement/outExcel')}",params,function(res){
+                // alert(res.status);
+                if(res.status){
+                    window.location.href = ("{:Url('index/Cwmanagement/download')}?file="+res.url);
+                }else{
+                    layer.msg('系统错误，操作失败');
+                }
+            },'json')
+        })
+
+=======
             
             
             layui.use('element', function () {
 
             })
+>>>>>>> dbdcd83f812b9ef18f4ecbd5eea74f88618e5b8d
         </script>
 	</body>
 </html>
