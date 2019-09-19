@@ -79,7 +79,7 @@
 					<td>{$row.k_name}</td>
 					<td>{$row.w_name}</td>
 					<td>{$row.c_name}</td>
-					<td>{$row.time|date="Y-m-d",###}</td>
+					<td><?php if(!empty($row['time'])){echo date('Y-m-d',$row['time']);} ?></td>
 					<td>{$row.product_time}</td>
 					<td>{$row.rk_nums}</td>
 					<td>{$row.netweight}</td>

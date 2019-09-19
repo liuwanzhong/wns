@@ -5,44 +5,37 @@
     <title>Title</title>
 </head>
 <body>
-<h1>入库单</h1>
-<form method="post" action="{:url('Instor/index')}">
-<p>装运单号:{$main.shipmentnum}</p>
-<p>入库日期:{$main.userintime}</p>
-<p>运输方式:{$main.transport}</p>
-<p>车牌号码:{$main.carid}</p>
-<p>装卸工:{$main.stevedore}</p>
-<p>入库仓库:{$main.ck_id}</option>
+<h1>货位进销存查询</h1>
 </select></p>
 <table class="table" border="1">
     <tr>
-        <th>入库工厂</th>
-        <th>产品名称</th>
-        <th>入库状态</th>
-        <th>入库货位</th>
-        <th>实收数量</th>
-        <th>产品日期</th>
-        <th>产品批次</th>
-        <th>备注</th>
-        <th>毛重</th>
-        <th>净重</th>
-        <th>订单编号</th>
+        <th>日期</th>
+        <th>单号</th>
+        <th>作业类型</th>
+        <th>客户</th>
+        <th>期初数量</th>
+        <th>到货入库</th>
+        <th>调拨入库</th>
+        <th>其他入库</th>
+        <th>销售出库</th>
+        <th>调拨出库</th>
+        <th>其他出库</th>
+        <th>结存</th>
     </tr>
-    {volist name='orders' id='v'}
+    {volist name='rows' id='row'}
     <tr>
-        <input type="hidden" name="min" value="{$v.Grossweight}">
-        <input type="hidden" name="gross_min" value="{$v.netweight}">
-        <th>{$v.factory}</th>
-        <th>{$v.product_name}</th>
-        <th>{$v.title}</th>
-        <th>{$v.name}</th>
-        <th>{$v.rk_nums}</th>
-        <th>{$v.product_time}</th>
-        <th>{$v.product_batch}</th>
-        <th>{$v.content}</th>
-        <th>{$v.Grossweight}</th>
-        <th>{$v.netweight}</th>
-        <th>{$v.transfers_id}</th>
+        <td><?php if(!empty($row['time'])){echo date('Y-m-d',$row['time']);} ?></td>
+        <td>{$row.odd_number}</td>
+        <td>{$row.task}</td>
+        <td>{$row.customer}</td>
+        <td>{$row.early_stage}</td>
+        <td>{$row.dh_ruku}</td>
+        <td>{$row.db_ruku}</td>
+        <td>{$row.qt_ruku}</td>
+        <td>{$row.xx_chuku}</td>
+        <td>{$row.db_chuku}</td>
+        <td>{$row.qt_chuku}</td>
+        <td>{$row.balance}</td>
     </tr>
     {/volist}
 </table>

@@ -7,42 +7,36 @@ class Instor extends Controller
 {
     //货物列表
     public function index(){
-        $orders = db('rukuform_xq')->field('a.*,b.title,c.name')
-            ->alias('a')
-            ->join('kc_status b','b.id = a.rk_status_id','left')
-            ->join('cabinet c','c.id = a.rk_huowei_id','left')
-            ->where('a.is_del',0)->where('b.is_del',0)->where('c.is_del',1)->where('state',1)->select();
-        foreach($orders as &$v){
-            $v['ckname'] = db('rukuform')->field('a.id,a.ck_id,b.name')
-                ->alias('a')
-                ->join('warehouse b','a.ck_id = b.id')
-                ->where('a.is_del',0)->where('b.is_del',1)
-                ->where('a.id',$v['rukuid'])->find()['name'];
-//            dump($v);
+        $orders = db('rukuform_xq')
+            ->where('rukuform_xq.state',1)
+            ->where('rukuform_xq.is_del',0)
+            ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id',"left")
+            ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
+            ->where('kc_status.is_del',0)
+            ->where('cabinet.is_del',1)
+            ->field('rukuform_xq.*,kc_status.title,cabinet.name')
+            ->select();
+        foreach($orders as &$v) {
+            $v['ckname'] = db('rukuform') -> field('a.id,a.ck_id,b.name')
+                               -> alias('a')
+                               -> join('warehouse b', 'a.ck_id = b.id')
+                               -> where('a.is_del', 0) -> where('b.is_del', 1)
+                               -> where('a.id', $v['rukuid']) -> find()['name'];
         }
-        echo db('rukuform_xq')->getlastSql();
-       dump($orders);exit;
         return view('index2',['orders'=>$orders]);
-    }
-    public function index2(){
-        $list = db('rukuform')->field('a.*,b.name')->alias('a')
-            ->join('warehouse b','b.id = a.ck_id','left')
-            ->where('a.is_del',0)->where('a.state',1)->where('b.is_del',1)->paginate(20);
-        return view('index',['list'=>$list]);
     }
     //查看入库产品
     public function show($id){
-        $main = db('rukuform')->where('is_del',0)->where('id',$id)->find();
-        $main['ck_id'] = db('warehouse')->where('is_del',1)->where('id',$main['ck_id'])->find()['name'];
-//        dump($main['ck_id']);exit();
-        $orders = db('rukuform_xq')->field('a.*,b.title,c.name')
-            ->alias('a')
-            ->join('kc_status b','b.id = a.rk_status_id','left')
-            ->join('cabinet c','c.id = a.rk_huowei_id','left')
-            ->where('a.rukuid',$id)->where('a.is_del',0)->where('b.is_del',0)->where('c.is_del',1)->select();
-//        dump($orders);exit;
-        return view('show',['main'=>$main,'orders'=>$orders]);
+        $rows=db('record')->where('rukuform_id',$id)->select();
+        dump($rows);
+        return view('show',['rows'=>$rows]);
     }
+    //模拟销售出库
+    public function mn() {
+
+    }
+
+
     //添加数据
     public function insert(Request $request){
         $ms=$this->qx();

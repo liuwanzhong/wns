@@ -20,6 +20,7 @@ return [
     'username'        => 'root',
     // 密码
     'password'        => 'qi_95624852_fa_phptxdy',
+//    'password'        => 'root',
     // 端口
     'hostport'        => '',
     // 连接dsn
