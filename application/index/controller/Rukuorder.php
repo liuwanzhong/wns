@@ -285,6 +285,7 @@ class Rukuorder extends Controller {
             ->where($search)
             ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
             ->paginate(100);
+            // var_dump($rows);exit;
         return view('warehousing',['rows'=>$rows]);
     }
     //订单详情

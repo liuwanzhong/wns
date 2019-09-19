@@ -27,9 +27,8 @@
                 <button type="button" class="layui-btn" id="dialog">导入excel表</button>
                 <button type="button" class="layui-btn" id="outorder">生成出库单</button>
             </div>
-            <main class="bd_content" style="margin-top: 30px;">
-
-                <table class="layui-table" style="width: 96%; margin: 12px auto;">
+            <main class="bd_content">
+                <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
                     <thead>
                     <tr>
                         <th><input type="checkbox" id="all"></th>
@@ -81,7 +80,8 @@
             <div class="content">
                 <form action="{:url('Outbound/upload_excel')}" method="post" enctype="multipart/form-data">
                     <div class="wrap">
-                        <input type="file" name="file" value="" required oninvalid="setCustomValidity('不能为空')" oninput="setCustomValidity('')"/>
+                        <input type="file" name="file" value="" required oninvalid="setCustomValidity('
+                            不能为空') oninput="setCustomValidity('')"/>
                         <input type="submit" class="save" id="btn" value="确定"/>
                     </div>
                 </form>
@@ -89,17 +89,17 @@
             </div>
         </div>
         <!-- 详细 -->
-        <div class="model_edit" style="overflow: hidden;">
+        <div class="model_edit">
             <div class="head">
                 <span>修改商品</span>
                 <a href="javascript:" class="close_edit">×</a>
             </div>
-            <div class="content" style="height: 100%;overflow-x: hidden;">
-                <form action="{:url('Outbound/detailed_edit')}" method="post" enctype="multipart/form-data" style="margin-bottom: 100px;">
+            <div class="content" style="height:550px;width:800px;overflow:auto;">
+                <form action="{:url('Outbound/detailed_edit')}" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="id" id="id" >
                     <div class="wrap">
                         <label>发货日期</label>
-                        <input type="text" id="delivery_time" name="delivery_time" value="" placeholder="xxxx/x/x" />
+                        <input type="text" id="delivery_time" name="delivery_time" value="" placeholder="xxxx/x/x"/ />
                     </div>
                     <div class="wrap">
                         <label>工厂编号</label>
@@ -265,11 +265,6 @@
                 }
             },'json')
         })
-
-            
-            layui.use('element', function () {
-
-            })
         </script>
 	</body>
 </html>
