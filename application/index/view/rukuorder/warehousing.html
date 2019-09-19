@@ -87,8 +87,15 @@
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script type="text/javascript">
-			layui.use('element', function () {
-				
+			layui.use(['element', 'laydate'], function () {
+				let laydate = layui.laydate;
+				laydate.render({
+					elem: '#delivery_time'
+					,range: '~'
+					,done: function(value){
+						$('#s_delivery_time').val(value)
+					}
+				})
 			})
 			
 			//详情

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="/images/css.css">
     <link rel="stylesheet" href="/images/index.css" />
     <link rel="stylesheet" href="/layui/css/layui.css" />
     <style>
@@ -10,9 +11,7 @@
         .submit{margin-left: 30px;margin-top: 30px;}
         .container{display: block;overflow-x: hidden;height: 580px;}
         .container::-webkit-scrollbar{width: 0;}
-        input[type="date"]::-webkit-inner-spin-button {
-            display: none;
-        }
+        .layui-form-radio{margin: 0;padding: 0;}
     </style>
 </head>
 <body>
@@ -95,9 +94,10 @@
                         <th>交货单号</th>
                         <th>仓库</th>
                         <th>产品名称</th>
-                        <th>数量</th>
+                        <th>总数量</th>
                         <th>货位</th>
-                        <th>日期</th>
+                        <th>数量</th>
+                        <th>毛重</th>
                         <th>净重</th>
                         <th>货位剩余数</th>
                         <th>备注</th>
@@ -107,6 +107,7 @@
                 <tbody class="tbd">
                     {volist name='rows' id='v'}
                     <tr>
+                        <input type="hidden" class="rukuform_xq_id">
                         <td>
                             <input type="hidden" value="" name="Delivery_id" readonly>
                             {$v.Delivery_id}
@@ -119,27 +120,26 @@
                             <input type="hidden" value="" name="material_name" readonly>
                             {$v.material_name}
                         </td>
-                        <td class="huowei">
+                        <td>
                             <input type="hidden" value="" name="Delivery_num" readonly>
                             {$v.Delivery_num}
                         </td>
                         <td class="huowei">
-                            <input type="hidden" value="" name="Delivery_id" readonly>
-                            {$v.Delivery_num}
+                            <botton class="layui-btn layui-btn-sm dia">点击</botton>
                         </td>
-                        <td class="huowei">
-                            <input type="hidden" value="" name="delivery_time" readonly>
-                            {$v.Delivery_num}
+                        <td class="count">
+                            0
                         </td>
-                        <td class="huowei">
-                            <input type="hidden" value="" name="Delivery_id" readonly>
-                            {$v.Delivery_num}
+                        <td class="mao">
+                            0
                         </td>
-                        <td class="huowei">
-                            <input type="hidden" value="" name="Delivery_id" readonly>
-                            {$v.Delivery_num}
+                        <td class="jin">
+                            0
                         </td>
-                        <td class="huowei">
+                        <td class="sy_count">
+                            0
+                        </td>
+                        <td>
                             <input type="hidden" value="" name="Delivery_id" readonly>
                             {$v.Delivery_num}
                         </td>
@@ -154,10 +154,35 @@
             <span>
                 保管签字：司机确认：
             </span>
+            <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
         </div>
 
-        <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
+
     </form>
+</div>
+<div class="model_table" style="display: none; top: 45%; overflow: hidden;">
+    <div class="head">
+        <span>修改商品</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content" style="height: 100%;overflow-x: hidden;">
+        <table class="layui-table layui-form">
+            <thead>
+            <tr>
+                <th></th>
+                <th>产品名称</th>
+                <th>产品日期</th>
+                <th>货位名称</th>
+                <th>库存数量</th>
+                <th>出库数量</th>
+                <th>备注</th>
+            </tr>
+            </thead>
+            <tbody class="kc_list"></tbody>
+        </table>
+        <button class="layui-btn sure" style="margin-top: 20px;">确定</button>
+    </div>
+
 </div>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
@@ -252,6 +277,67 @@
             }
 
         })
+
+
+        let par = '';
+        $('.tbd').on('click', '.dia', function () {
+            par = $(this).parents('tr');
+            $('.kc_list').empty();
+            $('.model_table').show();
+
+            $.ajax({
+                url:'/index/Table/houwei_ck',
+                data: {id:7},
+                success:function (data) {
+                    console.log(data)
+                    let html = '';
+                    for (let i =0; i<data.length; i++){
+                        html += ` <tr>
+                            <input type="hidden" id="id" class="layui-input" value="${data[i].id}">
+                            <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
+                            <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
+
+                            <td><input type="radio" name="sex" value="nan" title=""></td>
+                            <td>${data[i].product_name}</td>
+                            <td>${data[i].product_time}</td>
+                            <td class="hw">${data[i].name}</td>
+                            <td>${data[i].rk_nums}</td>
+                            <td><input type="text" class="layui-input" style="width: 80px;"></td>
+                            <td>${data[i].content}</td>
+                        </tr>`;
+                    }
+                    $('.kc_list').append(html)
+                    form.render()
+                }
+            })
+        })
+
+        $('.sure').on('click', function () {
+
+            $('.model_table').hide();
+
+            let che = $('.kc_list').find('input:radio:checked')[0];
+            let tr = $(che).parents('tr');
+            let id = tr.find('#id').val();
+            let m = tr.find('#m').val();
+            let j = tr.find('#j').val();
+            let hw = tr.find('.hw').text();
+            let num = tr.find('input[type=text]').val();
+
+            $.ajax({
+                url:'/index/Table/houwei_cd',
+                data:{id, m, j, count:num},
+                success:function (d) {
+                    console.log(d)
+                    par.find('.rukuform_xq_id').val(id);
+                    par.find('.huowei').text(hw);
+                    par.find('.count').text(num);
+                    par.find('.mao').text(d.m)
+                    par.find('.jin').text(d.j)
+                    par.find('.sy_count').text(d.sy)
+                }
+            })
+        })
     })
 
     function showtable(val){
@@ -313,6 +399,12 @@
         let p = $(this).parents('tr');
         p.remove();
     })
+
+    $('.close').on('click', function(){
+        $('.model_table').hide();
+
+    })
+
 </script>
 </body>
 </html>

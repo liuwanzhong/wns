@@ -150,6 +150,10 @@ class Rukuorder extends Controller {
     }
     //修改订单
     public function to_examine_up() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data=input();
         $userintime=strtotime($data['userintime']);
         array_shift($data);
@@ -200,6 +204,10 @@ class Rukuorder extends Controller {
     }
     //审核
     public function to_examine_yes() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $id=input('id');
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
@@ -219,6 +227,10 @@ class Rukuorder extends Controller {
     }
     //删除
     public function to_examine_del() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $id=input('id');
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
@@ -293,6 +305,10 @@ class Rukuorder extends Controller {
     }
     //删除
     public function warehousing_del() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $id=input('id');
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
@@ -354,6 +370,10 @@ class Rukuorder extends Controller {
     }
     //导出入库明细
     public function outExcel(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data = input();
         unset($data['/index/rukuorder/outexcel_html']);
         $id=$data['id'];
@@ -406,7 +426,6 @@ class Rukuorder extends Controller {
             $objWriter->save($filePath);
             if(!file_exists($filePath)){
                 $response = array(
-
                     'status' => 'false',
                     'url' => '',
                     'token'=>''
@@ -441,7 +460,6 @@ class Rukuorder extends Controller {
     public function download(){
         $fileName = date('Y-m-d',time()).'.xlsx';
         $path = 'D:\WWW\wns\public/'.$fileName;
-        // echo $path;exit;
         if(!file_exists($path)){
             header("HTTP/1.0 404 Not Found");
             exit;

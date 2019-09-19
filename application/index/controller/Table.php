@@ -24,4 +24,45 @@ class Table extends Controller {
             ->where('cabinet.warehouse_id',$id)->select();
         return json_encode($list);
     }
+
+    public function houwei_ck() {
+        $id=input('id');
+        static $md=[];
+        $ck=db('cabinet')->where('warehouse_id',$id)->where('is_del',1)->select();
+        foreach ($ck as $c) {
+            $rukuform=db('rukuform_xq')
+                ->where('rukuform_xq.state',1)
+                ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id')
+                ->field('rukuform_xq.*,cabinet.name')
+                ->select();
+            foreach ($rukuform as $k=>$item) {
+                if($c['id']==$item['rk_huowei_id']){
+                    $md[]=$item;
+                }
+            }
+        }
+        foreach ($md as $k=>$row) {
+            $md[$k]['m']=$row['Grossweight']/$row['rk_nums'];
+            $md[$k]['j']=$row['netweight']/$row['rk_nums'];
+        }
+        return $md;
+    }
+    public function houwei_cd() {
+        $data=input();
+        array_shift($data);
+        $mj=$this->blur($data['m'],$data['j'],$data['count']);
+        $row=db('rukuform_xq')->where('id',$data['id'])->find();
+        $sy=$row['rk_nums']-$data['count'];
+        $mj['sy']=$sy;
+        return $mj;
+    }
+
+
+    public function blur($groos_min,$min,$max) {
+        //净重
+        $number=sprintf("%.3f",$min*$max);
+        //毛重
+        $groos=sprintf("%.3f",$groos_min*$max);
+        return ['m'=>$number,'j'=>$groos];
+    }
 }

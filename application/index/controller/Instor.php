@@ -130,4 +130,9 @@ class Instor extends Controller
         }
     }
     //分配库存
+
+
+    public function search(){
+        return view('search');
+    }
 }
