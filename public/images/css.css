@@ -1,4 +1,4 @@
-.model,.model_select,.model_edit,.food_sort_up{
+.model,.model_select,.model_edit,.food_sort_up,.model_table{
 	width: 800px;
 	height: 600px;
 	margin: 0 auto;
@@ -11,7 +11,7 @@
 	box-shadow: 0 10px 10px rgba(51,51,51,.6);
 	display: none;
 }
-.model .head,.model_select .head,.model_edit .head,.food_sort_up .head{
+.model .head,.model_select .head,.model_edit .head,.food_sort_up .head,.model_table .head{
 	height: 50px;
 	background-color: #333;
 	display: flex;
@@ -28,7 +28,7 @@
 	font-size: 36px;
 	cursor: pointer;
 }
-.model .content,.model_select .content,.model_edit .content,.food_sort_up .content{
+.model .content,.model_select .content,.model_edit .content,.food_sort_up .content, .model_table .content{
 	padding: 25px 40px;
 }
 .content .wrap{

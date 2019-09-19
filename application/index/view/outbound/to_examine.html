@@ -17,12 +17,12 @@
 			<div class="nav">
 				<span class="layui-breadcrumb">
 					<a href="/public/main.html" target="box">首页</a>
-					<a href="javascript:;">入库管理</a>
-					<a><cite>入库台账</cite></a>
+					<a href="javascript:;">管理</a>
+					<a><cite>入库审核</cite></a>
 				</span>
 			</div>
 			<div class="seach">
-				<form action="{:url('Rukuorder/warehousing')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+				<form action="{:url('Rukuorder/to_examine')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
 					<div class="layui-form-item">
 						<label class="layui-form-label">工厂</label>
 						<div class="layui-input-inline">
@@ -65,15 +65,16 @@
 				{volist name='rows' id='row'}
 				<tr>
 					<td>{$row.id}</td>
-					<td>已审核</td>
+					<td>未审核</td>
 					<td>{$row.x_name}</td>
 					<td>{$row.shipmentnum}</td>
 					<td>{$row.w_name}</td>
 					<td><?php if(!empty($row['userintime'])){echo date('Y-m-d',$row['userintime']);} ?></td>
 					<td>{$row.count}</td>
 					<td>
-						<a href="#" class="edit xq" title="详情" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
-						<a href="{:url('Rukuorder/warehousing_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
+						<a href="#" class="edit xq" style="margin-right: 15px;"><i class="ico" title="详情">&#xe619;</i></a>
+						<a href="{:url('Rukuorder/to_examine_yes','id='.$row.id)}" class="edit ks" title="审核通过"><i class="ico">&#xe602;</i></a>
+						<a href="{:url('Rukuorder/to_examine_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
 					</td>
 				</tr>
 				{/volist}
@@ -87,8 +88,9 @@
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script type="text/javascript">
-			layui.use(['element', 'laydate'], function () {
-				let laydate = layui.laydate;
+			layui.use(['element', 'laydate'],function () {
+				let element = layui.element,
+					laydate = layui.laydate;
 				laydate.render({
 					elem: '#delivery_time'
 					,range: '~'
@@ -101,7 +103,7 @@
 			//详情
 			$('.xq').on('click',function () {
 				let id=$(this).parents('tr').find('td').eq(0).text();
-				location.href='/index/Rukuorder/warehousing_show?id='+id;
+				location.href='/index/Rukuorder/to_examine_show?id='+id;
 			})
 			layui.use(['element','laydate','form'], function(){
 				var laydate = layui.laydate;

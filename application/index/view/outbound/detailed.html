@@ -47,11 +47,11 @@
 					<div class="layui-form-item">
 						<div class="layui-input-inline">
 							<button class="layui-btn save" lay-submit>查询</button>
-							<button class="layui-btn" id="dc">导出</button>
 						</div>
 					</div>
 				</form>
 			</div>
+			<button id="dc">导出</button>
 			<table class="layui-table new_list" style="width: 96%; margin: 12px auto;">
 				<thead>
 				<tr>
@@ -79,7 +79,7 @@
 					<td>{$row.k_name}</td>
 					<td>{$row.w_name}</td>
 					<td>{$row.c_name}</td>
-					<td><?php if(!empty($row['time'])){echo date('Y-m-d',$row['time']);} ?></td>
+					<td>{$row.time|date="Y-m-d",###}</td>
 					<td>{$row.product_time}</td>
 					<td>{$row.rk_nums}</td>
 					<td>{$row.netweight}</td>
@@ -93,6 +93,9 @@
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script type="text/javascript">
+			layui.use(['element','form'],function(){
+				let form = layui.form;
+			})
 			layui.use(['element','laydate','form'], function(){
 				var laydate = layui.laydate;
 				var element = layui.element;
@@ -146,29 +149,20 @@
 					})
 				}
 			})
-
-			// 导出
 			$('#dc').on('click', function() {
+				// alert(1);
 				var data = sessionStorage.session_dc;
-				if(data !=  undefined || data != null){
-					var params = {id: data};
-					// console.log(params);
-					$.post("{:url('Rukuorder/outExcel')}", params, function (res) {
-						console.log(1)
-						console.log(res);
-						if (res.status) {
-							window.location.href = ("{:Url('index/Rukuorder/download')}?file=" + res.url);
-						} else {
-							layer.msg('系统错误，操作失败');
+				var params = {id: data};
+				console.log(params);
+				$.post("{:url('Rukuorder/outExcel')}", params, function (res) {
+					console.log(res);
+					if (res.status) {
+						window.location.href = ("{:Url('index/Rukuorder/download')}?file=" + res.url);
+					} else {
+						layer.msg('系统错误，操作失败');
 
-						}
-					}, 'json')
-				}
-				else {
-					layer.alert('请选择需要导出的数据',{icon:5})
-					return false;
-				}
-
+					}
+				}, 'json')
 			})
 		</script>
 	</body>

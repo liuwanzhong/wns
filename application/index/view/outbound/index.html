@@ -27,31 +27,15 @@
                 <button type="button" class="layui-btn" id="dialog">导入excel表</button>
                 <button type="button" class="layui-btn" id="outorder">生成出库单</button>
             </div>
-<<<<<<< HEAD
             <main class="bd_content">
                 <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
-=======
-            <main class="bd_content" style="margin-top: 30px;">
-
-                <table class="layui-table" style="width: 96%; margin: 12px auto;">
->>>>>>> dbdcd83f812b9ef18f4ecbd5eea74f88618e5b8d
                     <thead>
                     <tr>
                         <th><input type="checkbox" id="all"></th>
                         <th>发货日期</th>
-<<<<<<< HEAD
                         <th>工厂名</th>
                         <th>装运单号</th>
                         <th>交货单号</th>
-=======
-                        <th class="out_num">工厂编号</th>
-                        <th>工厂名</th>
-                        <th>装运单号</th>
-                        <th>交货单号</th>
-                        <th>售达方代码</th>
-                        <th>售达方名称</th>
-                        <th class="out_num">送达方代码</th>
->>>>>>> dbdcd83f812b9ef18f4ecbd5eea74f88618e5b8d
                         <th>送达方名称</th>
                         <th>物料名</th>
                         <th class="out_num">交货数量</th>
@@ -267,7 +251,6 @@
             var orders = sessionStorage.getItem('out_session');
             location.href = "/index/Rukuorder/index/id/"+orders;
         })
-<<<<<<< HEAD
 
         $('#outExcel').on('click', function(){
             alert(1);
@@ -282,14 +265,6 @@
                 }
             },'json')
         })
-
-=======
-            
-            
-            layui.use('element', function () {
-
-            })
->>>>>>> dbdcd83f812b9ef18f4ecbd5eea74f88618e5b8d
         </script>
 	</body>
 </html>
