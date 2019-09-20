@@ -70,4 +70,12 @@ class Table extends Controller {
         $groos=sprintf("%.3f",$groos_min*$max);
         return ['m'=>$number,'j'=>$groos];
     }
+
+    //删除数量
+    public function huifu() {
+        $id=input('id');
+        $num=input('num');
+        $row=db('rukuform_xq')->where('id',$id)->find();
+        db('rukuform_xq')->where('id',$id)->update(['sy_count'=>$row['sy_count']+$num]);
+    }
 }

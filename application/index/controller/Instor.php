@@ -123,10 +123,5 @@ class Instor extends Controller
             $this->error("删除失败");
         }
     }
-    //分配库存
 
-
-    public function search(){
-        return view('search');
-    }
 }
