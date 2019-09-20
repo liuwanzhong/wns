@@ -466,4 +466,9 @@ class Outbound extends Controller {
         $status=db('kc_status')->where('is_del',0)->select();
         return view('detailed',['rows'=>$rows,'status'=>$status]);
     }
+
+    //出库列表测试
+    public function shipping_order(){
+        return view('shipping_order');
+    }
 }
