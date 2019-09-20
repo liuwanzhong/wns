@@ -112,6 +112,10 @@ class Outbound extends Controller {
     }
     // 生成出库单
     public function make_outbound_order(){
+        $f=db('rukuform_xq')->where('state',1)->select();
+        for($i=0;$i<count($f);$i++){
+            db('rukuform_xq')->where('id',$f[$i]['id'])->update(['sy_count'=>$f[$i]['rk_nums']]);
+        }
         $cd=input('id');
         $cd=str_replace(array("\",\""),",",$cd);
         $cd=str_replace(array("[\""),"",$cd);
