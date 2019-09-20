@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/images/index.css">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <style>
+        .layui-table th, .layui-table td{
+            white-space: nowrap;
+        }
+        .layui-table tbody tr:hover{background: #fff;}
+        .bd_content1{
+            width: 96%;
+            min-height:90px;
+            height: auto !important;
+            height: 90px;
+            max-height: 700px;
+            margin: 12px auto;
+            overflow-x: scroll;
+            overflow-y: auto;
+        }
+       .bd_content1::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.2);
+       }
+        .layui-input{width: 120px;border: 0;}
+        .layui-table td{
+            padding: 3px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="note">
+        <div class="nav">
+            <span class="layui-breadcrumb">
+                <a href="/public/main.html" target="box">首页</a>
+                <a href="javascript:;">车辆管理</a>
+                <a><cite>运输台账</cite></a>
+            </span>
+        </div>
+        <div class="form_box" style="width: 96%;margin: 12px auto;">
+            <button class="layui-btn add">添加</button>
+        </div>
+        <div class="bd_content1">
+            <table class="layui-table layui-form" style="width: 100%;">
+                <thead>
+                <tr>
+                    <th rowspan="2">发运日期</th>
+                    <th rowspan="2">始发地</th>
+                    <th rowspan="2">目的地</th>
+                    <th rowspan="2">车牌号码</th>
+                    <th rowspan="2">司机姓名</th>
+                    <th rowspan="2">司机电话</th>
+                    <th rowspan="2">蒙牛订单日期</th>
+                    <th rowspan="2">蒙牛装运单号</th>
+                    <th rowspan="2">蒙牛订单吨位</th>
+                    <th rowspan="2">蒙牛订单数量</th>
+                    <th rowspan="2">实发吨位(毛重)</th>
+                    <th rowspan="2">实装数量</th>
+                    <th rowspan="2">合同结算吨位(净重)</th>
+                    <th rowspan="2">毛净重节约吨位</th>
+                    <th rowspan="2">毛净重节约费用</th>
+                    <th rowspan="2">公司标准运价</th>
+                    <th rowspan="2">合同单吨运价</th>
+                    <th rowspan="2">单吨运价节约金额</th>
+                    <th rowspan="2">单吨运价差额节约金额</th>
+                    <th colspan="5" style="text-align: center">支出运费</th>
+                    <th rowspan="2">承运人</th>
+                    <th rowspan="2">运输发票</th>
+                    <th rowspan="2">备注</th>
+                    <th rowspan="2">状态</th>
+                    <th rowspan="2">操作</th>
+                </tr>
+                <tr>
+                    <th>总运费</th>
+                    <th>油卡</th>
+                    <th>满运宝支付</th>
+                    <th>银行支付</th>
+                    <th>余额</th>
+                </tr>
+                </thead>
+                <tbody class="tbd">
+                {volist name='rows' id='r'}
+                    <tr>
+                        <td><input type="date" name="" value="{$r['delivery_time']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['origin']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['destination']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['license_plate']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['name']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['name_tel']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['ddrq']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['driver_name']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['driver_tel']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['gross_weight']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['net_weight']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['real_clothes']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['oil_card']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['gross_weight_freight']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['net_weight_freight']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['save_freight']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['receipt']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['mengniu_yunjia']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['mengniu_zongjia']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['freight']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['youka']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['manyunbao']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['yinhang']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['yue']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['cehgnyunren']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['yunshu']}"  class="layui-input"></td>
+                        <td><input type="text" name="" value="{$r['content']}"  class="layui-input"></td>
+                        <td><?php if($r['state']==0){echo "<span style='color:red'>未审核</span>";}else{echo "<span style='color:#03ff2f'>已审核</span>";} ?></td>
+                        <td>
+                            <?php if($r['state']==0): ?>
+                            <button class="layui-btn">修改</button>
+                            <button class="layui-btn">审核通过</button>
+                            <?php endif;?>
+                        </td>
+                    </tr>
+                {/volist}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script src="/layui/layui.js"></script>
+    <script>
+        layui.use(['element'], function () {
+
+        })
+
+        // 新添加一行
+        $('.add').on('click', function () {
+            let html = `<tr>
+                        <td><input type="date" class="layui-input" name="delivery_time"></td><!--发运日期-->
+                        <td><input type="text" class="layui-input" name="origin"></td><!--始发地-->
+                        <td><input type="text" class="layui-input" name="destination"></td><!--目的地-->
+                        <td><input type="text" class="layui-input" name="license_plate"></td><!--车牌号码-->
+                        <td><input type="text" class="layui-input" name="name"></td><!--司机姓名-->
+                        <td><input type="text" class="layui-input" name="name_tel"></td><!--司机电话-->
+                        <td><input type="date" class="layui-input" name="ddrq"></td><!--蒙牛订单日期-->
+                        <td><input type="text" class="layui-input" name="driver_name"></td><!--蒙牛装运单号-->
+                        <td><input type="text" class="layui-input" name="driver_tel"></td><!--蒙牛订单吨位-->
+                        <td><input type="text" class="layui-input" name="gross_weight"></td><!--蒙牛订单数量-->
+                        <td><input type="text" class="layui-input" name="net_weight"></td><!--实发吨位-->
+                        <td><input type="text" class="layui-input" name="real_clothes"></td><!--实装数量-->
+                        <td><input type="text" class="layui-input" name="oil_card"></td><!--合同结算吨位-->
+                        <td><input type="text" class="layui-input" name="gross_weight_freight"></td><!--毛净重节约吨位-->
+                        <td><input type="text" class="layui-input" name="net_weight_freight"></td><!--毛净重节约费用-->
+                        <td><input type="text" class="layui-input" name="save_freight"></td><!--公司标准运价-->
+                        <td><input type="text" class="layui-input" name="receipt"></td><!--合同单吨运价-->
+                        <td><input type="text" class="layui-input" name="mengniu_yunjia"></td><!--单吨运价节约金额-->
+                        <td><input type="text" class="layui-input" name="mengniu_zongjia"></td><!--单吨运价差额节约金额-->
+                        <td><input type="text" class="layui-input" name="freight"></td><!--总运费-->
+                        <td><input type="text" class="layui-input" name="youka"></td><!--油卡-->
+                        <td><input type="text" class="layui-input" name="manyunbao"></td><!--满运宝支付-->
+                        <td><input type="text" class="layui-input" name="yinhang"></td><!--银行支付-->
+                        <td><input type="text" class="layui-input" name="yue"></td><!--余额-->
+                        <td><input type="text" class="layui-input" name="cehgnyunren"></td><!--承运人-->
+                        <td><input type="text" class="layui-input" name="yunshu"></td><!--运输发票-->
+                        <td><input type="text" class="layui-input" name="content"></td><!--备注-->
+                        <td></td>
+                        <td><button class="layui-btn submit">提交</button></td>
+                    </tr>`;
+            $('.tbd').append(html);
+        })
+
+        $('.tbd').on('click', '.submit', function () {
+            let list = $(this).parents('tr').find('input');
+            console.log(list)
+            let obj = {}
+            for(let i =0; i<list.length; i++){
+                let name = list[i].name
+                obj[name] = list[i].value
+            }
+            console.log(obj)
+            $.ajax({
+                url:'',
+                data:{obj},
+                success:function (data) {
+                    
+                }
+            })
+        })
+    </script>
+</body>
+</html>

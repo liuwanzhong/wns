@@ -152,9 +152,7 @@
 				var data = sessionStorage.session_dc;
 				if(data !=  undefined || data != null){
 					var params = {id: data};
-					// console.log(params);
 					$.post("{:url('Rukuorder/outExcel')}", params, function (res) {
-						console.log(1)
 						console.log(res);
 						if (res.status) {
 							window.location.href = ("{:Url('index/Rukuorder/download')}?file=" + res.url);

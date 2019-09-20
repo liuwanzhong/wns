@@ -71,7 +71,7 @@ nav dd a:hover{background:#161a1e;color:#fff;}
 .ks{margin-right: 20px;}
 
 .bd_content{height: 100%;overflow-x: hidden;}
-.bd_content::-webkit-scrollbar{width: 0;}
+.bd_content::-webkit-scrollbar{display: none;}
 .bd_content .layui-form{width: 90%;margin: 0 auto;}
 .bd_content .layui-form .layui-input-block{display: flex;}
 .bd_content .layui-form .layui-input-block>span{color: #FF0000;align-self: center;margin-left: 10px;}
