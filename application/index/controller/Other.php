@@ -11,7 +11,6 @@ class Other extends Controller {
         $rows=db('fayunbb')->where('is_del',1)->select();
         return view('transport',['rows'=>$rows]);
     }
-
     public function insert() {
         $data=input();
         array_shift($data);

@@ -93,9 +93,6 @@
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script type="text/javascript">
-			layui.use(['element','form'],function(){
-				let form = layui.form;
-			})
 			layui.use(['element','laydate','form'], function(){
 				var laydate = layui.laydate;
 				var element = layui.element;
@@ -150,10 +147,9 @@
 				}
 			})
 			$('#dc').on('click', function() {
-				// alert(1);
+				alert(1);
 				var data = sessionStorage.session_dc;
 				var params = {id: data};
-				console.log(params);
 				$.post("{:url('Rukuorder/outExcel')}", params, function (res) {
 					console.log(res);
 					if (res.status) {

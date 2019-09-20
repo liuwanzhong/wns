@@ -11,7 +11,7 @@ class Outbound extends Controller {
     // 显示页
     public function index(){
         $list = db('system_order')
-            // -> where("$search")
+            -> where("is_del",0)
             -> order('id desc')
             -> paginate(100);
         return view("index", ['list' => $list]);
@@ -164,36 +164,44 @@ class Outbound extends Controller {
     // 出库订单
     public function insert(){
         $data=input();
-        echo "<pre>";
-        print_r($data);exit;
-        try{
-            $id = db('outbound_from')
-            ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data[$reachout_name],'delivery_time'=>$data['delivery_time'],'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id']]);
-            for ($i=0;$i<count($data['material_name']);$i++){
-                $rs = db('outbound_xq_from')->insert(['factory'=>$data['transfers_factory'][$i],
-                    'Delivery_id'=>$data['Delivery_id'][$i],
-                    'product_name'=>$data['product_name'][$i],
-                    'ck_huowei_id'=>$data['huowei'][$i],
-                    'ck_nums'=>$data['nums'][$i],
-                    'product_time'=>$data['product_time'][$i],
-                    'product_batch'=>$data['storno'][$i],
-                    'content'=>$data['content'][$i],
-                    'netweight'=>$data['netweight'][$i],
-                    'Grossweight'=>$data['Grossweight'][$i],
-                    'transfers_id'=>$data['transfers_id'][$i],
-                    'rukuid'=>$id]);
+        // echo "<pre>";
+        // print_r($data);exit;
+        if(!empty($data['huowei_name'])){
+            for ($i=0;$i<count($data['huowei_name']);$i++){
+                if(!empty($data['huowei_name']['i'])){
+                    $this->error('货位为必填');
+                }
             }
-            $del=db('system_order')->where('id','in',$data['cd'])->update(['is_del'=>1]);
-            if($id && $rs && $del) {
-                // 提交事务
-                Db::commit();
-            }
-        } catch (\Exception $e) {
-            $this->error('添加入库订单失败,请联系管理员');
-            // 回滚事务
-            Db::rollback();
         }
-
+            try{
+                $id = db('outbound_from')
+                ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>$data['delivery_time'],'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id']]);
+                for ($i=0;$i<count($data['delivery_num']);$i++){
+                    $rs = db('outbound_xq_from')->insert([
+                        'chukuid'=>$id,
+                            'delivery_id'=>$data['Delivery_id'][$i],
+                            'product_name'=>$data['material_name'][$i],
+                            'ck_huowei_id'=>$data['huowei_name'][$i],
+                            'ck_nums'=>$data['huowei_out'][$i],
+                            'netweight'=>$data['jin'][$i],
+                            'content'=>$data['detailed'][$i],
+                            'create_time'=>time(),
+                            'state'=>0,
+                            'chukuid'=>$id
+                        ]);
+                }
+                $del=db('system_order')->where('id','in',$data['cd'])->update(['is_del'=>1]);
+                if($id && $rs && $del) {
+                    // 提交事务
+                    Db::commit();
+                }
+            } catch (\Exception $e) {
+                // db('outbound_from')->where('id',$id)->delete();
+                $this->error('添加入库订单失败,请联系管理员');
+                // 回滚事务
+                Db::rollback();
+            }
+            $this->success('生成订单成功','index');
     }
     // 货位查询
     public function huowei($id){
@@ -205,43 +213,57 @@ class Outbound extends Controller {
     // 出库计划
     public function to_examine() {
         $data=input();
-        $search = '';
-        if (!empty($data['s_transfers_id'])) {
-            $search = 'rukuform_xq.factory like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
-        }
-        // 时间转换
-        if (!empty($data['s_delivery_time'])) {
-            $time = explode('~', $data['s_delivery_time']);
-            foreach ($time as $key) {
-                $time[] = strtotime($key);
-                array_shift($time);
-            }
-            if (!empty($search)) {
-                $time = ' and rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
-            } else {
-                $time = 'rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
-            }
-            $search .= $time;
-        }
-        // 物料名
-        if (!empty($data['s_material_name'])) {
-            $material_name = $data['s_material_name'];
-            if (!empty($search)) {
-                $material_name = ' and rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
-            } else {
-                $material_name = ' rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
-            }
-            $search .= $material_name;
-        }
-        $rows=db('rukuform')
-            ->join('warehouse','rukuform.ck_id=warehouse.id','left')
-            ->join('rukuform_xq','rukuform.id=rukuform_xq.rukuid','left')
-            ->where('rukuform.is_del',0)
-            ->where('rukuform.state',0)
-            ->group('rukuform_xq.factory,rukuform_xq.rukuid')
-            ->where($search)
-            ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
+        // $search = '';
+        // if (!empty($data['s_transfers_id'])) {
+        //     $search = 'rukuform_xq.factory like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+        // }
+        // // 时间转换
+        // if (!empty($data['s_delivery_time'])) {
+        //     $time = explode('~', $data['s_delivery_time']);
+        //     foreach ($time as $key) {
+        //         $time[] = strtotime($key);
+        //         array_shift($time);
+        //     }
+        //     if (!empty($search)) {
+        //         $time = ' and rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+        //     } else {
+        //         $time = 'rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+        //     }
+        //     $search .= $time;
+        // }
+        // // 物料名
+        // if (!empty($data['s_material_name'])) {
+        //     $material_name = $data['s_material_name'];
+        //     if (!empty($search)) {
+        //         $material_name = ' and rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
+        //     } else {
+        //         $material_name = ' rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
+        //     }
+        //     $search .= $material_name;
+        // }
+        // $rows=db('rukuform')
+        // ->join('warehouse','rukuform.ck_id=warehouse.id','left')
+        // ->join('rukuform_xq','rukuform.id=rukuform_xq.rukuid','left')
+        // ->where('rukuform.is_del',0)
+        // ->where('rukuform.state',0)
+        // ->group('rukuform_xq.factory,rukuform_xq.rukuid')
+        // ->where($search)
+        // ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
+        // ->paginate(100);
+
+
+        $rows=db('outbound_from')
+            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.state',0)
+            ->group('outbound_xq_from.product_name,outbound_xq_from.chukuid')
+            // ->where($search)
+            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
             ->paginate(100);
+        echo db('outbound_from')->getlastSql();exit;
+        // echo "<pre>";
+        // print_r($rows);exit;
         return view('to_examine',['rows'=>$rows]);
     }
     // 出库订单详情
@@ -275,44 +297,44 @@ class Outbound extends Controller {
         $data=input();
         $userintime=strtotime($data['userintime']);
         array_shift($data);
-//        try{
-        $r = db('rukuform')
-            -> where('id', $data['id'])
-            -> update(['shipmentnum' => $data['shipmentnum'], 'userintime' => $userintime, 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id']]);
-        for ($i = 0; $i < count($data['transfers_factory']); $i++) {
-            if (empty($data['cd'][$i])) {
-                $fs=db('rukuform_xq') -> insert(['factory'       => $data['transfers_factory'][$i],
-                                             'product_name'  => $data['material_name'][$i],
-                                             'rk_status_id'  => $data['status'][$i],
-                                             'rk_huowei_id'  => $data['huowei'][$i],
-                                             'rk_nums'       => $data['nums'][$i],
-                                             'product_time'  => $data['intime'][$i],
-                                             'product_batch' => $data['storno'][$i],
-                                             'content'       => $data['content'][$i],
-                                             'netweight'     => $data['netweight'][$i],
-                                             'Grossweight'   => $data['Grossweight'][$i],
-                                             'transfers_id'  => $data['transfers_id'][$i],
-                                             'rukuid'        => $data['id']]);
-            }else{
-                $rs = db('rukuform_xq') -> where('id', $data['cd'][$i])
-                    -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id'  => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i], 'product_time'  => $data['intime'][$i], 'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'     => $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
-            }
+        //        try{
+            $r = db('rukuform')
+                -> where('id', $data['id'])
+                -> update(['shipmentnum' => $data['shipmentnum'], 'userintime' => $userintime, 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id']]);
+            for ($i = 0; $i < count($data['transfers_factory']); $i++) {
+                if (empty($data['cd'][$i])) {
+                    $fs=db('rukuform_xq') -> insert(['factory'       => $data['transfers_factory'][$i],
+                                                    'product_name'  => $data['material_name'][$i],
+                                                    'rk_status_id'  => $data['status'][$i],
+                                                    'rk_huowei_id'  => $data['huowei'][$i],
+                                                    'rk_nums'       => $data['nums'][$i],
+                                                    'product_time'  => $data['intime'][$i],
+                                                    'product_batch' => $data['storno'][$i],
+                                                    'content'       => $data['content'][$i],
+                                                    'netweight'     => $data['netweight'][$i],
+                                                    'Grossweight'   => $data['Grossweight'][$i],
+                                                    'transfers_id'  => $data['transfers_id'][$i],
+                                                    'rukuid'        => $data['id']]);
+                }else{
+                    $rs = db('rukuform_xq') -> where('id', $data['cd'][$i])
+                        -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id'  => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i], 'product_time'  => $data['intime'][$i], 'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'     => $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
+                }
 
-//            }
-//            for($c=0;$c<count($data['transfers_factory']);$c++){
-//
-//            }
-//            if($r && $rs) {
-//                // 提交事务
-//                Db::commit();
-//                $this->error('操作成功','to_examine');
-//            }
-//        } catch (\Exception $e) {
-//            $this->error('添加入库订单失败,请联系管理员');
-//            // 回滚事务
-//            Db::rollback();
-//        }
-//            return redirect('to_examine');
+        //            }
+        //            for($c=0;$c<count($data['transfers_factory']);$c++){
+        //
+        //            }
+        //            if($r && $rs) {
+        //                // 提交事务
+        //                Db::commit();
+        //                $this->error('操作成功','to_examine');
+        //            }
+        //        } catch (\Exception $e) {
+        //            $this->error('添加入库订单失败,请联系管理员');
+        //            // 回滚事务
+        //            Db::rollback();
+        //        }
+        //            return redirect('to_examine');
         }
         if($r  || $rs){
             return redirect('to_examine');
@@ -469,5 +491,21 @@ class Outbound extends Controller {
         //产品属性
         $status=db('kc_status')->where('is_del',0)->select();
         return view('detailed',['rows'=>$rows,'status'=>$status]);
+    }
+
+
+    //出库列表测试
+    public function shipping_order(){
+        return view('shipping_order');
+    }
+
+    //出库列表测试
+    public function shipping_order_show(){
+        return view('shipping_order_show');
+    }
+
+    //运输台账测试
+    public function transport(){
+        return view('transport');
     }
 }

@@ -170,13 +170,11 @@
 
         $('.tbd').on('click', '.submit', function () {
             let list = $(this).parents('tr').find('input');
-            // console.log(list)
             let obj = {}
             for(let i =0; i<list.length; i++){
                 let name = list[i].name
                 obj[name] = list[i].value
             }
-            // console.log(obj)
             $.ajax({
                 url:'/index/Other/insert',
                 data:{obj},
