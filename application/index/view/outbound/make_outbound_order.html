@@ -91,7 +91,7 @@
                     <select name="ck_id" lay-filter="ck_id" id="table" onchange="showtable(this.value)">
                         <option value="0">请选择仓库</option>
                         <?php foreach($cks as $ck): ?>
-                        <option value="<?=$ck['id']?>"><?=$ck['name']?></option>
+                        <option value="<?=$ck['id']?>" ><?=$ck['name']?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -114,17 +114,17 @@
                 <tbody class="tbd">
                     {volist name='rows' id='v'}
                     <tr>
-                        <input type="hidden" class="rukuform_xq_id">
+                        <input type="hidden" name="sys_id" value="{$v.id}">
                         <td>
-                            <input type="hidden" value="" name="Delivery_id" readonly>
+                            <input type="hidden" value="" name="Delivery_id[]" readonly>
                             {$v.Delivery_id}
                         </td>
                         <td class="status">
-                            <input type="hidden" value="" name="material_name" readonly>
+                            <input type="hidden" value="" name="material_name[]" readonly>
                             {$v.material_name}
                         </td>
                         <td>
-                            <input type="hidden" value="" name="delivery_num" readonly>
+                            <input type="hidden" value="{$v.num}" name="delivery_num[]" readonly>
                             {$v.num}
                         </td>
                         <td class="huowei">
@@ -157,10 +157,13 @@
                 </tbody>
             </table>
             <span>
-                合计数量：合计重量：派车人签字：
+                合计数量：<input type="text" class="text" name="sumnum" readonly="readonly">
+                合计重量：<input type="text" class="text" name="sumweight" readonly="readonly">
+                派车人签字：
             </span></br>
             <span>
-                保管签字：司机确认：
+                保管签字：
+                司机确认：
             </span>
             <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
         </div>

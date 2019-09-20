@@ -150,10 +150,9 @@
 				}
 			})
 			$('#dc').on('click', function() {
-				// alert(1);
+				alert(1);
 				var data = sessionStorage.session_dc;
 				var params = {id: data};
-				console.log(params);
 				$.post("{:url('Rukuorder/outExcel')}", params, function (res) {
 					console.log(res);
 					if (res.status) {

@@ -160,23 +160,49 @@ class Outbound extends Controller {
     // 出库订单
     public function insert(){
         $data=input();
+        $id = db('outbound_from')
+            ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>$data['delivery_time'],'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id']]);
+        if($id){
+            echo 1;
+        }else{
+            echo 2;
+        }
         echo "<pre>";
         print_r($data);exit;
+        for ($i=0;$i<count($data['delivery_num']);$i++){
+                    $rs = db('outbound_xq_from')->insert([
+                        // 'factory'=>$data['transfers_factory'][$i],
+                        // 'Delivery_id'=>$data['Delivery_id'][$i],
+                        // 'product_name'=>$data['product_name'][$i],
+                        // 'ck_huowei_id'=>$data['huowei'][$i],
+                        'ck_nums'=>$data['delivery_num'][$i],
+                        // 'product_time'=>$data['product_time'][$i],
+                        // 'product_batch'=>$data['storno'][$i],
+                        // 'content'=>$data['content'][$i],
+                        // 'netweight'=>$data['netweight'][$i],
+                        // 'Grossweight'=>$data['Grossweight'][$i],
+                        // 'transfers_id'=>$data['transfers_id'][$i],
+                        'rukuid'=>$id]);
+                }
+                
+        echo "<pre>";
+        print_r($rs);exit;
         try{
             $id = db('outbound_from')
-            ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data[$reachout_name],'delivery_time'=>$data['delivery_time'],'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id']]);
-            for ($i=0;$i<count($data['material_name']);$i++){
-                $rs = db('outbound_xq_from')->insert(['factory'=>$data['transfers_factory'][$i],
-                    'Delivery_id'=>$data['Delivery_id'][$i],
-                    'product_name'=>$data['product_name'][$i],
-                    'ck_huowei_id'=>$data['huowei'][$i],
-                    'ck_nums'=>$data['nums'][$i],
-                    'product_time'=>$data['product_time'][$i],
-                    'product_batch'=>$data['storno'][$i],
-                    'content'=>$data['content'][$i],
-                    'netweight'=>$data['netweight'][$i],
-                    'Grossweight'=>$data['Grossweight'][$i],
-                    'transfers_id'=>$data['transfers_id'][$i],
+            ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>$data['delivery_time'],'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id']]);
+            for ($i=0;$i<count($data['delivery_num']);$i++){
+                $rs = db('outbound_xq_from')->insert([
+                    // 'factory'=>$data['transfers_factory'][$i],
+                    // 'Delivery_id'=>$data['Delivery_id'][$i],
+                    // 'product_name'=>$data['product_name'][$i],
+                    // 'ck_huowei_id'=>$data['huowei'][$i],
+                    'ck_nums'=>$data['delivery_num'][$i],
+                    // 'product_time'=>$data['product_time'][$i],
+                    // 'product_batch'=>$data['storno'][$i],
+                    // 'content'=>$data['content'][$i],
+                    // 'netweight'=>$data['netweight'][$i],
+                    // 'Grossweight'=>$data['Grossweight'][$i],
+                    // 'transfers_id'=>$data['transfers_id'][$i],
                     'rukuid'=>$id]);
             }
             $del=db('system_order')->where('id','in',$data['cd'])->update(['is_del'=>1]);
@@ -271,44 +297,44 @@ class Outbound extends Controller {
         $data=input();
         $userintime=strtotime($data['userintime']);
         array_shift($data);
-//        try{
-        $r = db('rukuform')
-            -> where('id', $data['id'])
-            -> update(['shipmentnum' => $data['shipmentnum'], 'userintime' => $userintime, 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id']]);
-        for ($i = 0; $i < count($data['transfers_factory']); $i++) {
-            if (empty($data['cd'][$i])) {
-                $fs=db('rukuform_xq') -> insert(['factory'       => $data['transfers_factory'][$i],
-                                             'product_name'  => $data['material_name'][$i],
-                                             'rk_status_id'  => $data['status'][$i],
-                                             'rk_huowei_id'  => $data['huowei'][$i],
-                                             'rk_nums'       => $data['nums'][$i],
-                                             'product_time'  => $data['intime'][$i],
-                                             'product_batch' => $data['storno'][$i],
-                                             'content'       => $data['content'][$i],
-                                             'netweight'     => $data['netweight'][$i],
-                                             'Grossweight'   => $data['Grossweight'][$i],
-                                             'transfers_id'  => $data['transfers_id'][$i],
-                                             'rukuid'        => $data['id']]);
-            }else{
-                $rs = db('rukuform_xq') -> where('id', $data['cd'][$i])
-                    -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id'  => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i], 'product_time'  => $data['intime'][$i], 'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'     => $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
-            }
+        //        try{
+            $r = db('rukuform')
+                -> where('id', $data['id'])
+                -> update(['shipmentnum' => $data['shipmentnum'], 'userintime' => $userintime, 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id']]);
+            for ($i = 0; $i < count($data['transfers_factory']); $i++) {
+                if (empty($data['cd'][$i])) {
+                    $fs=db('rukuform_xq') -> insert(['factory'       => $data['transfers_factory'][$i],
+                                                    'product_name'  => $data['material_name'][$i],
+                                                    'rk_status_id'  => $data['status'][$i],
+                                                    'rk_huowei_id'  => $data['huowei'][$i],
+                                                    'rk_nums'       => $data['nums'][$i],
+                                                    'product_time'  => $data['intime'][$i],
+                                                    'product_batch' => $data['storno'][$i],
+                                                    'content'       => $data['content'][$i],
+                                                    'netweight'     => $data['netweight'][$i],
+                                                    'Grossweight'   => $data['Grossweight'][$i],
+                                                    'transfers_id'  => $data['transfers_id'][$i],
+                                                    'rukuid'        => $data['id']]);
+                }else{
+                    $rs = db('rukuform_xq') -> where('id', $data['cd'][$i])
+                        -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id'  => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i], 'product_time'  => $data['intime'][$i], 'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'     => $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
+                }
 
-//            }
-//            for($c=0;$c<count($data['transfers_factory']);$c++){
-//
-//            }
-//            if($r && $rs) {
-//                // 提交事务
-//                Db::commit();
-//                $this->error('操作成功','to_examine');
-//            }
-//        } catch (\Exception $e) {
-//            $this->error('添加入库订单失败,请联系管理员');
-//            // 回滚事务
-//            Db::rollback();
-//        }
-//            return redirect('to_examine');
+        //            }
+        //            for($c=0;$c<count($data['transfers_factory']);$c++){
+        //
+        //            }
+        //            if($r && $rs) {
+        //                // 提交事务
+        //                Db::commit();
+        //                $this->error('操作成功','to_examine');
+        //            }
+        //        } catch (\Exception $e) {
+        //            $this->error('添加入库订单失败,请联系管理员');
+        //            // 回滚事务
+        //            Db::rollback();
+        //        }
+        //            return redirect('to_examine');
         }
         if($r  || $rs){
             return redirect('to_examine');
