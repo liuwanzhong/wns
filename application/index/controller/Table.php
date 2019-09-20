@@ -7,6 +7,7 @@ use think\Controller;
 use think\Db;
 
 class Table extends Controller {
+    static public $sy;
     public function index() {
         //产品名称列表
         $list = db('cw_management')->field('material_name,transfers_factory')
@@ -26,12 +27,14 @@ class Table extends Controller {
     }
 
     public function houwei_ck() {
+        $sy=isset($_POST['sy']) ? $_POST['sy'] : 0;
         $id=input('id');
         static $md=[];
         $ck=db('cabinet')->where('warehouse_id',$id)->where('is_del',1)->select();
         foreach ($ck as $c) {
             $rukuform=db('rukuform_xq')
                 ->where('rukuform_xq.state',1)
+                ->where('rukuform_xq.sy_count>=1')
                 ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id')
                 ->field('rukuform_xq.*,cabinet.name')
                 ->select();
@@ -44,6 +47,7 @@ class Table extends Controller {
         foreach ($md as $k=>$row) {
             $md[$k]['m']=$row['Grossweight']/$row['rk_nums'];
             $md[$k]['j']=$row['netweight']/$row['rk_nums'];
+            $md[$k]['sy']=$row['rk_nums']-$sy;
         }
         return $md;
     }
@@ -52,8 +56,9 @@ class Table extends Controller {
         array_shift($data);
         $mj=$this->blur($data['m'],$data['j'],$data['count']);
         $row=db('rukuform_xq')->where('id',$data['id'])->find();
-        $sy=$row['rk_nums']-$data['count'];
-        $mj['sy']=$sy;
+        db('rukuform_xq')->where('id',$data['id'])->update(['sy_count'=>$row['sy_count']-$data['count']]);
+        $row=db('rukuform_xq')->where('id',$data['id'])->find();
+        $mj['sy']=$row['sy_count'];
         return $mj;
     }
 

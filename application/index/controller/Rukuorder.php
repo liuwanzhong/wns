@@ -52,17 +52,17 @@ class Rukuorder extends Controller {
             $id = db('rukuform')->insertGetId(['shipmentnum'=>$data['shipmentnum'],'userintime'=>$userintime,'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id']]);
             for ($i=0;$i<count($data['transfers_factory']);$i++){
                 $rs = db('rukuform_xq')->insert(['factory'=>$data['transfers_factory'][$i],
-                    'product_name'=>$data['material_name'][$i],
-                    'rk_status_id'=>$data['status'][$i],
-                    'rk_huowei_id'=>$data['huowei'][$i],
-                    'rk_nums'=>$data['nums'][$i],
-                    'product_time'=>$data['intime'][$i],
-                    'product_batch'=>$data['storno'][$i],
-                    'content'=>$data['content'][$i],
-                    'netweight'=>$data['netweight'][$i],
-                    'Grossweight'=>$data['Grossweight'][$i],
-                    'transfers_id'=>$data['transfers_id'][$i],
-                    'rukuid'=>$id]);
+                                                 'product_name'=>$data['material_name'][$i],
+                                                 'rk_status_id'=>$data['status'][$i],
+                                                 'rk_huowei_id'=>$data['huowei'][$i],
+                                                 'rk_nums'=>$data['nums'][$i],
+                                                 'product_time'=>$data['intime'][$i],
+                                                 'product_batch'=>$data['storno'][$i],
+                                                 'content'=>$data['content'][$i],
+                                                 'netweight'=>$data['netweight'][$i],
+                                                 'Grossweight'=>$data['Grossweight'][$i],
+                                                 'transfers_id'=>$data['transfers_id'][$i],
+                                                 'rukuid'=>$id]);
             }
             $del=db('cw_management')->where('id','in',$data['cd'])->update(['is_del'=>1]);
             if($id && $rs && $del) {
@@ -164,17 +164,17 @@ class Rukuorder extends Controller {
         for ($i = 0; $i < count($data['transfers_factory']); $i++) {
             if (empty($data['cd'][$i])) {
                 $fs=db('rukuform_xq') -> insert(['factory'       => $data['transfers_factory'][$i],
-                                             'product_name'  => $data['material_name'][$i],
-                                             'rk_status_id'  => $data['status'][$i],
-                                             'rk_huowei_id'  => $data['huowei'][$i],
-                                             'rk_nums'       => $data['nums'][$i],
-                                             'product_time'  => $data['intime'][$i],
-                                             'product_batch' => $data['storno'][$i],
-                                             'content'       => $data['content'][$i],
-                                             'netweight'     => $data['netweight'][$i],
-                                             'Grossweight'   => $data['Grossweight'][$i],
-                                             'transfers_id'  => $data['transfers_id'][$i],
-                                             'rukuid'        => $data['id']]);
+                                                 'product_name'  => $data['material_name'][$i],
+                                                 'rk_status_id'  => $data['status'][$i],
+                                                 'rk_huowei_id'  => $data['huowei'][$i],
+                                                 'rk_nums'       => $data['nums'][$i],
+                                                 'product_time'  => $data['intime'][$i],
+                                                 'product_batch' => $data['storno'][$i],
+                                                 'content'       => $data['content'][$i],
+                                                 'netweight'     => $data['netweight'][$i],
+                                                 'Grossweight'   => $data['Grossweight'][$i],
+                                                 'transfers_id'  => $data['transfers_id'][$i],
+                                                 'rukuid'        => $data['id']]);
             }else{
                 $rs = db('rukuform_xq') -> where('id', $data['cd'][$i])
                     -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id'  => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i], 'product_time'  => $data['intime'][$i], 'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'     => $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
@@ -293,7 +293,7 @@ class Rukuorder extends Controller {
             ->where($search)
             ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
             ->paginate(100);
-            // var_dump($rows);exit;
+        // var_dump($rows);exit;
         return view('warehousing',['rows'=>$rows]);
     }
     //订单详情
@@ -389,7 +389,7 @@ class Rukuorder extends Controller {
         $da=str_replace('"', '', $id);
         $da=trim($da,'[');
         $da=trim($da,']');
-        // $data=db('rukuform_xq')->where("id in ($da)")->select();
+         $data=db('rukuform_xq')->where("id in ($da)")->select();
         $data=db('rukuform_xq')
             ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id','left')
             ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
@@ -422,7 +422,7 @@ class Rukuorder extends Controller {
                 $phpExcel->getActiveSheet()->setCellValue('C' . $rownum, $v['k_name']);
                 $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['w_name']);
                 $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['c_name']);
-                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, date('Y-m-d',$v['time']));
+                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum,$v['time']);
                 $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['product_time']);
                 $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['rk_nums']);
                 $phpExcel->getActiveSheet()->setCellValue('I' . $rownum, $v['netweight']);
@@ -468,7 +468,7 @@ class Rukuorder extends Controller {
     }
     public function download(){
         $fileName = date('Y-m-d',time()).'.xlsx';
-        $path = 'D:\WWW\wns\public/'.$fileName;
+        $path = ROOT_PATH."\public/".$fileName;
         if(!file_exists($path)){
             header("HTTP/1.0 404 Not Found");
             exit;
