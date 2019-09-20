@@ -19,8 +19,8 @@
     <div class="nav">
         <span class="layui-breadcrumb">
             <a href="/public/main.html" target="box">首页</a>
-            <a href="javascript:;">出库管理</a>
-            <a><cite>出库单</cite></a>
+            <a href="javascript:;">入库管理</a>
+            <a><cite>入库单</cite></a>
         </span>
     </div>
 
@@ -46,7 +46,7 @@
                 <label class="layui-form-label">发货日期:</label>
                 <div class="layui-input-inline">
                     {volist name='fh' id='fh'}
-                    <input type="text" name="delivery_time" autocomplete="off" class="layui-input" id="time" value="<?php echo date('Y-m-d',$fh['delivery_time']);?>">
+                    <input type="text" name="delivery_time" autocomplete="off" class="layui-input" id="time" value="{$fh.delivery_time}">
                     {/volist}
                 </div>
             </div>
@@ -87,14 +87,16 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                    <label class="layui-form-label">仓库:</label>
+                <label class="layui-form-label">仓库:</label>
+                <div class="layui-input-inline">
                     <select name="ck_id" lay-filter="ck_id" id="table" onchange="showtable(this.value)">
                         <option value="0">请选择仓库</option>
                         <?php foreach($cks as $ck): ?>
-                        <option value="<?=$ck['id']?>" ><?=$ck['name']?></option>
+                        <option value="<?=$ck['id']?>"><?=$ck['name']?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
+            </div>
         </div>
         <div class="container">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
@@ -114,13 +116,13 @@
                 <tbody class="tbd">
                     {volist name='rows' id='v'}
                     <tr>
-                        <input type="hidden" name="sys_id" value="{$v.id}">
+                        <input type="hidden" name="cd[]" value="{$v.id}">
                         <td>
-                            <input type="hidden" value="" name="Delivery_id[]" readonly>
+                            <input type="hidden" value="{$v.Delivery_id}" name="Delivery_id[]" readonly>
                             {$v.Delivery_id}
                         </td>
                         <td class="status">
-                            <input type="hidden" value="" name="material_name[]" readonly>
+                            <input type="hidden" value="{$v.material_name}" name="material_name[]" readonly>
                             {$v.material_name}
                         </td>
                         <td>
@@ -131,19 +133,23 @@
                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
                         </td>
                         <td class="count">
-                            0
+                            <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
+                            <span>0</span>
                         </td>
                         <td class="mao">
-                            0
+                            <input type="hidden" value="mao" name="mao[]" readonly>
+                            <span>0</span>
                         </td>
                         <td class="jin">
-                            0
+                            <input type="hidden" value="jin" name="jin[]" readonly>
+                            <span>0</span>
                         </td>
                         <td class="sy_count">
-                            0
+                            <input type="hidden" value="sy_count" name="sy_count[]" readonly>
+                            <span>0</span>
                         </td>
                         <td>
-                            <input type="hidden" value="" name="Delivery_id" readonly>
+                            <input type="hidden" value="{$v.detailed}" name="detailed[]" readonly>
                             {$v.detailed}
                         </td>
                         <td>
@@ -151,19 +157,16 @@
                                 <i class="layui-icon">&#xe654;</i>
                             </button>
                         </td>
-
+                        
                     </tr>
                     {/volist}
                 </tbody>
             </table>
             <span>
-                合计数量：<input type="text" class="text" name="sumnum" readonly="readonly">
-                合计重量：<input type="text" class="text" name="sumweight" readonly="readonly">
-                派车人签字：
+                合计数量：合计重量：派车人签字：
             </span></br>
             <span>
-                保管签字：
-                司机确认：
+                保管签字：司机确认：
             </span>
             <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
         </div>
@@ -198,63 +201,68 @@
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
-    layui.use(['element', 'form','laydate'], function () {
+    layui.use(['element', 'form','laydate','layer'], function () {
         let element = layui.element;
         let form = layui.form;
         let laydate = layui.laydate;
+        let layer = layui.layer;
         laydate.render({
             elem: '#time',
             type: 'date'
         })
+
         $('.layui-table').on('click', '.add', function(){
             let _tr = $(this).parents('tr');
             let child = _tr[0].children;
+            console.log(child)
+
             let html = `<tr>
-            <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
-            <td>
-                <input type="hidden" value="${child[1].innerText}" name="Delivery_id" readonly>
-                ${child[1].innerText}
-            </td>
-            <td class="status">
-                <input type="hidden" value="${child[2].innerText}" name="material_name" readonly>
-                ${child[2].innerText}
-            </td>
-            <td>
-                <input type="hidden" value="0" name="delivery_num" readonly>
-                <span>0</span>
-            </td>
-            <td class="huowei">
-                <botton class="layui-btn layui-btn-sm dia">点击</botton>
-            </td>
-            <td class="count">
-                <input type="hidden" value="0" name="delivery_num" readonly>
-                <span>0</span>
-            </td>
-            <td class="mao">
-                <input type="hidden" value="0" name="delivery_num" readonly>
-                <span>0</span>
-            </td>
-            <td class="jin">
-                <input type="hidden" value="0" name="delivery_num" readonly>
-                <span>0</span>
-            </td>
-            <td class="sy_count">
-                <input type="hidden" value="0" name="delivery_num" readonly>
-                <span>0</span>
-            </td>
-            <td>
-                <input type="hidden" value="${child[9].innerText}" name="Delivery_id" readonly>
-                ${child[9].innerText}
-            </td>
-            <td>
-                <button type="button" class="layui-btn layui-btn-sm add">
-                    <i class="layui-icon">&#xe654;</i>
-                </button>
-                <button type="button" class="layui-btn layui-btn-sm remove">
-                    <i class="layui-icon">&#xe640;</i>
-                </button>
-            </td>
-        </tr>`;
+                        <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
+                        <td>
+                            <input type="hidden" value="${child[1].innerText}" name="Delivery_id[]" readonly>
+                            ${child[1].innerText}
+                        </td>
+                        <td class="status">
+                            <input type="hidden" value="${child[2].innerText}" name="material_name[]" readonly>
+                            ${child[2].innerText}
+                        </td>
+                        <td>
+                            <input type="hidden" value="${child[3].innerText}" name="delivery_num[]" readonly>
+                            ${child[3].innerText}
+                        </td>
+                        <td class="huowei">
+                            <botton class="layui-btn layui-btn-sm dia">点击</botton>
+                        </td>
+                        <td class="count">
+                            <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
+                            <span>0</span>
+                        </td>
+                        <td class="mao">
+                            <input type="hidden" value="mao" name="mao[]" readonly>
+                            <span>0</span>
+                        </td>
+                        <td class="jin">
+                            <input type="hidden" value="jin" name="jin[]" readonly>
+                            <span>0</span>
+                        </td>
+                        <td class="sy_count">
+                            <input type="hidden" value="${child[8].innerText}" name="sy_count[]" readonly>
+                            <span>${child[8].innerText}</span>
+                        </td>
+                        <td>
+                            <input type="hidden" value="${child[9].innerText}" name="detailed[]" readonly>
+                            ${child[9].innerText}
+                        </td>
+                        <td>
+                            <button type="button" class="layui-btn layui-btn-sm add">
+                                <i class="layui-icon">&#xe654;</i>
+                            </button>
+                            <button type="button" class="layui-btn layui-btn-sm remove">
+                                <i class="layui-icon">&#xe640;</i>
+                            </button>
+                        </td>
+                        
+                    </tr>`;
             $('.tbd').append(html);
             form.render();
 
@@ -282,25 +290,33 @@
 
         })
 
-        //点击
+
         let par = '';
         $('.tbd').on('click', '.dia', function () {
-        let id = $('#table').val();
-            par = $(this).parents('tr');
-            $('.kc_list').empty();
-            $('.model_table').show();
-            $.ajax({
-                url:'/index/Table/houwei_ck',
-                data: {id},
-                success:function (data) {
-                    console.log(data);
-                    let html = '';
-                    for (let i =0; i<data.length; i++){
-                        html += ` <tr>
+            let id = $('#table').val();
+            console.log(id)
+            if(id == 0){
+                layer.alert('请选择仓库',{icon:5});
+                return false;
+            }
+            else {
+                par = $(this).parents('tr');
+                $('.kc_list').empty();
+                $('.model_table').show();
+
+                $.ajax({
+                    url:'/index/Table/houwei_ck',
+                    data: {id},
+                    success:function (data) {
+                        console.log(data)
+                        let html = '';
+                        for (let i =0; i<data.length; i++){
+                            html += ` <tr>
                             <input type="hidden" id="id" class="layui-input" value="${data[i].id}">
                             <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
                             <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
-                            <input type="hidden" id="sy" class="layui-input" value="${data[i].sy}">
+                            <input type="hidden" id="c_id" class="layui-input" value="${data[i].c_id}">
+
                             <td><input type="radio" name="sex" value="nan" title=""></td>
                             <td>${data[i].product_name}</td>
                             <td>${data[i].product_time}</td>
@@ -309,36 +325,43 @@
                             <td><input type="text" class="layui-input" style="width: 80px;"></td>
                             <td>${data[i].content}</td>
                         </tr>`;
+                        }
+                        $('.kc_list').append(html)
+                        form.render()
                     }
-                    $('.kc_list').append(html)
-                    form.render()
-                }
-            })
+                })
+            }
         })
 
-        //确认
+
         $('.sure').on('click', function () {
+
             $('.model_table').hide();
+
             let che = $('.kc_list').find('input:radio:checked')[0];
             let tr = $(che).parents('tr');
             let id = tr.find('#id').val();
             let m = tr.find('#m').val();
             let j = tr.find('#j').val();
-            let sy = tr.find('#sy').val();
+            let c_id = tr.find('#c_id').val();
             let hw = tr.find('.hw').text();
             let num = tr.find('input[type=text]').val();
+
             $.ajax({
                 url:'/index/Table/houwei_cd',
-                data:{id, m, j, count:num,sy},
+                data:{id, m, j, count:num},
                 success:function (d) {
-                    console.log(id,m,j,num,sy)
-                    console.log(d);
+                    console.log(d)
                     par.find('.rukuform_xq_id').val(id);
-                    par.find('.huowei').text(hw);
-                    par.find('.count').text(num);
-                    par.find('.mao').text(d.m);
-                    par.find('.jin').text(d.j);
-                    par.find('.sy_count').text(d.sy)
+                    par.find('.huowei').html(`<input type="hidden" value="${c_id}" name="huowei_name[]" readonly><span>${hw}</span>`);
+                    par.find('.count').find('span').text(num);
+                    par.find('.count').find('input').val(num);
+                    par.find('.mao').find('span').text(d.j);
+                    par.find('.mao').find('input').val(d.j);
+                    par.find('.jin').find('span').text(d.m);
+                    par.find('.jin').find('input').val(d.m);
+                    par.find('.sy_count').find('span').text(d.sy);
+                    par.find('.sy_count').find('input').val(d.sy);
                 }
             })
         })
@@ -371,6 +394,13 @@
     $('.tbd').on('click','.remove', function(){
         let p = $(this).parents('tr');
         p.remove();
+        let id=p.find('.rukuform_xq_id').val();
+    let num=p.find('.count').find('input').val();
+    p.remove();
+    $.ajax({
+        url:'/index/Table/huifu',
+        data:{id,num}
+    })
     })
 
     $('.close').on('click', function(){

@@ -30,13 +30,16 @@ class Table extends Controller {
         $sy=isset($_POST['sy']) ? $_POST['sy'] : 0;
         $id=input('id');
         static $md=[];
-        $ck=db('cabinet')->where('warehouse_id',$id)->where('is_del',1)->select();
+        $ck=db('cabinet')
+        ->where('warehouse_id',$id)
+        ->where('is_del',1)
+        ->select();
         foreach ($ck as $c) {
             $rukuform=db('rukuform_xq')
                 ->where('rukuform_xq.state',1)
                 ->where('rukuform_xq.sy_count>=1')
                 ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id')
-                ->field('rukuform_xq.*,cabinet.name')
+                ->field('rukuform_xq.*,cabinet.name,cabinet.id as c_id')
                 ->select();
             foreach ($rukuform as $k=>$item) {
                 if($c['id']==$item['rk_huowei_id']){
@@ -48,6 +51,7 @@ class Table extends Controller {
             $md[$k]['m']=$row['Grossweight']/$row['rk_nums'];
             $md[$k]['j']=$row['netweight']/$row['rk_nums'];
             $md[$k]['sy']=$row['rk_nums']-$sy;
+            $md[$k]['c_id']=$row['c_id'];
         }
         return $md;
     }
@@ -61,7 +65,12 @@ class Table extends Controller {
         $mj['sy']=$row['sy_count'];
         return $mj;
     }
-
+    public function huifu() {
+        $id=input('id');
+        $num=input('num');
+        $row=db('rukuform_xq')->where('id',$id)->find();
+        db('rukuform_xq')->where('id',$id)->update(['sy_count'=>$row['sy_count']+$num]);
+    }
 
     public function blur($groos_min,$min,$max) {
         //净重
