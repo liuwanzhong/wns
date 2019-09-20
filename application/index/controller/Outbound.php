@@ -159,4 +159,9 @@ class Outbound extends Controller {
         $cd=input();
         var_dump($cd);
     }
+
+    //出库列表测试
+    public function shipping_order(){
+        return view('shipping_order');
+    }
 }
