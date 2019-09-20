@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/images/index.css">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+</head>
+<body>
+    <div class="note">
+        <div class="nav">
+            <span class="layui-breadcrumb">
+                <a href="/public/main.html" target="box">首页</a>
+                <a href="javascript:;">出库管理</a>
+                <a><cite>订单列表</cite></a>
+            </span>
+        </div>
+        <div>
+            <table class="layui-table" style="width: 96%; margin: 12px auto;">
+                <thead>
+                    <tr>
+                        <th>装运单号</th>
+                        <th>实装数量</th>
+                        <th>售达方</th>
+                        <th>毛重</th>
+                        <th>净重</th>
+                        <th>发货日期</th>
+                        <th>司机姓名</th>
+                        <th>司机电话</th>
+                        <th>合同编号</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>A00000000000012</td>
+                        <td>10000000</td>
+                        <td>成都常温配送中心工厂</td>
+                        <td>0.805</td>
+                        <td>0.279</td>
+                        <td>2019-09-20</td>
+                        <td>张三</td>
+                        <td>13115123133</td>
+                        <td>B00010112345</td>
+                        <td>
+                            <a href="{:url('Outbound/shipping_order_show')}"><i class="ico">&#xe619;</i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    <script src="/static/js/jquery.1.9.1.min.js"></script>
+    <script src="/layui/layui.js"></script>
+    <script>
+        layui.use('element', function () {
+            
+        })
+    </script>
+
+</body>
+</html>

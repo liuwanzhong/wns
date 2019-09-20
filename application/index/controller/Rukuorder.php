@@ -389,7 +389,7 @@ class Rukuorder extends Controller {
         $da=str_replace('"', '', $id);
         $da=trim($da,'[');
         $da=trim($da,']');
-         $data=db('rukuform_xq')->where("id in ($da)")->select();
+        $data=db('rukuform_xq')->where("id in ($da)")->select();
         $data=db('rukuform_xq')
             ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id','left')
             ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
@@ -422,7 +422,8 @@ class Rukuorder extends Controller {
                 $phpExcel->getActiveSheet()->setCellValue('C' . $rownum, $v['k_name']);
                 $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['w_name']);
                 $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['c_name']);
-                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum,$v['time']);
+                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, $v['time']);
+
                 $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['product_time']);
                 $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['rk_nums']);
                 $phpExcel->getActiveSheet()->setCellValue('I' . $rownum, $v['netweight']);
@@ -486,7 +487,7 @@ class Rukuorder extends Controller {
                 echo fread($file,2048);
             }
             fclose($file);
-            unlink($path);
+//            unlink($path);
             exit();
         }
     }
