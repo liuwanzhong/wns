@@ -153,7 +153,6 @@
 				if(data !=  undefined || data != null){
 					var params = {id: data};
 					$.post("{:url('Rukuorder/outExcel')}", params, function (res) {
-						console.log(res);
 						if (res.status) {
 							window.location.href = ("{:Url('index/Rukuorder/download')}?file=" + res.url);
 						} else {

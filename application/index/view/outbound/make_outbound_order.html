@@ -19,8 +19,8 @@
     <div class="nav">
         <span class="layui-breadcrumb">
             <a href="/public/main.html" target="box">首页</a>
-            <a href="javascript:;">入库管理</a>
-            <a><cite>入库单</cite></a>
+            <a href="javascript:;">出库管理</a>
+            <a><cite>出库单</cite></a>
         </span>
     </div>
 
@@ -149,15 +149,20 @@
                             <span>0</span>
                         </td>
                         <td>
+<<<<<<< HEAD
                             <input type="hidden" value="{$v.num}" name="" readonly>
                             {$v.num}
+=======
+                            <input type="hidden" value="" name="Delivery_id" readonly>
+                            {$v.detailed}
+>>>>>>> 1549de7a205f9937eae04802fc11c704a153c8fa
                         </td>
                         <td>
                             <button type="button" class="layui-btn layui-btn-sm add">
                                 <i class="layui-icon">&#xe654;</i>
                             </button>
                         </td>
-                        
+
                     </tr>
                     {/volist}
                 </tbody>
@@ -210,10 +215,10 @@
             elem: '#time',
             type: 'date'
         })
-
         $('.layui-table').on('click', '.add', function(){
             let _tr = $(this).parents('tr');
             let child = _tr[0].children;
+<<<<<<< HEAD
             console.log(child)
 
             let html = `<tr>
@@ -263,6 +268,54 @@
                         </td>
                         
                     </tr>`;
+=======
+            let html = `<tr>
+            <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
+            <td>
+                <input type="hidden" value="${child[1].innerText}" name="Delivery_id" readonly>
+                ${child[1].innerText}
+            </td>
+            <td class="status">
+                <input type="hidden" value="${child[2].innerText}" name="material_name" readonly>
+                ${child[2].innerText}
+            </td>
+            <td>
+                <input type="hidden" value="0" name="delivery_num" readonly>
+                <span>0</span>
+            </td>
+            <td class="huowei">
+                <botton class="layui-btn layui-btn-sm dia">点击</botton>
+            </td>
+            <td class="count">
+                <input type="hidden" value="0" name="delivery_num" readonly>
+                <span>0</span>
+            </td>
+            <td class="mao">
+                <input type="hidden" value="0" name="delivery_num" readonly>
+                <span>0</span>
+            </td>
+            <td class="jin">
+                <input type="hidden" value="0" name="delivery_num" readonly>
+                <span>0</span>
+            </td>
+            <td class="sy_count">
+                <input type="hidden" value="0" name="delivery_num" readonly>
+                <span>0</span>
+            </td>
+            <td>
+                <input type="hidden" value="${child[9].innerText}" name="Delivery_id" readonly>
+                ${child[9].innerText}
+            </td>
+            <td>
+                <button type="button" class="layui-btn layui-btn-sm add">
+                    <i class="layui-icon">&#xe654;</i>
+                </button>
+                <button type="button" class="layui-btn layui-btn-sm remove">
+                    <i class="layui-icon">&#xe640;</i>
+                </button>
+            </td>
+        </tr>`;
+>>>>>>> 1549de7a205f9937eae04802fc11c704a153c8fa
             $('.tbd').append(html);
             form.render();
 
@@ -290,7 +343,7 @@
 
         })
 
-
+        //点击
         let par = '';
         $('.tbd').on('click', '.dia', function () {
             let id = $('#table').val();
@@ -315,12 +368,12 @@
                             <input type="hidden" id="id" class="layui-input" value="${data[i].id}">
                             <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
                             <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
-
+                            <input type="hidden" id="sy" class="layui-input" value="${data[i].sy}">
                             <td><input type="radio" name="sex" value="nan" title=""></td>
                             <td>${data[i].product_name}</td>
                             <td>${data[i].product_time}</td>
                             <td class="hw">${data[i].name}</td>
-                            <td>${data[i].rk_nums}</td>
+                            <td>${data[i].sy_count}</td>
                             <td><input type="text" class="layui-input" style="width: 80px;"></td>
                             <td>${data[i].content}</td>
                         </tr>`;
@@ -332,24 +385,23 @@
             }
         })
 
-
+        //确认
         $('.sure').on('click', function () {
-
             $('.model_table').hide();
-
             let che = $('.kc_list').find('input:radio:checked')[0];
             let tr = $(che).parents('tr');
             let id = tr.find('#id').val();
             let m = tr.find('#m').val();
             let j = tr.find('#j').val();
+            let sy = tr.find('#sy').val();
             let hw = tr.find('.hw').text();
             let num = tr.find('input[type=text]').val();
-
             $.ajax({
                 url:'/index/Table/houwei_cd',
-                data:{id, m, j, count:num},
+                data:{id, m, j, count:num,sy},
                 success:function (d) {
-                    console.log(d)
+                    console.log(id,m,j,num,sy)
+                    console.log(d);
                     par.find('.rukuform_xq_id').val(id);
                     par.find('.huowei').html(`<input type="hidden" value="${hw}" name="" readonly><span>${hw}</span>`);
                     par.find('.count').find('span').text(num);

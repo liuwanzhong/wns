@@ -112,6 +112,10 @@ class Outbound extends Controller {
     }
     // 生成出库单
     public function make_outbound_order(){
+        $f=db('rukuform_xq')->where('state',1)->select();
+        for($i=0;$i<count($f);$i++){
+            db('rukuform_xq')->where('id',$f[$i]['id'])->update(['sy_count'=>$f[$i]['rk_nums']]);
+        }
         $cd=input('id');
         $cd=str_replace(array("\",\""),",",$cd);
         $cd=str_replace(array("[\""),"",$cd);
@@ -466,6 +470,7 @@ class Outbound extends Controller {
         $status=db('kc_status')->where('is_del',0)->select();
         return view('detailed',['rows'=>$rows,'status'=>$status]);
     }
+
 
     //出库列表测试
     public function shipping_order(){
