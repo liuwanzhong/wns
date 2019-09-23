@@ -22,21 +22,21 @@
 				</span>
 			</div>
 			<div class="seach">
-				<form action="{:url('Rukuorder/warehousing')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+				<form action="{:url('Outbound/warehousing')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
 					<div class="layui-form-item">
-						<label class="layui-form-label">工厂</label>
+						<label class="layui-form-label">出库仓库</label>
 						<div class="layui-input-inline">
 							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
 						</div>
 					</div>
 					<div class="layui-form-item">
-						<label class="layui-form-label">时间</label>
+						<label class="layui-form-label">出库时间</label>
 						<div class="layui-input-inline">
 							<input type="text" class="layui-input" id="delivery_time" name="s_delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
-						<label class="layui-form-label">单号</label>
+						<label class="layui-form-label">交货单号</label>
 						<div class="layui-input-inline">
 							<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
 						</div>
@@ -53,10 +53,10 @@
 				<tr>
 					<th>ID</th>
 					<th>审核</th>
-					<th>出库工厂</th>
+					<th>出库仓库</th>
 					<th>装运单号</th>
-					<th>仓库</th>
-					<th>入库日期</th>
+					<th>交货单号</th>
+					<th>出库日期</th>
 					<th>总数量</th>
 					<th>操作</th>
 				</tr>
@@ -66,14 +66,14 @@
 				<tr>
 					<td>{$row.id}</td>
 					<td>已审核</td>
-					<td>{$row.x_name}</td>
-					<td>{$row.shipmentnum}</td>
 					<td>{$row.w_name}</td>
-					<td>{$row.userintime|date="Y-m-d",###}</td>
+					<td>{$row.transport_id}</td>
+					<td>{$row.delivery_id}</td>
+					<td>{$row.delivery_time|date="Y-m-d",###}</td>
 					<td>{$row.count}</td>
 					<td>
 						<a href="#" class="edit xq" title="详情" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
-						<a href="{:url('Rukuorder/warehousing_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
+						<a href="{:url('Outbound/warehousing_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
 					</td>
 				</tr>
 				{/volist}
@@ -94,7 +94,7 @@
 			//详情
 			$('.xq').on('click',function () {
 				let id=$(this).parents('tr').find('td').eq(0).text();
-				location.href='/index/Rukuorder/warehousing_show?id='+id;
+				location.href='/index/Outbound/warehousing_show?id='+id;
 			})
 		</script>
 	</body>

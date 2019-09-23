@@ -108,6 +108,7 @@
                         <th>货位</th>
                         <th>货位分配数</th>
                         <th>实际重量</th>
+                        <th>净重</th>
                         <th>货位剩余数</th>
                         <th>备注</th>
                         <th>操作</th>
@@ -132,38 +133,24 @@
                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
                         </td>
                         <td class="count">
-<!--<<<<<<< HEAD-->
-<!--                            <input type="hidden" value="0" name="" readonly>-->
-<!--                            <span>0</span>-->
-<!--                        </td>-->
-<!--                        <td class="jin">-->
-<!--                            <input type="hidden" value="0" name="" readonly>-->
-<!--                            <span>0</span>-->
-<!--                        </td>-->
-<!--                        <td class="sy_count">-->
-<!--                            <input type="hidden" value="0" name="" readonly>-->
-<!--=======-->
                             <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
                             <span>0</span>
                         </td>
-<!--                        <td class="mao">-->
-<!--                            <input type="hidden" value="mao" name="mao[]" readonly>-->
-<!--                            <span>0</span>-->
-<!--                        </td>-->
+                       <td class="mao">
+                           <input type="hidden" value="mao" name="mao[]" readonly>
+                           <span>0</span>
+                       </td>
                         <td class="jin">
                             <input type="hidden" value="jin" name="jin[]" readonly>
                             <span>0</span>
                         </td>
                         <td class="sy_count">
                             <input type="hidden" value="sy_count" name="sy_count[]" readonly>
-<!--&gt;>>>>>> 124aa85a24d72f2fc445823090eb32c4bf7eb73d-->
                             <span>0</span>
                         </td>
                         <td>
                             <input type="hidden" value="{$v.detailed}" name="detailed[]" readonly>
-                            <input type="hidden" value="{$v.num}" name="" readonly>
-                            {$v.num}
-                            <input type="hidden" value="" name="Delivery_id" readonly>
+                            <input type="hidden" value="" name="Delivery" readonly>
                             {$v.detailed}
                         </td>
                         <td>
@@ -231,7 +218,6 @@
             console.log(child)
 
             let html = `<tr>
-<!--<<<<<<< HEAD-->
             <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
             <td>
                 <input type="hidden" value="${child[1].innerText}" name="Delivery_id" readonly>
@@ -273,54 +259,6 @@
                 </button>
             </td>
         </tr>`;
-// =======
-//                         <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
-//                         <td>
-//                             <input type="hidden" value="${child[1].innerText}" name="Delivery_id[]" readonly>
-//                             ${child[1].innerText}
-//                         </td>
-//                         <td class="status">
-//                             <input type="hidden" value="${child[2].innerText}" name="material_name[]" readonly>
-//                             ${child[2].innerText}
-//                         </td>
-//                         <td>
-//                             <input type="hidden" value="${child[3].innerText}" name="delivery_num[]" readonly>
-//                             ${child[3].innerText}
-//                         </td>
-//                         <td class="huowei">
-//                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
-//                         </td>
-//                         <td class="count">
-//                             <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
-//                             <span>0</span>
-//                         </td>
-//                         <td class="mao">
-//                             <input type="hidden" value="mao" name="mao[]" readonly>
-//                             <span>0</span>
-//                         </td>
-//                         <td class="jin">
-//                             <input type="hidden" value="jin" name="jin[]" readonly>
-//                             <span>0</span>
-//                         </td>
-//                         <td class="sy_count">
-//                             <input type="hidden" value="${child[8].innerText}" name="sy_count[]" readonly>
-//                             <span>${child[8].innerText}</span>
-//                         </td>
-//                         <td>
-//                             <input type="hidden" value="${child[9].innerText}" name="detailed[]" readonly>
-//                             ${child[9].innerText}
-//                         </td>
-//                         <td>
-//                             <button type="button" class="layui-btn layui-btn-sm add">
-//                                 <i class="layui-icon">&#xe654;</i>
-//                             </button>
-//                             <button type="button" class="layui-btn layui-btn-sm remove">
-//                                 <i class="layui-icon">&#xe640;</i>
-//                             </button>
-//                         </td>
-//
-//                     </tr>`;
-// >>>>>>> 124aa85a24d72f2fc445823090eb32c4bf7eb73d
             $('.tbd').append(html);
             form.render();
 
@@ -407,18 +345,7 @@
             $.ajax({
                 url:'/index/Table/houwei_cd',
                 data:{id, m, j, count:num},
-                success:function (d) {
-// <<<<<<< HEAD
-//                     par.find('.rukuform_xq_id').val(id);
-//                     par.find('.huowei').html(`<input type="hidden" value="${hw}" name="" readonly><span>${hw}</span>`);
-//                     par.find('.count').find('span').text(num);
-//                     par.find('.count').find('input').val(num);
-//                     par.find('.mao').find('span').text(d.m);
-//                     par.find('.mao').find('input').val(num);
-//                     par.find('.jin').find('span').text(d.j);
-//                     par.find('.jin').find('input').val(d.j);
-// =======
-                    console.log(d)
+                success:function (d) {console.log(d)
                     par.find('.rukuform_xq_id').val(id);
                     par.find('.huowei').html(`<input type="hidden" value="${c_id}" name="huowei_name[]" readonly><span>${hw}</span>`);
                     par.find('.count').find('span').text(num);
@@ -427,7 +354,6 @@
                     par.find('.mao').find('input').val(d.j);
                     par.find('.jin').find('span').text(d.m);
                     par.find('.jin').find('input').val(d.m);
-// >>>>>>> 124aa85a24d72f2fc445823090eb32c4bf7eb73d
                     par.find('.sy_count').find('span').text(d.sy);
                     par.find('.sy_count').find('input').val(d.sy);
                 }

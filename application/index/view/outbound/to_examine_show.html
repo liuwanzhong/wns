@@ -20,23 +20,29 @@
     <div class="nav">
         <span class="layui-breadcrumb">
             <a href="/public/main.html" target="box">首页</a>
-            <a href="javascript:;">入库管理</a>
-            <a><cite>入库单</cite></a>
+            <a href="javascript:;">出库管理</a>
+            <a><cite>出库单</cite></a>
         </span>
     </div>
-    <form method="post" class="layui-form" action="{:url('Rukuorder/to_examine_up')}">
+    <form method="post" class="layui-form" action="{:url('Outbound/to_examine_up')}">
         <input type="hidden" name="id" value="{$rows['id']}">
         <div class="form_box">
             <div class="layui-form-item">
                 <label class="layui-form-label">装运单号:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="shipmentnum" value="{$rows['shipmentnum']}" autocomplete="off" class="layui-input">
+                    <input type="text" name="transport_id" value="{$rows['transport_id']}" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">入库日期:</label>
+                <label class="layui-form-label">发货日期:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="userintime" value="<?php if(!empty($rows['userintime'])){echo date('Y-m-d',$rows['userintime']);}?>" autocomplete="off" class="layui-input" id="time">
+                    <input type="text" name="userintime" value="<?php if(!empty($rows['delivery_time'])){echo date('Y-m-d',$rows['delivery_time']);}?>" autocomplete="off" class="layui-input" id="time">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">售达方:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="reachout_name" value="{$rows['reachout_name']}" autocomplete="off" class="layui-input" id="reachout_name">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -52,18 +58,36 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">装卸工:</label>
+                <label class="layui-form-label">司机:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="stevedore" value="{$rows['stevedore']}" autocomplete="off" class="layui-input">
+                    <input type="text" name="driver" value="{$rows['driver']}" autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">入库仓库:</label>
+                <label class="layui-form-label">司机电电话:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="driverphone" value="{$rows['driverphone']}" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">装卸工:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="workers" value="{$rows['workers']}" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">承运单位:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="transport_unit" value="{$rows['transport_unit']}" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">出库仓库:</label>
                 <div class="layui-input-inline">
                     <select name="ck_id" lay-filter="ck_id" id="table" onchange="showtable(this.value)">
                         <option value="0">请选择仓库</option>
                         <?php foreach($cks as $ck): ?>
-                        <option value="<?=$ck['id']?>" <?php if($rows['ck_id']==$ck['id']){echo 'selected';} ?>><?=$ck['name']?></option>
+                        <option value="<?php echo $ck['id']?>" <?php if($rows['ck_id']==$ck['id']){echo "selected" ;} ?>><?=$ck['name']?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -75,16 +99,14 @@
                     <tr>
                         <th class="ckgc">出库工厂</th>
                         <th>产品名称</th>
-                        <th>产品属性</th>
-                        <th>入库货位</th>
-                        <th>实收数量</th>
+                        <th>出库货位</th>
+                        <th>实发数量</th>
                         <th>产品日期</th>
                         <th>产品批次</th>
                         <th>备注</th>
                         <th>毛重</th>
                         <th>净重</th>
                         <th class="ddbh">订单编号</th>
-                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody class="tbd">
@@ -94,22 +116,14 @@
                         <input type="hidden" name="cd[]" value="{$v.id}">
                         <input type="hidden" name="gross_min" value="{$v.j}">
                         <td>
-                            <input type="hidden" value="{$v.factory}" name="transfers_factory[]" readonly>
-                            {$v.factory}
+                            <input type="hidden" value="{$rows['w_name']}" name="transfers_factory[]" readonly>
+                            {$rows['w_name']}
                         </td>
                         <td>
                             <input type="hidden" value="{$v.product_name}" name="material_name[]" readonly>
                             {$v.product_name}
                         </td>
-                        <td class="status">
-                            <select name="status[]">
-                                <option value="0">请选择</option>
-                                <?php foreach($status as $statu): ?>
-                                <option value="<?=$statu['id']?>" <?php if($v['rk_status_id']==$statu['id']){echo 'selected';} ?>><?=$statu['title']?></option>
-                                <?php endforeach ?>
-                            </select>
-                        </td>
-                        <?php if($v['rk_huowei_id']==0): ?>
+                        <?php if($v['ck_huowei_id']==0): ?>
                             <td class="huowei">
                                 <select name='huowei[]' class='showhuowei'>
                                     <option value='0'>请选择货位</option>
@@ -119,13 +133,13 @@
                             <td class="huowei">
                                 <select name='huowei[]'>
                                     <?php foreach($cabinet as $s): ?>
-                                    <option value="{$s.id}" <?php if($s['id']==$v['rk_huowei_id']){echo 'selected';} ?>>{$s.name}</option>
+                                    <option value="{$s.id}" <?php if($s['id']==$v['ck_huowei_id']){echo 'selected';} ?>>{$s.name}</option>
                                     <?php endforeach;?>
                                 </select>
                             </td>
                         <?php endif; ?>
                         <td>
-                            <input type="number" value="{$v.rk_nums}" class="countnum layui-input" id="blur" name="nums[]">
+                            <input type="number" value="{$v.ck_nums}" class="countnum layui-input" id="blur" name="nums[]">
                         </td>
                         <td><input type="date" name="intime[]" class="layui-input" value="{$v.product_time}"></td>
                         <td><input type="text" name="storno[]" placeholder="请输入批次" value="{$v.product_batch}" class="layui-input"></td>
@@ -139,13 +153,8 @@
                             <span>{$v.netweight}</span>
                         </td>
                         <td>
-                            <input type="hidden" name="transfers_id[]" value="{$v.transfers_id}" readonly>
-                            {$v.transfers_id}
-                        </td>
-                        <td>
-                            <button type="button" class="layui-btn layui-btn-sm add">
-                                <i class="layui-icon">&#xe654;</i>
-                            </button>
+                            <input type="hidden" name="delivery_id[]" value="{$v.delivery_id}" readonly>
+                            {$v.delivery_id}
                         </td>
                     </tr>
                     {/volist}
@@ -153,7 +162,7 @@
             </table>
             <div class="btn">
                 <button class="layui-btn submit" lay-submit lay-filter="formDemo" id="del">立即提交</button>
-                <a class="layui-btn" href="{:url('Rukuorder/to_examine')}">返回</a>
+                <a class="layui-btn" href="{:url('Outbound/to_examine')}">返回</a>
             </div>
         </div>
     </form>
@@ -180,49 +189,51 @@
                 str += `<option value="${status[i].value}">${status[i].text}</option>`
             }
             let html = `<tr>
-                            <input type="hidden" name="min" value="${child[0].value}">
-                            <input type="hidden" name="gross_min" value="${child[2].value}">
-                            <td>
-                                <input type="hidden" value="${child[3].innerText}" name="transfers_factory[]" readonly>
-                                ${child[3].innerText}
-                            </td>
-                            <td>
-                                <input type="hidden" value="${child[4].innerText}" name="material_name[]" readonly>
-                                ${child[4].innerText}
-                            </td>
-                            <td class="status">
-                                <select name="status[]" lay-filter="test">
-                                    ${str}
+                        <input type="hidden" name="min" value="">
+                        <input type="hidden" name="cd[]" value="">
+                        <input type="hidden" class='gross_min' name="gross_min" value="">
+                        <td>
+                            <input type="hidden" value="${child[3].innerText}" name="transfers_factory[]" readonly>
+                            ${child[3].innerText}
+                        </td>
+                        <td>
+                            <input type="hidden" value="${child[4].innerText}" name="material_name[]" readonly>
+                            ${child[4].innerText}
+                        </td>
+                        <?php if($v['ck_huowei_id']==0): ?>
+                            <td class="huowei">
+                                <select name='huowei[]' class='showhuowei'>
+                                    <option value='0'>请选择货位</option>
                                 </select>
                             </td>
-                            <td class="huowei"><select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select></td>
-                            <td>
-                                <input type="number" value="0" class="countnum layui-input" id="blur" name="nums[]">
+                        <?php else:?>
+                            <td class="huowei">
+                                <select name='huowei[]'>
+                                    <?php foreach($cabinet as $s): ?>
+                                    <option value="{$s.id}" <?php if($s['id']==$v['ck_huowei_id']){echo 'selected';} ?>>{$s.name}</option>
+                                    <?php endforeach;?>
+                                </select>
                             </td>
-                            <td><input type="date" name="intime[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd"></td>
-                            <td><input type="text" name="storno[]" class="layui-input" placeholder="请输入批次"></td>
-                            <td><textarea name="content[]" class="layui-textarea"></textarea></td>
-                            <td>
-                                <input type="hidden"class="groos" name="Grossweight[]" value="0" readonly>
-                                <span></span>
-                            </td>
-                            <td>
-                                <input type="hidden" class="num" name="netweight[]" value="0" readonly>
-                                <span></span>
-                            </td>
-                            <td>
-                                <input type="hidden" name="transfers_id[]" value="${child[13].innerText}" readonly>
-                                ${child[13].innerText}
-                            </td>
-                            <td width="95px;">
-                                <button type="button" class="layui-btn layui-btn-sm add">
-                                    <i class="layui-icon">&#xe654;</i>
-                                </button>
-                                <button type="button" class="layui-btn layui-btn-sm remove">
-                                    <i class="layui-icon">&#xe640;</i>
-                                </button>
-                            </td>
-                        </tr>`;
+                        <?php endif; ?>
+                        <td>
+                            <input type="number" value="{$v.ck_nums}" class="countnum layui-input" id="blur" name="nums[]">
+                        </td>
+                        <td><input type="date" name="intime[]" class="layui-input" value="{$v.product_time}"></td>
+                        <td><input type="text" name="storno[]" placeholder="请输入批次" value="{$v.product_batch}" class="layui-input"></td>
+                        <td><textarea name="content[]" class="layui-textarea">{$v.content}</textarea></td>
+                        <td>
+                            <div class="groos"><input type="hidden" class="groos" name="Grossweight[]" value="{$v.Grossweight}" readonly></div>
+                            <span>{$v.Grossweight}</span>
+                        </td>
+                        <td>
+                            <div class="num"><input type="hidden" class="num" name="netweight[]" value="{$v.netweight}" readonly></div>
+                            <span>{$v.netweight}</span>
+                        </td>
+                        <td>
+                            <input type="hidden" name="delivery_id[]" value="${child[12].innerText}" readonly>
+                            ${child[12].innerText}
+                        </td>
+                    </tr>`;
             $('.tbd').append(html);
             form.render();
 
@@ -270,10 +281,13 @@
     // 修改商品数量
     $('.tbd').on('blur', '.countnum', function(){
         let parent =$(this).parents('tr');
+        console.log(parent)
         //净重
-        let min = $(this).parents('tr').find('input[name=gross_min]').val();
+        let min = parent.find('input[name=gross_min]').val();
+        console.log(min);
         //毛重
         let gross_min = $(this).parents('tr').find('input[name=min]').val();
+        console.log(gross_min)
         let max = $(this).val()
         $.ajax({
             url:'/index/Rukuorder/blur',
