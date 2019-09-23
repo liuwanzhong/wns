@@ -9,7 +9,7 @@ use think\Controller;
 class Run extends Controller {
     //地区库房列表
     public function warehouse() {
-        $rows=db('warehouse')->where('is_del',1)->select();
+        $rows=db('warehouse')->where('is_del',1)->paginate(100);
         return view('warehouse',['rows'=>$rows]);
     }
     //添加库房
@@ -40,6 +40,10 @@ class Run extends Controller {
         if($id==0){
             $this->eror('缺少必要参数,请重试');
         }
+        $count=db('cabinet')->where('is_del',1)->where('warehouse_id',$id)->find();
+        if($count){
+            $this->error('该库房下还有货位,不能删除');
+        }
         $r=db('warehouse')->where('id',$id)->update(['is_del'=>0]);
         if($r){
             return redirect('warehouse');
@@ -49,16 +53,17 @@ class Run extends Controller {
     }
     //查看库房
     public function warehouse_select() {
+        $ms=$this->qx();
+        if($ms==0){
+            $msg=['error'=>0,'msg'=>'警告:越权操作'];
+            return $msg;
+        }
         $id=$_POST['id'];
         $row=db('warehouse')->where('id',$id)->find();
         return $row;
     }
     //修改库房
     public function warehouse_edit() {
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
         $data=input();
         array_shift($data);
         $count=db('warehouse')->where('name',$data['name'])->where("id!=$data[id]")->where('is_del',1)->count();
@@ -80,7 +85,7 @@ class Run extends Controller {
             ->where('cabinet.is_del',1)
             ->join('warehouse','cabinet.warehouse_id=warehouse.id')
             ->field('cabinet.*,warehouse.name as w_name')
-            ->select();
+            ->paginate(100);
         $ware=db('warehouse')->where('is_del',1)->select();
         return view('cabinet',['rows'=>$rows,'ware'=>$ware]);
     }
@@ -124,6 +129,11 @@ class Run extends Controller {
     }
     //查看货位
     public function cabinet_select() {
+        $ms=$this->qx();
+        if($ms==0){
+            $msg=['error'=>0,'msg'=>'警告:越权操作'];
+            return $msg;
+        }
         $id=$_POST['id'];
         $row=db('cabinet')->where('id',$id)->find();
         return $row;
@@ -155,7 +165,7 @@ class Run extends Controller {
 
     //库存列表
     public function index(){
-        $list = db('kc_status')->where('is_del',0)->paginate(20);
+        $list = db('kc_status')->where('is_del',0)->paginate(100);
         return view('index',['list'=>$list]);
     }
     //添加状态
@@ -175,8 +185,13 @@ class Run extends Controller {
     }
     //修改查看接口
     public function show($id){
+        $ms=$this->qx();
+        if($ms==0){
+            $msg=['error'=>0,'msg'=>'警告:越权操作'];
+            return $msg;
+        }
         $list = db('kc_status')->where('is_del',0)->where('id',$id)->find();
-        return json_encode($list);
+        return $list;
     }
     //修改
     public function edit(){

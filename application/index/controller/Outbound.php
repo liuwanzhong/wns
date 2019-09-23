@@ -471,19 +471,4 @@ class Outbound extends Controller {
         return view('detailed',['rows'=>$rows]);
     }
 
-
-    //出库列表测试
-    public function shipping_order(){
-        return view('shipping_order');
-    }
-
-    //出库列表测试
-    public function shipping_order_show(){
-        return view('shipping_order_show');
-    }
-
-    //运输台账测试
-    public function transport(){
-        return view('transport');
-    }
 }
