@@ -261,9 +261,6 @@ class Outbound extends Controller {
             // ->where($search)
             ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
             ->paginate(100);
-        echo db('outbound_from')->getlastSql();exit;
-        // echo "<pre>";
-        // print_r($rows);exit;
         return view('to_examine',['rows'=>$rows]);
     }
     // 出库订单详情
@@ -504,8 +501,4 @@ class Outbound extends Controller {
         return view('shipping_order_show');
     }
 
-    //运输台账测试
-    public function transport(){
-        return view('transport');
-    }
 }
