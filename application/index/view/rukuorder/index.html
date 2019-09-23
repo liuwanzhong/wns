@@ -220,11 +220,10 @@
                 $('.showhuowei').empty();
                 $.ajax({
                     type: "get",//请求方式有post，get请求方式，这里是post请求
-                    url: '/index/table/show/id/' + id,//请求的方法的路径
+                    url: '/index/Rukuorder/show/id/' + id,//请求的方法的路径
                     dataType: 'json',//请求参数的格式为json.另外还有text等
                     success: function(data){
-                        var data = JSON.parse(data);
-                        console.log(data);
+                        console.log(data)
                         $('.showhuowei').append("<option value=''>请选择货位</option>");
                         for (var i=0;i<data.length;i++)
                         {

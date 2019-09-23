@@ -3,6 +3,8 @@
 	<head>
 	<meta charset="utf-8"/>
 	<title>新增权限</title>
+		<link rel="stylesheet" href="/images/css.css">
+<!--		<link rel="stylesheet" href="/images/boot.css">-->
 		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
 		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
 	<style type="text/css">
@@ -24,13 +26,13 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">工厂</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+							<input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
 						</div>
 					</div>
 					<div class="layui-form-item">
 						<label class="layui-form-label">日期</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
@@ -39,7 +41,7 @@
 							<select name="s_material_name" id="">
 								<option value="0">---请选择产品属性---</option>
 								{volist name='status' id='st'}
-								<option value="{$st.id}">{$st.title}</option>
+								<option value="{$st.id}" <?php if($s_material_name==$st['id']){echo 'selected';} ?>>{$st.title}</option>
 								{/volist}
 							</select>
 						</div>
@@ -88,6 +90,9 @@
 				{/volist}
 				</tbody>
 			</table>
+			<div style="text-align:center; margin-bottom: 200px;">
+				{$rows->render()}
+			</div>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
@@ -153,11 +158,14 @@
 				if(data !=  undefined || data != null){
 					var params = {id: data};
 					$.post("{:url('Rukuorder/outExcel')}", params, function (res) {
+						if(res.error==0){
+							alert(res.msg);
+							return false;
+						}
 						if (res.status) {
 							window.location.href = ("{:Url('index/Rukuorder/download')}?file=" + res.url);
 						} else {
 							layer.msg('系统错误，操作失败');
-
 						}
 					}, 'json')
 				}
@@ -165,7 +173,6 @@
 					layer.alert('请选择需要导出的数据',{icon:5})
 					return false;
 				}
-
 			})
 		</script>
 	</body>

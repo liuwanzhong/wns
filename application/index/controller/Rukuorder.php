@@ -9,6 +9,10 @@ use think\Db;
 class Rukuorder extends Controller {
     //添加入库订单列表
     public function index(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告:越权操作');
+        }
         $cd=input('id');
         $id=str_replace(array("[","]","\""),"",$cd);
         $id=explode(',',$id);
@@ -33,6 +37,23 @@ class Rukuorder extends Controller {
         }
         return view('index',['rows'=>$rows,'status'=>$status,'cks'=>$cks,'id'=>$cd]);
     }
+    //货位
+    public function show($id){
+        $list = db('cabinet')
+            ->where('cabinet.is_del',1)
+            ->where('cabinet.warehouse_id',$id)->select();
+        foreach ($list as $k=>$item) {
+            $rows=db('rukuform_xq')->where('is_del',0)->select();
+            foreach ($rows as $row) {
+                if($item['id']==$row['rk_huowei_id'] and $row['rk_nums']!=0){
+                    unset($list[$k]);
+
+                }
+            }
+        }
+        $list=array_values($list);
+        return $list;
+    }
     //毛重净重计算
     public function blur() {
         $groos_min=input('groos_min');//毛重
@@ -48,15 +69,17 @@ class Rukuorder extends Controller {
     public function insert(){
         $data = input();
         $userintime=strtotime($data['userintime']);
+
         try{
             $id = db('rukuform')->insertGetId(['shipmentnum'=>$data['shipmentnum'],'userintime'=>$userintime,'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id']]);
             for ($i=0;$i<count($data['transfers_factory']);$i++){
+                $t=strtotime($data['intime'][$i]);
                 $rs = db('rukuform_xq')->insert(['factory'=>$data['transfers_factory'][$i],
                                                  'product_name'=>$data['material_name'][$i],
                                                  'rk_status_id'=>$data['status'][$i],
                                                  'rk_huowei_id'=>$data['huowei'][$i],
                                                  'rk_nums'=>$data['nums'][$i],
-                                                 'product_time'=>$data['intime'][$i],
+                                                 'product_time'=>$t,
                                                  'product_batch'=>$data['storno'][$i],
                                                  'content'=>$data['content'][$i],
                                                  'netweight'=>$data['netweight'][$i],
@@ -79,17 +102,18 @@ class Rukuorder extends Controller {
 
 
 
-
     //入库计划
     public function to_examine() {
-        $data=input();
+        $s_transfers_id=input('s_transfers_id');//工厂
+        $s_delivery_time=input('s_delivery_time');//时间
+        $s_material_name=input('s_material_name');//单号
         $search = '';
-        if (!empty($data['s_transfers_id'])) {
-            $search = 'rukuform_xq.factory like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+        if (!empty($s_transfers_id)) {
+            $search = 'rukuform_xq.factory like ' . "'%" . $s_transfers_id . '%' . "'";
         }
         // 时间转换
-        if (!empty($data['s_delivery_time'])) {
-            $time = explode('~', $data['s_delivery_time']);
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
             foreach ($time as $key) {
                 $time[] = strtotime($key);
                 array_shift($time);
@@ -97,17 +121,17 @@ class Rukuorder extends Controller {
             if (!empty($search)) {
                 $time = ' and rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
             } else {
-                $time = 'rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+                $time = ' rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
             }
             $search .= $time;
         }
-        // 物料名
-        if (!empty($data['s_material_name'])) {
-            $material_name = $data['s_material_name'];
+        // 单号
+        if (!empty($s_material_name)) {
+            $material_name = $s_material_name;
             if (!empty($search)) {
-                $material_name = ' and rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
+                $material_name = ' and rukuform.shipmentnum like ' . "'%" . $material_name . '%' . "'";
             } else {
-                $material_name = ' rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
+                $material_name = ' rukuform.shipmentnum like ' . "'%" . $material_name . '%' . "'";
             }
             $search .= $material_name;
         }
@@ -119,11 +143,15 @@ class Rukuorder extends Controller {
             ->group('rukuform_xq.factory,rukuform_xq.rukuid')
             ->where($search)
             ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
-            ->paginate(100);
-        return view('to_examine',['rows'=>$rows]);
+            ->paginate(20,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+        return view('to_examine',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     //订单详情
     public function to_examine_show($id) {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告:越权操作');
+        }
         $rows=db('rukuform')
             ->join('warehouse','rukuform.ck_id=warehouse.id','left')
             ->where('rukuform.is_del',0)
@@ -162,13 +190,15 @@ class Rukuorder extends Controller {
             -> where('id', $data['id'])
             -> update(['shipmentnum' => $data['shipmentnum'], 'userintime' => $userintime, 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id']]);
         for ($i = 0; $i < count($data['transfers_factory']); $i++) {
+            $t=strtotime($data['intime'][$i]);
             if (empty($data['cd'][$i])) {
-                $fs=db('rukuform_xq') -> insert(['factory'       => $data['transfers_factory'][$i],
+
+                db('rukuform_xq') -> insert(['factory'       => $data['transfers_factory'][$i],
                                                  'product_name'  => $data['material_name'][$i],
                                                  'rk_status_id'  => $data['status'][$i],
                                                  'rk_huowei_id'  => $data['huowei'][$i],
                                                  'rk_nums'       => $data['nums'][$i],
-                                                 'product_time'  => $data['intime'][$i],
+                                                 'product_time'  => $t,
                                                  'product_batch' => $data['storno'][$i],
                                                  'content'       => $data['content'][$i],
                                                  'netweight'     => $data['netweight'][$i],
@@ -177,26 +207,10 @@ class Rukuorder extends Controller {
                                                  'rukuid'        => $data['id']]);
             }else{
                 $rs = db('rukuform_xq') -> where('id', $data['cd'][$i])
-                    -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id'  => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i], 'product_time'  => $data['intime'][$i], 'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'     => $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
+                    -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id'  => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i], 'product_time'  => $t, 'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'     => $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
             }
-
-//            }
-//            for($c=0;$c<count($data['transfers_factory']);$c++){
-//
-//            }
-//            if($r && $rs) {
-//                // 提交事务
-//                Db::commit();
-//                $this->error('操作成功','to_examine');
-//            }
-//        } catch (\Exception $e) {
-//            $this->error('添加入库订单失败,请联系管理员');
-//            // 回滚事务
-//            Db::rollback();
-//        }
-//            return redirect('to_examine');
         }
-        if($r  || $rs){
+        if($r!==false  || $rs!==false){
             return redirect('to_examine');
         }else{
             $this->error('添加入库订单失败,请联系管理员');
@@ -255,14 +269,16 @@ class Rukuorder extends Controller {
 
     //入库台账
     public function warehousing() {
-        $data=input();
+        $s_transfers_id=input('s_transfers_id');//工厂
+        $s_delivery_time=input('s_delivery_time');//时间
+        $s_material_name=input('s_material_name');//单号
         $search = '';
-        if (!empty($data['s_transfers_id'])) {
-            $search = 'rukuform_xq.factory like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+        if (!empty($s_transfers_id)) {
+            $search = 'rukuform_xq.factory like ' . "'%" . $s_transfers_id . '%' . "'";
         }
         // 时间转换
-        if (!empty($data['s_delivery_time'])) {
-            $time = explode('~', $data['s_delivery_time']);
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
             foreach ($time as $key) {
                 $time[] = strtotime($key);
                 array_shift($time);
@@ -275,12 +291,12 @@ class Rukuorder extends Controller {
             $search .= $time;
         }
         // 物料名
-        if (!empty($data['s_material_name'])) {
-            $material_name = $data['s_material_name'];
+        if (!empty($s_material_name)) {
+            $material_name = $s_material_name;
             if (!empty($search)) {
-                $material_name = ' and rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
+                $material_name = ' and rukuform.shipmentnum like ' . "'%" . $material_name . '%' . "'";
             } else {
-                $material_name = ' rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
+                $material_name = ' rukuform.shipmentnum like ' . "'%" . $material_name . '%' . "'";
             }
             $search .= $material_name;
         }
@@ -292,9 +308,9 @@ class Rukuorder extends Controller {
             ->group('rukuform_xq.factory,rukuform_xq.rukuid')
             ->where($search)
             ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
-            ->paginate(100);
+            ->paginate(20,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         // var_dump($rows);exit;
-        return view('warehousing',['rows'=>$rows]);
+        return view('warehousing',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     //订单详情
     public function warehousing_show($id) {
@@ -332,16 +348,18 @@ class Rukuorder extends Controller {
 
     //入库明细
     public function detailed() {
-        $data=input();
+        $s_transfers_id=input('s_transfers_id');//工厂
+        $s_delivery_time=input('s_delivery_time');//时间
+        $s_material_name=input('s_material_name');//产品属性
         $search = '';
         //工厂名
-        if (!empty($data['s_transfers_id'])) {
-            $data['s_transfers_id']=addslashes($data['s_transfers_id']);
-            $search = 'rukuform_xq.factory like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+        if (!empty($s_transfers_id)) {
+            $s_transfers_id=addslashes($s_transfers_id);
+            $search = 'rukuform_xq.factory like ' . "'%" . $s_transfers_id . '%' . "'";
         }
         // 时间转换
-        if (!empty($data['s_delivery_time'])) {
-            $time = explode('~', $data['s_delivery_time']);
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
             foreach ($time as $key) {
                 $time[] = strtotime($key);
                 array_shift($time);
@@ -353,9 +371,9 @@ class Rukuorder extends Controller {
             }
             $search .= $time;
         }
-        // 物料名
-        if (!empty($data['s_material_name'])) {
-            $material_name = $data['s_material_name'];
+        // 产品属性
+        if (!empty($s_material_name)) {
+            $material_name = $s_material_name;
             if (!empty($search)) {
                 $material_name = ' and rukuform_xq.rk_status_id like ' . "'%" . $material_name . '%' . "'";
             } else {
@@ -372,17 +390,13 @@ class Rukuorder extends Controller {
             ->where('rukuform_xq.state',1)
             ->where("$search")
             ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
-            ->select();
+            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         //产品属性
         $status=db('kc_status')->where('is_del',0)->select();
-        return view('detailed',['rows'=>$rows,'status'=>$status]);
+        return view('detailed',['rows'=>$rows,'status'=>$status,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     //导出入库明细
     public function outExcel(){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
         $data = input();
         unset($data['/index/rukuorder/outexcel_html']);
         $id=$data['id'];
@@ -422,7 +436,7 @@ class Rukuorder extends Controller {
                 $phpExcel->getActiveSheet()->setCellValue('C' . $rownum, $v['k_name']);
                 $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['w_name']);
                 $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['c_name']);
-                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, $v['time']);
+                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, date('Y-m-d',$v['time']));
 
                 $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['product_time']);
                 $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['rk_nums']);

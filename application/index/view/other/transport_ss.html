@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="/images/index.css">
-    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/images/boot.css">
+    <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
     <style>
         .layui-table th, .layui-table td{
             white-space: nowrap;
@@ -114,12 +116,15 @@
                 {/volist}
                 </tbody>
             </table>
+            <div style="text-align:center;">
+                {$rows->render()}
+            </div>
         </div>
     </div>
 
     <script src="/static/js/jquery-1.9.1.min.js"></script>
     <script src="/layui/layui.js"></script>
-    
+
     <script>
         layui.use(['element', 'layer'], function () {
             var layer = layui.layer;
