@@ -153,5 +153,4 @@ class Instor extends Controller
             $this->error("删除失败");
         }
     }
-
 }
