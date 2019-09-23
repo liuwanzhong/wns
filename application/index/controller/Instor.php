@@ -57,6 +57,71 @@ class Instor extends Controller
                                -> where('a.is_del', 0) -> where('b.is_del', 1)
                                -> where('a.id', $v['rukuid'])->find()['name'];
         }
+        
+        // $res=db('rukuform_xq')
+        //     ->join('rukuform,rukuform.id=rukuform_xq.rukuid')
+        //     ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id','left')
+        //     ->where('kc_status.is_del',0)
+        //     ->where('cabinet.is_del',1)
+        //     ->where('rukuform_xq.state',1)
+        //     ->field('rukuform_xq.*,cabinet.name as c_mane,rukuform.userintime')
+        //     ->select();
+        $res=db('rukuform_xq')
+            ->join('rukuform','rukuform.id=rukuform_xq.rukuid',"left")
+            ->where('rukuform_xq.is_del',0)
+            ->field('rukuform_xq.*,rukuform.userintime as r_time')
+            ->select();
+            // echo "<pre>";
+            // print_r($res);exit;
+        foreach($res as $val){
+            $id=$val['rk_huowei_id'];
+            $rs =db('statistical')
+            ->where('huowei',$id)
+            ->select();
+            echo "<pre>";
+            echo db('statistical')->getlastSql();
+            print_r($rs);
+            // exit;
+            // foreach($rs as $value){
+                // echo "<pre>";
+                // print_r($value);
+                // if(!empty($value)){
+                    // db('statistical')
+                    // ->update([
+                    //     'goods_name'=>$val['product_name'],
+                    //     'product_time'=>$val['product_time'],
+                    //     'order_id'=>$val['transfers_id'],
+                    //     't_num'=>$val['rk_nums'],
+                    //     'customer'=>$val['factory'],
+                    //     'start_num'=>0,
+                    //     'balance'=>$val['rk_nums'],
+                    // ])
+                    // ->where($sid,$id);
+                    // echo db('statistical')->getlastSql();
+                    // echo 1;
+                    // echo "<pre>";
+                    // echo db('statistical')->getlastSql();
+                    // print_r($val);
+                // }else{
+            //         db('statistical')
+            //         ->insert([
+            //             'huowei'=>$val['rk_huowei_id'],
+            //             'goods_name'=>$val['product_name'],
+            //             'product_time'=>$val['product_time'],
+            //             'order_id'=>$val['transfers_id'],
+            //             'type'=>1,
+            //             't_num'=>$val['rk_nums'],
+            //             'customer'=>$val['factory'],
+            //             'start_num'=>0,
+            //             'balance'=>$val['rk_nums'],
+            //         ]);
+            //         echo 2;
+            //     }
+            // }
+                
+        }
+        exit;
+        return view('index2',['orders'=>$orders]);
         //仓库
         $ware=db('warehouse')->where('is_del',1)->select();
         return view('index2',['orders'=>$orders,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);

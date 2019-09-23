@@ -15,55 +15,42 @@
 			<div class="nav">
 				<span class="layui-breadcrumb">
 					<a href="/public/main.html" target="box">首页</a>
-					<a href="javascript:;">入库管理</a>
-					<a><cite>入库明细</cite></a>
+					<a href="javascript:;">出库管理</a>
+					<a><cite>出库明细</cite></a>
 				</span>
 			</div>
 			<div class="seach">
-				<form action="{:url('Rukuorder/detailed')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+				<form action="{:url('Outbound/detailed')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
 					<div class="layui-form-item">
-						<label class="layui-form-label">工厂</label>
+						<label class="layui-form-label">出库仓库</label>
 						<div class="layui-input-inline">
 							<input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
 						</div>
 					</div>
 					<div class="layui-form-item">
-						<label class="layui-form-label">日期</label>
+						<label class="layui-form-label">发货日期</label>
 						<div class="layui-input-inline">
 							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
-						<label class="layui-form-label">产品属性</label>
-						<div class="layui-input-inline">
-							<select name="s_material_name" id="">
-								<option value="0">---请选择产品属性---</option>
-								{volist name='status' id='st'}
-								<option value="{$st.id}">{$st.title}</option>
-								{/volist}
-							</select>
-						</div>
-					</div>
-					<div class="layui-form-item">
 						<div class="layui-input-inline">
 							<button class="layui-btn save" lay-submit>查询</button>
+							<button class="layui-btn" id="dc">导出</button>
 						</div>
 					</div>
 				</form>
 			</div>
-			<button id="dc">导出</button>
 			<table class="layui-table new_list" style="width: 96%; margin: 12px auto;">
 				<thead>
 				<tr>
 					<th><input type="checkbox" id="all"></th>
 					<th>ID</th>
-					<th>工厂</th>
-					<th>产品名称</th>
-					<th>产品属性</th>
-					<th>入库仓库</th>
-					<th>入库货位</th>
-					<th>入库时间</th>
-					<th>产品时间</th>
+					<th>出库仓库</th>
+					<th>出库货物</th>
+					<th>出库货位</th>
+					<th>送达方</th>
+					<th>发货日期</th>
 					<th>数量</th>
 					<th>净重</th>
 					<th>毛重</th>
@@ -74,16 +61,16 @@
 				<tr id="check" class="news_list">
 					<td><input type="checkbox" value="{$row.id}"></td>
 					<td>{$row.id}</td>
-					<td>{$row.factory}</td>
-					<td>{$row.product_name}</td>
-					<td>{$row.k_name}</td>
 					<td>{$row.w_name}</td>
+					<td>{$row.product_name}</td>
 					<td>{$row.c_name}</td>
-					<td>{$row.time|date="Y-m-d",###}</td>
-					<td>{$row.product_time}</td>
-					<td>{$row.rk_nums}</td>
+					<td>{$row.reachout_name}</td>
+					<td><?php if(!empty($row['delivery_time'])){echo date('Y-m-d',$row['delivery_time']);}?></td>
+					<td>{$row.ck_nums}</td>
 					<td>{$row.netweight}</td>
 					<td>{$row.Grossweight}</td>
+					<td></td>
+					<td></td>
 				</tr>
 				{/volist}
 				</tbody>
@@ -150,10 +137,10 @@
 				alert(1);
 				var data = sessionStorage.session_dc;
 				var params = {id: data};
-				$.post("{:url('Rukuorder/outExcel')}", params, function (res) {
+				$.post("{:url('Oukuorder/outExcel')}", params, function (res) {
 					console.log(res);
 					if (res.status) {
-						window.location.href = ("{:Url('index/Rukuorder/download')}?file=" + res.url);
+						window.location.href = ("{:Url('index/Oukuorder/download')}?file=" + res.url);
 					} else {
 						layer.msg('系统错误，操作失败');
 

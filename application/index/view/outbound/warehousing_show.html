@@ -9,6 +9,9 @@
         .container{display: block;overflow-x: hidden;}
         .container::-webkit-scrollbar{width: 0;}
         .btn{margin-left: 40px;margin-top: 30px;}
+        #table{
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -26,37 +29,63 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">装运单号:</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="shipmentnum" value="{$rows['shipmentnum']}" readonly class="layui-input" >
+                        <input type="text" name="transport_id" value="{$rows['transport_id']}" autocomplete="off" class="layui-input" readonly>
                     </div>
                 </div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label">入库日期:</label>
+                    <label class="layui-form-label">发货日期:</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="userintime" value="{$rows.userintime|date='Y-m-d',###}" readonly class="layui-input" id="time">
+                        <input type="text" name="userintime" value="<?php if(!empty($rows['delivery_time'])){echo date('Y-m-d',$rows['delivery_time']);}?>" autocomplete="off" class="layui-input" id="time" readonly>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">售达方:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="reachout_name" value="{$rows['reachout_name']}" autocomplete="off" class="layui-input" id="reachout_name" readonly >
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">运输方式:</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="transport" value="{$rows['transport']}" readonly class="layui-input">
+                        <input type="text" name="transport" value="{$rows['transport']}" autocomplete="off" class="layui-input" readonly >
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">车牌号码:</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="carid" value="{$rows['carid']}" readonly class="layui-input">
+                        <input type="text" name="carid" value="{$rows['carid']}" autocomplete="off" class="layui-input" readonly >
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">司机:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="driver" value="{$rows['driver']}" autocomplete="off" class="layui-input" readonly >
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">司机电电话:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="driverphone" value="{$rows['driverphone']}" autocomplete="off" class="layui-input" readonly >
                     </div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">装卸工:</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="stevedore" value="{$rows['stevedore']}" readonly class="layui-input">
+                        <input type="text" name="workers" value="{$rows['workers']}" autocomplete="off" class="layui-input" readonly >
                     </div>
                 </div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label">仓库:</label>
+                    <label class="layui-form-label">承运单位:</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="stevedore" value="{$rows['w_name']}" readonly class="layui-input">
+                        <input type="text" name="transport_unit" value="{$rows['transport_unit']}" autocomplete="off" class="layui-input" readonly >
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">出库仓库:</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline">
+                            <input type="text" name="transport_unit" value="{$rows['w_name']}" autocomplete="off" class="layui-input" readonly >
+                        </div>
                     </div>
                 </div>
             </div>
@@ -64,40 +93,55 @@
 
         <table class="layui-table" style="width: 96%; margin: 12px auto;">
             <thead>
-            <tr>
-                <th>出库工厂</th>
-                <th>产品名称</th>
-                <th>产品属性</th>
-                <th>入库货位</th>
-                <th>实收数量</th>
-                <th>产品日期</th>
-                <th>产品批次</th>
-                <th>备注</th>
-                <th>毛重</th>
-                <th>净重</th>
-                <th>订单编号</th>
-            </tr>
+                <tr>
+                    <th class="ckgc">出库工厂</th>
+                    <th>产品名称</th>
+                    <th>出库货位</th>
+                    <th>实发数量</th>
+                    <th>产品日期</th>
+                    <th>产品批次</th>
+                    <th>备注</th>
+                    <th>毛重</th>
+                    <th>净重</th>
+                    <th class="ddbh">订单编号</th>
+                </tr>
             </thead>
             <tbody class="tbd">
-            {volist name='cats' id='ca'}
-            <tr>
-                <td>{$ca.factory}</td>
-                <td>{$ca.product_name}</td>
-                <td>{$ca.w_name}</td>
-                <td>{$ca.c_name}</td>
-                <td>{$ca.rk_nums}</td>
-                <td>{$ca.product_time}</td>
-                <td>{$ca.product_batch}</td>
-                <td>{$ca.content}</td>
-                <td>{$ca.netweight}</td>
-                <td>{$ca.Grossweight}</td>
-                <td>{$ca.transfers_id}</td>
-            </tr>
-            {/volist}
+                {volist name='cats' id='v'}
+                <tr>
+                    <input type="hidden" name="min" value="{$v.m}">
+                    <input type="hidden" name="cd[]" value="{$v.id}">
+                    <input type="hidden" name="gross_min" value="{$v.j}">
+                    <td>
+                        {$rows['w_name']}
+                    </td>
+                    <td>
+                        {$v.product_name}
+                    </td>
+                    <td>
+                        {$v.c_name}
+                    </td>
+                    <td>
+                            {$v.ck_nums}
+                    </td>
+                    <td><?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);}?></td>
+                    <td>{$v.product_batch}</td>
+                    <td>{$v.content}</td>
+                    <td>
+                        {$v.Grossweight}
+                    </td>
+                    <td>
+                            {$v.netweight}
+                    </td>
+                    <td>
+                            {$v.delivery_id}
+                    </td>
+                </tr>
+                {/volist}
             </tbody>
         </table>
         <div class="btn">
-            <a class="layui-btn" href="{:url('Rukuorder/to_examine')}">返回</a>
+            <a class="layui-btn" href="{:url('Outbound/to_examine')}">返回</a>
         </div>
     </div>
 </div>

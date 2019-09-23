@@ -80,8 +80,6 @@ class Outbound extends Controller {
         $objContent   = $objReader -> load($file['tmp_name']);
         $sheetContent = $objContent -> getSheet(0) -> toArray();
         unset($sheetContent[0]);
-        // unset($sheetContent[1]);
-        // var_dump($sheetContent);exit;
         foreach ($sheetContent as $k => $v) {
             $arr['delivery_time']                   = strtotime($v[0]);//发货日期
             $arr['factory_id']               = $v[1];//工厂编号
@@ -158,14 +156,11 @@ class Outbound extends Controller {
             ->group('material_name')
             ->select();
         $cks = db('warehouse')->where('is_del',1)->select();
-        // var_dump($rows);exit;
         return view('make_outbound_order',['rows'=>$rows,'fh'=>$fh,'zy'=>$zy,'sd'=>$sd,'cks'=>$cks,'id'=>$cd]);
     }
     // 出库订单
     public function insert(){
         $data=input();
-        // echo "<pre>";
-        // print_r($data);exit;
         if(!empty($data['huowei_name'])){
             for ($i=0;$i<count($data['huowei_name']);$i++){
                 if(!empty($data['huowei_name']['i'])){
@@ -175,7 +170,7 @@ class Outbound extends Controller {
         }
             try{
                 $id = db('outbound_from')
-                ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>$data['delivery_time'],'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id']]);
+                ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id']]);
                 for ($i=0;$i<count($data['delivery_num']);$i++){
                     $rs = db('outbound_xq_from')->insert([
                         'chukuid'=>$id,
@@ -184,6 +179,7 @@ class Outbound extends Controller {
                             'ck_huowei_id'=>$data['huowei_name'][$i],
                             'ck_nums'=>$data['huowei_out'][$i],
                             'netweight'=>$data['jin'][$i],
+                            'Grossweight'=> $data['mao'][$i],
                             'content'=>$data['detailed'][$i],
                             'create_time'=>time(),
                             'state'=>0,
@@ -196,10 +192,10 @@ class Outbound extends Controller {
                     Db::commit();
                 }
             } catch (\Exception $e) {
-                // db('outbound_from')->where('id',$id)->delete();
-                $this->error('添加入库订单失败,请联系管理员');
+                $this->error('添加出库订单失败,请联系管理员');
                 // 回滚事务
                 Db::rollback();
+                db('outbound_from')->where('id',$id)->delete();
             }
             $this->success('生成订单成功','index');
     }
@@ -213,130 +209,113 @@ class Outbound extends Controller {
     // 出库计划
     public function to_examine() {
         $data=input();
-        // $search = '';
-        // if (!empty($data['s_transfers_id'])) {
-        //     $search = 'rukuform_xq.factory like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
-        // }
-        // // 时间转换
-        // if (!empty($data['s_delivery_time'])) {
-        //     $time = explode('~', $data['s_delivery_time']);
-        //     foreach ($time as $key) {
-        //         $time[] = strtotime($key);
-        //         array_shift($time);
-        //     }
-        //     if (!empty($search)) {
-        //         $time = ' and rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
-        //     } else {
-        //         $time = 'rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
-        //     }
-        //     $search .= $time;
-        // }
-        // // 物料名
-        // if (!empty($data['s_material_name'])) {
-        //     $material_name = $data['s_material_name'];
-        //     if (!empty($search)) {
-        //         $material_name = ' and rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
-        //     } else {
-        //         $material_name = ' rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
-        //     }
-        //     $search .= $material_name;
-        // }
-        // $rows=db('rukuform')
-        // ->join('warehouse','rukuform.ck_id=warehouse.id','left')
-        // ->join('rukuform_xq','rukuform.id=rukuform_xq.rukuid','left')
-        // ->where('rukuform.is_del',0)
-        // ->where('rukuform.state',0)
-        // ->group('rukuform_xq.factory,rukuform_xq.rukuid')
-        // ->where($search)
-        // ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
-        // ->paginate(100);
-
-
+        $search = '';
+        // 出库货物
+        if (!empty($data['s_transfers_id'])) {
+            $search = 'warehouse.name like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+        }
+        // 时间转换
+        if (!empty($data['s_delivery_time'])) {
+            $time = explode('~', $data['s_delivery_time']);
+            foreach ($time as $key) {
+                $time[] = strtotime($key);
+                array_shift($time);
+            }
+            if (!empty($search)) {
+                $time = ' and outbound_from.delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            } else {
+                $time = 'outbound_from.delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            }
+            $search .= $time;
+        }
+        // 订单号
+        if (!empty($data['s_material_name'])) {
+            $material_name = $data['s_material_name'];
+            if (!empty($search)) {
+                $material_name = ' and outbound_xq_from.delivery_id like ' . "'%" . $material_name . '%' . "'";
+            } else {
+                $material_name = ' outbound_xq_from.delivery_id like ' . "'%" . $material_name . '%' . "'";
+            }
+            $search .= $material_name;
+        }
         $rows=db('outbound_from')
             ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
             ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
             ->where('outbound_from.is_del',0)
             ->where('outbound_from.state',0)
-            ->group('outbound_xq_from.product_name,outbound_xq_from.chukuid')
-            // ->where($search)
+            ->group('outbound_xq_from.chukuid')
+            ->where($search)
             ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
             ->paginate(100);
         return view('to_examine',['rows'=>$rows]);
     }
     // 出库订单详情
     public function to_examine_show($id) {
-        $rows=db('rukuform')
-            ->join('warehouse','rukuform.ck_id=warehouse.id','left')
-            ->where('rukuform.is_del',0)
-            ->where('rukuform.id',$id)
-            ->field('rukuform.*,warehouse.name as w_name')
+        $rows=db('outbound_from')
+            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.id',$id)
+            ->field('outbound_from.*,warehouse.name as w_name')
             ->find();
-        $cats=db('rukuform_xq')
-            ->where('rukuform_xq.rukuid',$rows['id'])
-            ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id','left')
-            ->join('kc_status','kc_status.id=rukuform_xq.rk_status_id','left')
-            ->field('rukuform_xq.*,kc_status.title as w_name,cabinet.name as c_name')
+        $cats=db('outbound_xq_from')
+            ->where('outbound_xq_from.chukuid',$rows['id'])
+            ->join('cabinet','cabinet.id=outbound_xq_from.ck_huowei_id','left')
+            ->field('outbound_xq_from.*,cabinet.name as c_name')
             ->select();
         $cks = db('warehouse')->where('is_del',1)->select();
-        $status=db('kc_status')->where('is_del',0)->select();
         $cabinet=db('cabinet')->where('is_del',1)->select();
-//        if(!empty($rows['userintime'])){
-//            $rows['userintime']=date("Y-m-d",$rows['userintime']);
-//        }
+       if(!empty($rows['userintime'])){
+           $rows['userintime']=date("Y-m-d",$rows['userintime']);
+       }
         foreach ($cats as $k=>$row) {
-            $cats[$k]['m']=$row['Grossweight']/$row['rk_nums'];
-            $cats[$k]['j']=$row['netweight']/$row['rk_nums'];
+            if($row['Grossweight']!=0 &&$row['ck_nums']!=0){
+                $cats[$k]['m']=$row['Grossweight']/$row['ck_nums'];
+                $cats[$k]['j']=$row['netweight']/$row['ck_nums'];
+            }else{
+                $cats[$k]['m']=0;
+                $cats[$k]['j']=0;
+            }
         }
-        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'status'=>$status,'cks'=>$cks,'cabinet'=>$cabinet]);
+        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet]);
     }
     //出库修改订单
     public function to_examine_up() {
         $data=input();
-        $userintime=strtotime($data['userintime']);
-        array_shift($data);
-        //        try{
-            $r = db('rukuform')
-                -> where('id', $data['id'])
-                -> update(['shipmentnum' => $data['shipmentnum'], 'userintime' => $userintime, 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id']]);
-            for ($i = 0; $i < count($data['transfers_factory']); $i++) {
-                if (empty($data['cd'][$i])) {
-                    $fs=db('rukuform_xq') -> insert(['factory'       => $data['transfers_factory'][$i],
-                                                    'product_name'  => $data['material_name'][$i],
-                                                    'rk_status_id'  => $data['status'][$i],
-                                                    'rk_huowei_id'  => $data['huowei'][$i],
-                                                    'rk_nums'       => $data['nums'][$i],
-                                                    'product_time'  => $data['intime'][$i],
-                                                    'product_batch' => $data['storno'][$i],
-                                                    'content'       => $data['content'][$i],
-                                                    'netweight'     => $data['netweight'][$i],
-                                                    'Grossweight'   => $data['Grossweight'][$i],
-                                                    'transfers_id'  => $data['transfers_id'][$i],
-                                                    'rukuid'        => $data['id']]);
-                }else{
-                    $rs = db('rukuform_xq') -> where('id', $data['cd'][$i])
-                        -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id'  => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i], 'product_time'  => $data['intime'][$i], 'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'     => $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
-                }
-
-        //            }
-        //            for($c=0;$c<count($data['transfers_factory']);$c++){
-        //
-        //            }
-        //            if($r && $rs) {
-        //                // 提交事务
-        //                Db::commit();
-        //                $this->error('操作成功','to_examine');
-        //            }
-        //        } catch (\Exception $e) {
-        //            $this->error('添加入库订单失败,请联系管理员');
-        //            // 回滚事务
-        //            Db::rollback();
-        //        }
-        //            return redirect('to_examine');
+        $r = db('outbound_from')
+            -> where('id', $data['id'])
+            -> update([
+                'transport_id' => $data['transport_id'],
+                'reachout_name' => $data['reachout_name'],
+                'delivery_time' => strtotime($data['userintime']),
+                'transport' => $data['transport'], 
+                'carid' => $data['carid'], 
+                'driver' => $data['driver'],
+                'driverphone' => $data['driverphone'],
+                'workers' => $data['workers'],
+                'transport_unit' => $data['transport_unit'],
+                'update_time' => time(),
+                'ck_id' => $data['ck_id']
+                ]);
+        for ($i = 0; $i < count($data['huowei']); $i++) {
+                $fs=db('outbound_xq_from') 
+                -> where('id', $data['cd'][$i])
+                -> update([
+                    'delivery_id'  => $data['delivery_id'][$i],
+                    'product_name'  => $data['material_name'][$i],
+                    'ck_huowei_id'  => $data['huowei'][$i],
+                    'ck_nums'       => $data['nums'][$i],
+                    'product_time'  => strtotime($data['intime'][$i]),
+                    'product_batch' => $data['storno'][$i],
+                    'content'       => $data['content'][$i],
+                    'netweight'     => $data['Grossweight'][$i],
+                    'Grossweight'   => $data['netweight'][$i],
+                    'update_time'   => time(),
+                    ]);
         }
         if($r  || $rs){
             return redirect('to_examine');
         }else{
-            $this->error('添加入库订单失败,请联系管理员');
+            $this->error('修改出库订单失败,请联系管理员');
         }
     }
     //出库审核
@@ -346,8 +325,8 @@ class Outbound extends Controller {
             $this->error('缺少必要参数,请重试');
         }
         try{
-            $r=db('rukuform')->where('id',$id)->update(['state'=>1]);
-            $s=db('rukuform_xq')->where('rukuid',$id)->update(['state'=>1]);
+            $r=db('outbound_from')->where('id',$id)->update(['state'=>1]);
+            $s=db('outbound_xq_from')->where('chukuid',$id)->update(['state'=>1]);
             if($r && $s) {
                 return redirect('to_examine');
                 Db::commit();
@@ -364,7 +343,7 @@ class Outbound extends Controller {
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
         }
-        $r=db('rukuform')->where('id',$id)->update(['is_del'=>1]);
+        $r=db('outbound_from')->where('id',$id)->update(['is_del'=>1]);
         if($r!==false){
             return redirect('to_examine');
         }else{
@@ -375,8 +354,9 @@ class Outbound extends Controller {
     public function warehousing() {
         $data=input();
         $search = '';
+        // 出库货物
         if (!empty($data['s_transfers_id'])) {
-            $search = 'rukuform_xq.factory like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+            $search = 'warehouse.name like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
         }
         // 时间转换
         if (!empty($data['s_delivery_time'])) {
@@ -386,48 +366,61 @@ class Outbound extends Controller {
                 array_shift($time);
             }
             if (!empty($search)) {
-                $time = ' and rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+                $time = ' and outbound_from.delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
             } else {
-                $time = 'rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+                $time = 'outbound_from.delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
             }
             $search .= $time;
         }
-        // 物料名
+        // 订单号
         if (!empty($data['s_material_name'])) {
             $material_name = $data['s_material_name'];
             if (!empty($search)) {
-                $material_name = ' and rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
+                $material_name = ' and outbound_xq_from.delivery_id like ' . "'%" . $material_name . '%' . "'";
             } else {
-                $material_name = ' rukuform_xq.transfers_id like ' . "'%" . $material_name . '%' . "'";
+                $material_name = ' outbound_xq_from.delivery_id like ' . "'%" . $material_name . '%' . "'";
             }
             $search .= $material_name;
         }
-        $rows=db('rukuform')
-            ->join('warehouse','rukuform.ck_id=warehouse.id','left')
-            ->join('rukuform_xq','rukuform.id=rukuform_xq.rukuid','left')
-            ->where('rukuform.is_del',0)
-            ->where('rukuform.state',1)
-            ->group('rukuform_xq.factory,rukuform_xq.rukuid')
+        $rows=db('outbound_from')
+            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.state',1)
+            ->group('outbound_from.id')
             ->where($search)
-            ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
+            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
             ->paginate(100);
         return view('warehousing',['rows'=>$rows]);
     }
     //订单详情
     public function warehousing_show($id) {
-        $rows=db('rukuform')
-            ->join('warehouse','rukuform.ck_id=warehouse.id')
-            ->where('rukuform.is_del',0)
-            ->where('rukuform.id',$id)
-            ->field('rukuform.*,warehouse.name as w_name')
+        $rows=db('outbound_from')
+            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.id',$id)
+            ->field('outbound_from.*,warehouse.name as w_name')
             ->find();
-        $cats=db('rukuform_xq')
-            ->where('rukuform_xq.rukuid',$rows['id'])
-            ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id')
-            ->join('kc_status','kc_status.id=rukuform_xq.rk_status_id')
-            ->field('rukuform_xq.*,kc_status.title as w_name,cabinet.name as c_name')
+        $cats=db('outbound_xq_from')
+            ->where('outbound_xq_from.chukuid',$rows['id'])
+            ->join('cabinet','cabinet.id=outbound_xq_from.ck_huowei_id','left')
+            ->field('outbound_xq_from.*,cabinet.name as c_name')
             ->select();
-        return view('warehousing_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id]);
+        $cks = db('warehouse')->where('is_del',1)->select();
+        $cabinet=db('cabinet')->where('is_del',1)->select();
+       if(!empty($rows['userintime'])){
+           $rows['userintime']=date("Y-m-d",$rows['userintime']);
+       }
+        foreach ($cats as $k=>$row) {
+            if($row['Grossweight']!=0 &&$row['ck_nums']!=0){
+                $cats[$k]['m']=$row['Grossweight']/$row['ck_nums'];
+                $cats[$k]['j']=$row['netweight']/$row['ck_nums'];
+            }else{
+                $cats[$k]['m']=0;
+                $cats[$k]['j']=0;
+            }
+        }
+        return view('warehousing_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet]);
     }
     //删除
     public function warehousing_del() {
@@ -449,7 +442,7 @@ class Outbound extends Controller {
         //工厂名
         if (!empty($data['s_transfers_id'])) {
             $data['s_transfers_id']=addslashes($data['s_transfers_id']);
-            $search = 'rukuform_xq.factory like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+            $search = 'warehouse.name like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
         }
         // 时间转换
         if (!empty($data['s_delivery_time'])) {
@@ -459,35 +452,23 @@ class Outbound extends Controller {
                 array_shift($time);
             }
             if (!empty($search)) {
-                $time = ' and rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+                $time = ' and outbound_from.delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
             } else {
-                $time = 'rukuform.userintime BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+                $time = 'outbound_from.delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
             }
             $search .= $time;
         }
-        // 物料名
-        if (!empty($data['s_material_name'])) {
-            $material_name = $data['s_material_name'];
-            if (!empty($search)) {
-                $material_name = ' and rukuform_xq.rk_status_id like ' . "'%" . $material_name . '%' . "'";
-            } else {
-                $material_name = ' rukuform_xq.rk_status_id like ' . "'%" . $material_name . '%' . "'";
-            }
-            $search .= $material_name;
-        }
-        $rows=db('rukuform_xq')
-            ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id','left')
-            ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
-            ->join('rukuform','rukuform_xq.rukuid=rukuform.id','left')
-            ->join('warehouse','rukuform.ck_id=warehouse.id','left')
-            ->where('rukuform_xq.is_del',0)
-            ->where('rukuform_xq.state',1)
-            ->where("$search")
-            ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
-            ->select();
-        //产品属性
-        $status=db('kc_status')->where('is_del',0)->select();
-        return view('detailed',['rows'=>$rows,'status'=>$status]);
+        $rows=db('outbound_xq_from')
+            ->join('outbound_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->join('cabinet','outbound_xq_from.ck_huowei_id=cabinet.id','left')
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.state',1)
+            ->group('outbound_xq_from.id')
+            ->where($search)
+            ->field('outbound_xq_from.*,warehouse.name as w_name,outbound_from.transport_id as t_id,sum(outbound_xq_from.ck_nums) as count,outbound_from.reachout_name,outbound_from.delivery_time,cabinet.name as c_name')
+            ->paginate(100);
+        return view('detailed',['rows'=>$rows]);
     }
 
 }
