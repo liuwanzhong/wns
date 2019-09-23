@@ -74,6 +74,10 @@ class Staffs extends Controller {
     }
     //修改管理员视图
     public function staffs_edit($id) {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         //部门
         $rows=db('department')->where('is_del',1)->select();
         //权限
@@ -166,16 +170,28 @@ class Staffs extends Controller {
     }
     //查看部门
     public function department_select() {
+        $ms=$this->qx();
+        if($ms==0){
+            $msg=['error'=>0,'msg'=>'警告:越权操作'];
+            return $msg;
+        }
+        $id=$_POST['id'];
+        $row=db('department')->where('id',$id)->find();
+        return $row;
+    }
+    //修改部门视图
+    public function department_xs() {
+        $ms=$this->qx();
+        if($ms==0){
+            $msg=['error'=>0,'msg'=>'警告:越权操作'];
+            return $msg;
+        }
         $id=$_POST['id'];
         $row=db('department')->where('id',$id)->find();
         return $row;
     }
     //修改部门
     public function department_edit() {
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
         $data=input();
         array_shift($data);
         $r=db('department')->update($data);
@@ -192,7 +208,7 @@ class Staffs extends Controller {
             $this->error('警告：越权操作');
         }
         if($id==0){
-            $this->eror('缺少必要参数,请重试');
+            $this->error('缺少必要参数,请重试');
         }
         $r=db('department')->where('id',$id)->update(['is_del'=>0]);
         if($r){
@@ -250,14 +266,16 @@ class Staffs extends Controller {
         }
         $count=db('pow')->where('parent_id',$id)->where('is_del',1)->count();
         if($count>0){
-            $this->error('该规则内还有子级,不能删除');
+            $msg=['error'=>0,'msg'=>'该规则内还有子级,不能删除'];
+            return $msg;
         }
         $r=db('pow')->where('id',$id)->update(['is_del'=>0]);
         if($r!==false){
-            return redirect('Staffs/pow');
+            $msg=['error'=>1,'msg'=>'删除成功'];
         }else{
-            $this->error('删除失败,请联系管理员');
+            $msg=['error'=>101,'msg'=>'删除失败,请联系管理员'];
         }
+        return $msg;
     }
     //修改权限状态
     public function pow_state($id)

@@ -10,15 +10,19 @@ use think\Loader;
 class Cwmanagement extends Controller {
     // 仓储信息显示
     public function index() {
+        $s_transfers_id=input('s_transfers_id');//调拨订单编号
+        $s_delivery_time=input('s_delivery_time');//时间
+        $s_material_name=input('s_material_name');//物料名
+        $factory=input('factory');//工厂
         $data = input();
         // 调拨订单号
         $search = '';
-        if (!empty($data['s_transfers_id'])) {
-            $search = 'transfers_id = ' . $data['s_transfers_id'];
+        if (!empty($s_transfers_id)) {
+            $search = 'transfers_id = ' . $s_transfers_id;
         }
         // 时间转换
-        if (!empty($data['s_delivery_time'])) {
-            $time = explode('~', $data['s_delivery_time']);
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
             foreach ($time as $key) {
                 $time[] = strtotime($key);
                 array_shift($time);
@@ -31,9 +35,9 @@ class Cwmanagement extends Controller {
             $search .= $time;
         }
         // 物料名
-        if (!empty($data['s_material_name'])) {
-            $data['s_material_name']=addslashes($data['s_material_name']);
-            $material_name = $data['s_material_name'];
+        if (!empty($s_material_name)) {
+            $s_material_name=addslashes($s_material_name);
+            $material_name = $s_material_name;
             if (!empty($search)) {
                 $material_name = ' and material_name like ' . "'%" . $material_name . '%' . "'";
             } else {
@@ -42,14 +46,14 @@ class Cwmanagement extends Controller {
             $search .= $material_name;
         }
         // 工厂
-        if (!empty($data['factory'])) {
-            $factory = $data['factory'];
+        if (!empty($factory)) {
+//            $factory = $factory;
             if (!empty($search)) {
-                $factory = ' and transfers_factory like ' . "'%" . $factory . '%' . "'";
+                $factorys = ' and transfers_factory like ' . "'%" . $factory . '%' . "'";
             } else {
-                $factory = ' transfers_factory like ' . "'%" . $factory . '%' . "'";
+                $factorys = ' transfers_factory like ' . "'%" . $factory . '%' . "'";
             }
-            $search .= $factory;
+            $search .= $factorys;
         }
         // 未删除
         if(!empty($search)){
@@ -63,7 +67,7 @@ class Cwmanagement extends Controller {
             -> where("$search")
             ->where('is_del',0)
             -> order('id desc')
-            -> paginate(100);
+            -> paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'factory'=>$factory]]);
         // 查询工厂
         $res = db('cw_management')
             ->where('is_del',0)
@@ -71,11 +75,16 @@ class Cwmanagement extends Controller {
             ->group('transfers_factory')
             ->select();
 
-        return view("index", ['list' => $list, 'data' => $data,'res'=>$res]);
+        return view("index", ['list' => $list, 'data' => $data,'res'=>$res,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'factory'=>$factory]);
     }
 
     // 导入excel页面
     public function upload() {
+        $ms=$this->qx();
+        if($ms==0){
+            $msg=['error'=>0,'msg'=>'警告:越权操作'];
+            return $msg;
+        }
         return view();
     }
 
@@ -150,7 +159,8 @@ class Cwmanagement extends Controller {
     public function record_edit($id) {
         $ms = $this -> qx();
         if ($ms == 0) {
-            $this -> error('警告：越权操作');
+            $msg=['error'=>0,'message'=>'警告:越权操作'];
+            return $msg;
         }
         $row = db('cw_management') -> where('id', $id) -> find();
         if ($row['delivery_time'] != 0) {
@@ -181,7 +191,6 @@ class Cwmanagement extends Controller {
         $data['transfers_into_time'] = strtotime($data['transfers_into_time']);
         $data['delivery_time'] = strtotime($data['delivery_time']);
         $data['production_time'] = strtotime($data['production_time']);
-        $data['updata_time'] = time();
         unset($data['/index/cwmanagement/record_update_html']);
         $r = db('cw_management') -> where('id', $id) -> update($data);
         if ($r) {
@@ -194,13 +203,13 @@ class Cwmanagement extends Controller {
 
     // 删除选中
     public function check_record_del() {
-        $time=time();
         $ms = $this -> qx();
-        if ($ms == 0) {
-            $this -> error('警告：越权操作');
-        }
+        $time=time();
         $id = input('id');
         if (!empty($id)) {
+            if ($ms == 0) {
+                $this->error('警告:越权操作');
+            }
             $r = db('cw_management') -> where('id', $id) -> update(['del_time'=>$time,'is_del'=>1]);
             if ($r) {
                 return redirect('cwmanagement/index');
@@ -208,10 +217,13 @@ class Cwmanagement extends Controller {
                 $this -> error('删除失败');
             }
         } else {
+            if ($ms == 0) {
+                $msg = ["error" => 0, 'ts' => "警告:越权操作"];
+                return $msg;
+            }
             $data = input();
             $da   = implode(",", $data['check_all']);
             $key  = 'on,';
-
             if (strpos($da, $key) !== false) {
                 $da = mb_substr($da, 3);
             }

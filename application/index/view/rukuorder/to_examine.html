@@ -3,10 +3,10 @@
 	<head>
 	<meta charset="utf-8"/>
 	<title>新增权限</title>
-	<link rel="stylesheet" href="/images/css.css">
-	<link rel="stylesheet" href="/images/boot.css">
-	<link href="/images/index.css" type="text/css" rel="stylesheet"/>
-	<link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
+		<link rel="stylesheet" href="/images/css.css">
+		<link rel="stylesheet" href="/images/boot.css">
+		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
+		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
 	<style type="text/css">
 		.layui-table th{text-align: center;font-weight: bold;}
 		.layui-table td{text-align: center;}
@@ -26,19 +26,19 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">工厂</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
 						</div>
 					</div>
 					<div class="layui-form-item">
-						<label class="layui-form-label">时间</label>
+						<label class="layui-form-label">日期</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
 						<label class="layui-form-label">单号</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
+							<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($s_material_name)){echo $s_material_name;}?>"/>
 						</div>
 					</div>
 					<div class="layui-form-item">

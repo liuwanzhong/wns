@@ -19,12 +19,6 @@ class Table extends Controller {
 //        var_dump($list);exit;
         return view('index',['list'=>$list,'status'=>$status,'cks'=>$cks]);
     }
-    public function show($id){
-        $list = db('cabinet')
-            ->where('cabinet.is_del',1)
-            ->where('cabinet.warehouse_id',$id)->select();
-        return json_encode($list);
-    }
 
     public function houwei_ck() {
         $sy=isset($_POST['sy']) ? $_POST['sy'] : 0;

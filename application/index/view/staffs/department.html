@@ -39,7 +39,7 @@
 						<td>{$row['state_time']}</td>
 						<td>
 							<a href="#" class="select ks" title="查看"><i class="ico">&#xe61a;</i></a>
-							<a href="#" class="edit ks" title="编辑"><i class="ico">&#xe619;</i></a>
+							<a href="#" class="edit xs" title="编辑"><i class="ico">&#xe619;</i></a>
 							<a href="{:url('Staffs/department_del','id='.$row['id'])}" title="删除" class="ks"><i class="ico">&#xe605;</i></a>
 						</td>
 					</tr>
@@ -119,6 +119,7 @@
 			</div>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
+		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script type="text/javascript">
 			//添加
@@ -153,6 +154,39 @@
 					type:'post',
 					data:{"id":id},
 					success:function (data) {
+						if(data.error==0){
+							layer.alert(data.msg, {
+								icon: 6,
+								yes:function(){
+									location.href='/index/Staffs/department';
+								}
+							});
+						}
+						$('#name').val(data.name)
+						$('#content').val(data.content)
+						$('#r1').val(data.name)
+						$('#r2').val(data.content)
+						$('#r3').val(data.state_time)
+						$('#id').val(data.id)
+					}
+				})
+			})
+			//修改数据
+			$('.xs').click(function () {
+				let id=$(this).parents('tr').find('td').eq(0).text();
+				$.ajax({
+					url:'/index/Staffs/department_xs',
+					type:'post',
+					data:{"id":id},
+					success:function (data) {
+						if(data.error==0){
+							layer.alert(data.msg, {
+								icon: 6,
+								yes:function(){
+									location.href='/index/Staffs/department';
+								}
+							});
+						}
 						$('#name').val(data.name)
 						$('#content').val(data.content)
 						$('#r1').val(data.name)
