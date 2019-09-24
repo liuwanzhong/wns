@@ -161,7 +161,6 @@ class Outbound extends Controller {
     // 出库订单
     public function insert(){
         $data=input();
-        dump($data);exit;
         if(!empty($data['huowei_name'])){
             for ($i=0;$i<count($data['huowei_name']);$i++){
                 if(!empty($data['huowei_name']['i'])){
@@ -171,17 +170,16 @@ class Outbound extends Controller {
         }
             try{
                 $id = db('outbound_from')
-                ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id']]);
+                ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id'],'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight']]);
                 for ($i=0;$i<count($data['delivery_num']);$i++){
                     $rs = db('outbound_xq_from')->insert([
                             'chukuid'=>$id,
-                            'delivery_id'=>$data['Delivery_id'],
+                            'delivery_id'=>$data['Delivery_id'][$i],
                             'product_name'=>$data['material_name'][$i],
                             'ck_huowei_id'=>$data['huowei_name'][$i],
                             'ck_nums'=>$data['huowei_out'][$i],
                             'netweight'=>$data['jin'][$i],
                             'content'=>$data['detailed'][$i],
-                            'create_time'=>time(),
                             'state'=>0
                         ]);
                 }
@@ -327,8 +325,14 @@ class Outbound extends Controller {
             $d=db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->field('rk_nums')->find();
             $d=(int)$d['rk_nums'];
             $balance=$d-$r['ck_nums'];
-            dump($balance);
             db('record')->insert(['time'=>$time,'odd_number'=>$data['transport_id'],'task'=>$data['task'],'customer'=>$data['reachout_name'],'early_stage'=>$d,'xx_chuku'=>$r['ck_nums'],'balance'=>$balance,'huowei'=>$r['ck_huowei_id']]);
+            db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->update(['rk_nums'=>$balance]);
+            $rows=db('rukuform_xq')->where('is_del',0)->select();
+            for($i=0;$i<count($rows);$i++){
+                if($rows[$i]['rk_nums']<1){
+                    db('rukuform_xq')->where('id',$rows[$i]['id'])->update(['is_del'=>1]);
+                }
+            }
         }
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
@@ -482,4 +486,102 @@ class Outbound extends Controller {
         return view('detailed',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]);
     }
 
+
+    //导出
+    public function outExcel(){
+        $data = input();
+        array_shift($data);
+        $id=$data['id'];
+        $da=str_replace('"', '', $id);
+        $da=trim($da,'[');
+        $da=trim($da,']');
+        $data=db('outbound_from')
+            ->where("outbound_from.id in ($da)")
+            ->join('warehouse','warehouse.id=outbound_from.ck_id')
+            ->field('outbound_from.*,warehouse.name')
+            ->select();
+        if(!empty($data)){
+            Vendor('PHPExcel.PHPExcel');
+            Vendor('PHPExcel.PHPExcel.IOFactory');
+            $phpExcel = new \PHPExcel();
+            $phpExcel->setActiveSheetIndex(0)
+                ->setCellValue('A1', '出库仓库')
+                ->setCellValue('B1', '装运单号')
+                ->setCellValue('C1', '送达方')
+                ->setCellValue('D1', '出库日期')
+                ->setCellValue('E1', '总数量')
+                ->setCellValue('F1', '吨位');
+            $len = count($data);
+            for($i = 0 ; $i < $len ; $i++){
+                $v = $data[$i];
+                $rownum = $i+2;
+                $phpExcel->getActiveSheet()->setCellValue('A' . $rownum, $v['name']);
+                $phpExcel->getActiveSheet()->setCellValue('B' . $rownum, $v['transport_id']);
+                $phpExcel->getActiveSheet()->setCellValue('C' . $rownum, $v['reachout_name']);
+                $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, date('Y-m-d',$v['delivery_time']));
+                $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['total_shu']);
+                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, $v['total_zhong']);
+            }
+            $phpExcel->setActiveSheetIndex(0);
+            $filename=date('Y-m-d',time()).'.xlsx';
+            $objWriter=\PHPExcel_IOFactory::createWriter($phpExcel,'Excel2007');
+            $filePath =$filename;
+            $objWriter->save($filePath);
+            if(!file_exists($filePath)){
+                $response = array(
+                    'status' => 'false',
+                    'url' => '',
+                    'token'=>''
+                );
+            }else{
+                $response = array(
+                    'status' => true,
+                    'url' => $filename,
+                    'token'=>$this->getDownLoadToken($filename)
+                );
+            }
+        }else{
+            $response = array(
+                'status' => 'false',
+                'url' => '',
+                'token'=>''
+            );
+        }
+        exit(json_encode($response));
+    }
+    private function getDownLoadToken($filename,$length = 10){
+        $str = null;
+        $strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+        $max = strlen($strPol)-1;
+
+        for($i=0;$i<$length;$i++){
+            $str.=$strPol[rand(0,$max)];//rand($min,$max)生成介于min和max两个数之间的一个随机整数
+        }
+        $res = md5($str.time());
+        return $res;
+    }
+    public function download(){
+        $fileName = date('Y-m-d',time()).'.xlsx';
+        $path = ROOT_PATH."\public/".$fileName;
+        if(!file_exists($path)){
+            header("HTTP/1.0 404 Not Found");
+            exit;
+        }else{
+            $file = @fopen($path,"r");
+            if(!$file){
+                header("HTTP/1.0 505 Internal server error");
+                exit;
+            }
+            header("Content-type: application/octet-stream");
+            header("Accept-Ranges: bytes");
+            header("Accept-Length: ".filesize($path));
+            header("Content-Disposition: attachment; filename=" . $fileName);
+            while(!feof($file)){
+                echo fread($file,2048);
+            }
+            fclose($file);
+//            unlink($path);
+            exit();
+        }
+    }
 }

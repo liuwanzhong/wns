@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="/images/css.css">
     <link rel="stylesheet" href="/images/boot.css">
     <link href="/images/index.css" type="text/css" rel="stylesheet"/>
-    <link rel="stylesheet" href="/images/css.css">
-    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
     <style>
         .layui-table th, .layui-table td{
             white-space: nowrap;
@@ -22,7 +22,8 @@
             overflow-x: scroll;
             overflow-y: auto;
         }
-        .layui-input{border: 0;min-width: 120px;}
+        label{box-sizing: content-box;}
+        .add_tr .layui-input{border: 0;min-width: 120px;}
         .layui-table .add_tr td{
             padding: 3px 15px;
         }
@@ -32,19 +33,54 @@
 <body>
 <div class="note">
     <div class="nav">
-            <span class="layui-breadcrumb">
+        <span class="layui-breadcrumb">
                 <a href="/public/main.html" target="box">首页</a>
                 <a href="javascript:;">车辆管理</a>
                 <a><cite>运输台账</cite></a>
             </span>
-        </div>
+    </div>
+    <div class="seach">
+        <form action="{:url('Other/transport')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">目的地</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">发运日期</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">车牌号码</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($s_material_name)){echo $s_material_name;}?>"/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">装运单号</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="" name="zydh"  value="<?php if(!empty($zydh)){echo $zydh;}?>"/>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <button class="layui-btn save" lay-submit>查询</button>
+                </div>
+            </div>
+        </form>
+    </div>
         <div class="form_box" style="width: 96%;margin: 12px auto;">
             <button class="layui-btn add">添加</button>
+            <button class="layui-btn" id="dc">导出</button>
         </div>
         <div class="bd_content1">
-            <table class="layui-table layui-form">
+            <table class="layui-table ">
                 <thead>
                 <tr>
+                    <th rowspan="2"><input type="checkbox" id="all"></th>
                     <th rowspan="2">发运日期</th>
                     <th rowspan="2">始发地</th>
                     <th rowspan="2">目的地</th>
@@ -81,8 +117,9 @@
                 </thead>
                 <tbody class="tbd">
                 {volist name='rows' id='r'}
-                    <tr>
-                        <td>{$r['delivery_time']}</td>
+                <tr id="check" class="news_list">
+                        <td><input type="checkbox" value="{$r.id}"></td>
+                        <td><?php if(!empty($r['delivery_time'])){echo date('Y-m-d',$r['delivery_time']);} ?></td>
                         <td>{$r['origin']}</td>
                         <td>{$r['destination']}</td>
                         <td>{$r['license_plate']}</td>
@@ -121,17 +158,25 @@
     </div>
 </div>
 
-    <script src="/static/js/jquery-1.9.1.min.js"></script>
-    <script src="/layui/layui.js"></script>
+<script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+<script src="/layui/layui.js"></script>
     <script>
-
-        layui.use(['element', 'table', 'layer'], function () {
-            var layer = layui.layer;
-
+        layui.use(['element', 'laydate'],function () {
+            let element = layui.element,
+                laydate = layui.laydate;
+            laydate.render({
+                elem: '#s_delivery_time'
+                ,range: '~'
+                ,done: function(value){
+                    $('#s_delivery_time').val(value)
+                }
+            })
         })
         // 新添加一行
         $('.add').on('click', function () {
             let html = `<tr class="add_tr">
+                        <td></td>
                         <td><input type="date" class="layui-input" name="delivery_time"></td><!--发运日期-->
                         <td><input type="text" class="layui-input" name="origin"></td><!--始发地-->
                         <td><input type="text" class="layui-input" name="destination"></td><!--目的地-->
@@ -188,7 +233,62 @@
                 }
             })
         })
-
+        //全选
+        $("#all").click(function(){
+            let arr = [];
+            if(this.checked){
+                $("#check :checkbox,#all").prop("checked", true);
+                let checks = $('.tbd ').find('input:checkbox');
+                console.log(checks)
+                checks.each(function () {
+                    arr.push($(this)[0].value);
+                })
+                sessionStorage.setItem('session_cc',JSON.stringify(arr));
+            }else{
+                $("#check :checkbox,#all").prop("checked", false);
+                sessionStorage.removeItem('session_cc');
+            }
+        });
+        //单选
+        let session=[];
+        $('.tbd').on('click','input[type=checkbox]',function () {
+            let ses=JSON.parse(sessionStorage.getItem('session_cc'));
+            session = ses === null ? [] : ses;
+            if($(this)[0].checked == true){
+                session.push($(this).val());
+            }else{
+                let val = $(this).val();
+                for (let i in session){
+                    if(session[i] == val){
+                        session.splice(i,1);
+                    }
+                }
+            }
+            sessionStorage.setItem('session_cc',JSON.stringify(session));
+        })
+        // 导出
+        $('#dc').on('click', function() {
+            var data = sessionStorage.session_cc;
+            if(data !=  undefined || data != null){
+                var params = {id: data};
+                console.log(params);
+                $.post("{:url('Other/outExcel')}", params, function (res) {
+                    if(res.error==0){
+                        alert(res.msg);
+                        return false;
+                    }
+                    if (res.status) {
+                        window.location.href = ("{:Url('index/Other/download')}?file=" + res.url);
+                    } else {
+                        layer.msg('系统错误，操作失败');
+                    }
+                }, 'json')
+            }
+            else {
+                layer.alert('请选择需要导出的数据',{icon:5})
+                return false;
+            }
+        })
 </script>
 </body>
 </html>

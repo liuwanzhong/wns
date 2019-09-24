@@ -101,7 +101,6 @@
                     <th>产品日期</th>
                     <th>产品批次</th>
                     <th>备注</th>
-                    <th>毛重</th>
                     <th>净重</th>
                     <th class="ddbh">订单编号</th>
                 </tr>
@@ -109,7 +108,6 @@
             <tbody class="tbd">
                 {volist name='cats' id='v'}
                 <tr>
-                    <input type="hidden" name="min" value="{$v.m}">
                     <input type="hidden" name="cd[]" value="{$v.id}">
                     <input type="hidden" name="gross_min" value="{$v.j}">
                     <td>
@@ -127,9 +125,7 @@
                     <td><?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);}?></td>
                     <td>{$v.product_batch}</td>
                     <td>{$v.content}</td>
-                    <td>
-                        {$v.Grossweight}
-                    </td>
+
                     <td>
                             {$v.netweight}
                     </td>
@@ -151,7 +147,7 @@
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
     layui.use(['element'], function () {
-        
+
     })
 </script>
 </body>

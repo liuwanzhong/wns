@@ -45,6 +45,7 @@
 					<div class="layui-form-item">
 						<div class="layui-input-inline">
 							<button class="layui-btn save" lay-submit>查询</button>
+							<button class="layui-btn" id="dc">导出</button>
 						</div>
 					</div>
 				</form>
@@ -52,25 +53,25 @@
 			<table class="layui-table" style="width: 96%; margin: 12px auto;">
 				<thead>
 				<tr>
+					<th><input type="checkbox" id="all"></th>
 					<th>ID</th>
 					<th>审核</th>
 					<th>出库仓库</th>
 					<th>装运单号</th>
-					<th>交货单号</th>
 					<th>送达方</th>
 					<th>出库日期</th>
 					<th>总数量</th>
 					<th>操作</th>
 				</tr>
 				</thead>
-				<tbody>
+				<tbody class="tbd">
 				{volist name='rows' id='row'}
-				<tr>
+				<tr id="check" class="news_list">
+					<td><input type="checkbox" value="{$row.id}"></td>
 					<td>{$row.id}</td>
 					<td>未审核</td>
 					<td>{$row.w_name}</td>
 					<td>{$row.transport_id}</td>
-					<td>{$row.delivery_id}</td>
 					<td>{$row.reachout_name}</td>
 					<td><?php if(!empty($row['delivery_time'])){echo date('Y-m-d',$row['delivery_time']);} ?></td>
 					<td>{$row.count}</td>
@@ -119,6 +120,62 @@
 						$('#s_delivery_time').val(value)
 					}
 				});
+			})
+			//全选
+			$("#all").click(function(){
+				let arr = [];
+				if(this.checked){
+					$("#check :checkbox,#all").prop("checked", true);
+					let checks = $('.tbd ').find('input:checkbox');
+					console.log(checks)
+					checks.each(function () {
+						arr.push($(this)[0].value);
+					})
+					sessionStorage.setItem('session_ck',JSON.stringify(arr));
+				}else{
+					$("#check :checkbox,#all").prop("checked", false);
+					sessionStorage.removeItem('session_ck');
+				}
+			});
+			//单选
+			let session=[];
+			$('.tbd').on('click','input[type=checkbox]',function () {
+				let ses=JSON.parse(sessionStorage.getItem('session_ck'));
+				session = ses === null ? [] : ses;
+				if($(this)[0].checked == true){
+					session.push($(this).val());
+				}else{
+					let val = $(this).val();
+					for (let i in session){
+						if(session[i] == val){
+							session.splice(i,1);
+						}
+					}
+				}
+				sessionStorage.setItem('session_ck',JSON.stringify(session));
+			})
+			// 导出
+			$('#dc').on('click', function() {
+				var data = sessionStorage.session_ck;
+				if(data !=  undefined || data != null){
+					var params = {id: data};
+					$.post("{:url('Outbound/outExcel')}", params, function (res) {
+						console.log(res)
+						if(res.error==0){
+							alert(res.msg);
+							return false;
+						}
+						if (res.status) {
+							window.location.href = ("{:Url('index/Outbound/download')}?file=" + res.url);
+						} else {
+							layer.msg('系统错误，操作失败');
+						}
+					}, 'json')
+				}
+				else {
+					layer.alert('请选择需要导出的数据',{icon:5})
+					return false;
+				}
 			})
 		</script>
 	</body>

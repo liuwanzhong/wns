@@ -157,16 +157,19 @@
                 {/volist}
                 </tbody>
             </table>
-            <span>
-                合计数量：合计重量：派车人签字：
-            </span></br>
-            <span>
-                保管签字：司机确认：
-            </span>
+            <div class="total">
+                <input type="hidden" name="all_count" value="">
+                <input type="hidden" name="all_weight" value="">
+                <p>合计数量：<span class="all_count">0</span></p>
+                <p>合计重量：<span class="all_weight">0</span></p>
+                <p>派车人签字：</p>
+            </div>
+            <div class="sign">
+                <span>保管签字：</span>
+                <span>司机确认：</span>
+            </div>
             <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
         </div>
-
-
     </form>
 </div>
 <div class="model_table" style="display: none; top: 45%; overflow: hidden;">
@@ -213,7 +216,7 @@
             let html = `<tr>
             <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
             <td>
-                <input type="hidden" value="${child[1].innerText}" name="Delivery_id" readonly>
+                <input type="hidden" value="${child[1].innerText}" name="Delivery_id[]" readonly>
                 ${child[1].innerText}
             </td>
             <td class="status">
@@ -228,6 +231,7 @@
                 <botton class="layui-btn layui-btn-sm dia">点击</botton>
             </td>
             <td class="count">
+<!--<<<<<<< HEAD-->
                 <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
                 <span>0</span>
             </td>
@@ -237,6 +241,17 @@
             </td>
             <td class="sy_count">
                 <input type="hidden" value="sy_count" name="sy_count[]" readonly>
+<!--=======-->
+<!--                <input type="hidden" value="0" name="huowei_out[]" readonly>-->
+<!--                <span>0</span>-->
+<!--            </td>-->
+<!--            <td class="jin">-->
+<!--                <input type="hidden" value="0" name="jin[]" readonly>-->
+<!--                <span>0</span>-->
+<!--            </td>-->
+<!--            <td class="sy_count">-->
+<!--                <input type="hidden" value="0" name="sy_count[]" readonly>-->
+<!--&gt;>>>>>> 82f974f62b2b5c4d3830be4700efe34173beb53f-->
                 <span>0</span>
             </td>
             <td>
@@ -284,7 +299,6 @@
         let par = '';
         $('.tbd').on('click', '.dia', function () {
             let id = $('#table').val();
-            console.log(id)
             if(id == 0){
                 layer.alert('请选择仓库',{icon:5});
                 return false;
@@ -297,7 +311,6 @@
                     url:'/index/Table/houwei_ck',
                     data: {id},
                     success:function (data) {
-                        console.log(data)
                         let html = '';
                         for (let i =0; i<data.length; i++){
                             html += ` <tr>
@@ -324,9 +337,7 @@
 
 
         $('.sure').on('click', function () {
-
             $('.model_table').hide();
-
             let che = $('.kc_list').find('input:radio:checked')[0];
             let tr = $(che).parents('tr');
             let id = tr.find('#id').val();
@@ -335,21 +346,27 @@
             let c_id = tr.find('#c_id').val();
             let hw = tr.find('.hw').text();
             let num = tr.find('input[type=text]').val();
-
+            let allcount = $('.all_count').text();
+            let allweight = $('.all_weight').text();
             $.ajax({
                 url:'/index/Table/houwei_cd',
                 data:{id, m, j, count:num},
-                success:function (d) {console.log(d)
+                success:function (d) {
                     par.find('.rukuform_xq_id').val(id);
                     par.find('.huowei').html(`<input type="hidden" value="${c_id}" name="huowei_name[]" readonly><span>${hw}</span>`);
                     par.find('.count').find('span').text(num);
                     par.find('.count').find('input').val(num);
-                    par.find('.mao').find('span').text(d.j);
-                    par.find('.mao').find('input').val(d.j);
                     par.find('.jin').find('span').text(d.m);
                     par.find('.jin').find('input').val(d.m);
                     par.find('.sy_count').find('span').text(d.sy);
                     par.find('.sy_count').find('input').val(d.sy);
+                    let count = Number(allcount) + Number(num);
+                    let weight = [(Number(allweight) + Number(d.m))*1000]/1000;
+                    let we=Math.round(weight*1000)/1000;
+                    $('.all_count').text(count);
+                    $('.all_weight').text(we);
+                    $('input[name=all_count]').val(count);
+                    $('input[name=all_weight]').val(we);
                 }
             })
         })
