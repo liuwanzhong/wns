@@ -232,7 +232,7 @@ class Rukuorder extends Controller {
             ->where('rukuid',$id)
             ->select();
         foreach ($s as $c){
-            db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$data['odd_number'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums']]);
+            db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$data['odd_number'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums'],'huowei'=>$c['rk_huowei_id']]);
         }
         try{
             $r=db('rukuform')->where('id',$id)->update(['state'=>1]);

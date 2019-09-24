@@ -35,13 +35,13 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                    <label class="layui-form-label">售达方:</label>
-                    <div class="layui-input-inline">
-                        {volist name='sd' id='sd'}
-                        <input type="text" name="reachout_name" autocomplete="off" class="layui-input" value="{$sd.reachby_name}" >
-                        {/volist}
-                    </div>
+                <label class="layui-form-label">售达方:</label>
+                <div class="layui-input-inline">
+                    {volist name='sd' id='sd'}
+                    <input type="text" name="reachout_name" autocomplete="off" class="layui-input" value="{$sd.reachby_name}" >
+                    {/volist}
                 </div>
+            </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">发货日期:</label>
                 <div class="layui-input-inline">
@@ -101,66 +101,60 @@
         <div class="container">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
-                    <tr>
-                        <th>交货单号</th>
-                        <th>产品名称</th>
-                        <th>总数量</th>
-                        <th>货位</th>
-                        <th>货位分配数</th>
-                        <th>实际重量</th>
-                        <th>净重</th>
-                        <th>货位剩余数</th>
-                        <th>备注</th>
-                        <th>操作</th>
+                <tr>
+                    <th>交货单号</th>
+                    <th>产品名称</th>
+                    <th>总数量</th>
+                    <th>货位</th>
+                    <th>货位分配数</th>
+                    <th>实际重量</th>
+                    <th>货位剩余数</th>
+                    <th>备注</th>
+                    <th>操作</th>
                 </thead>
                 <tbody class="tbd">
-                    {volist name='rows' id='v'}
-                    <tr>
-                        <input type="hidden" name="cd[]" value="{$v.id}">
-                        <td>
-                            <input type="hidden" value="{$v.Delivery_id}" name="Delivery_id[]" readonly>
-                            {$v.Delivery_id}
-                        </td>
-                        <td class="status">
-                            <input type="hidden" value="{$v.material_name}" name="material_name[]" readonly>
-                            {$v.material_name}
-                        </td>
-                        <td>
-                            <input type="hidden" value="{$v.num}" name="delivery_num[]" readonly>
-                            {$v.num}
-                        </td>
-                        <td class="huowei">
-                            <botton class="layui-btn layui-btn-sm dia">点击</botton>
-                        </td>
-                        <td class="count">
-                            <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
-                            <span>0</span>
-                        </td>
-                       <td class="mao">
-                           <input type="hidden" value="mao" name="mao[]" readonly>
-                           <span>0</span>
-                       </td>
-                        <td class="jin">
-                            <input type="hidden" value="jin" name="jin[]" readonly>
-                            <span>0</span>
-                        </td>
-                        <td class="sy_count">
-                            <input type="hidden" value="sy_count" name="sy_count[]" readonly>
-                            <span>0</span>
-                        </td>
-                        <td>
-                            <input type="hidden" value="{$v.detailed}" name="detailed[]" readonly>
-                            <input type="hidden" value="" name="Delivery" readonly>
-                            {$v.detailed}
-                        </td>
-                        <td>
-                            <button type="button" class="layui-btn layui-btn-sm add">
-                                <i class="layui-icon">&#xe654;</i>
-                            </button>
-                        </td>
+                {volist name='rows' id='v'}
+                <tr>
+                    <input type="hidden" name="cd[]" value="{$v.id}">
+                    <td>
+                        <input type="hidden" value="{$v.Delivery_id}" name="Delivery_id[]" readonly>
+                        {$v.Delivery_id}
+                    </td>
+                    <td class="status">
+                        <input type="hidden" value="{$v.material_name}" name="material_name[]" readonly>
+                        {$v.material_name}
+                    </td>
+                    <td>
+                        <input type="hidden" value="{$v.num}" name="delivery_num[]" readonly>
+                        {$v.num}
+                    </td>
+                    <td class="huowei">
+                        <botton class="layui-btn layui-btn-sm dia">点击</botton>
+                    </td>
+                    <td class="count">
+                        <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
+                        <span>0</span>
+                    </td>
+                    <td class="jin">
+                        <input type="hidden" value="jin" name="jin[]" readonly>
+                        <span>0</span>
+                    </td>
+                    <td class="sy_count">
+                        <input type="hidden" value="sy_count" name="sy_count[]" readonly>
+                        <span>0</span>
+                    </td>
+                    <td>
+                        <input type="hidden" value="{$v.detailed}" name="detailed[]" readonly>
+                        {$v.detailed}
+                    </td>
+                    <td>
+                        <button type="button" class="layui-btn layui-btn-sm add">
+                            <i class="layui-icon">&#xe654;</i>
+                        </button>
+                    </td>
 
-                    </tr>
-                    {/volist}
+                </tr>
+                {/volist}
                 </tbody>
             </table>
             <span>
@@ -215,7 +209,6 @@
         $('.layui-table').on('click', '.add', function(){
             let _tr = $(this).parents('tr');
             let child = _tr[0].children;
-            console.log(child)
 
             let html = `<tr>
             <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
@@ -224,30 +217,30 @@
                 ${child[1].innerText}
             </td>
             <td class="status">
-                <input type="hidden" value="${child[2].innerText}" name="material_name" readonly>
+                <input type="hidden" value="${child[2].innerText}" name="material_name[]" readonly>
                 ${child[2].innerText}
             </td>
             <td>
-                <input type="hidden" value="0" name="delivery_num" readonly>
+                <input type="hidden" value="0" name="delivery_num[]" readonly>
                 <span>0</span>
             </td>
             <td class="huowei">
                 <botton class="layui-btn layui-btn-sm dia">点击</botton>
             </td>
             <td class="count">
-                <input type="hidden" value="0" name="delivery_num" readonly>
+                <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
                 <span>0</span>
             </td>
             <td class="jin">
-                <input type="hidden" value="0" name="delivery_num" readonly>
+                <input type="hidden" value="jin" name="jin[]" readonly>
                 <span>0</span>
             </td>
             <td class="sy_count">
-                <input type="hidden" value="0" name="delivery_num" readonly>
+                <input type="hidden" value="sy_count" name="sy_count[]" readonly>
                 <span>0</span>
             </td>
             <td>
-                <input type="hidden" value="${child[8].innerText}" name="Delivery_id" readonly>
+                <input type="hidden" value="${child[8].innerText}" name="detailed[]" readonly>
                 ${child[8].innerText}
             </td>
             <td>
@@ -258,6 +251,7 @@
                     <i class="layui-icon">&#xe640;</i>
                 </button>
             </td>
+
         </tr>`;
             $('.tbd').append(html);
             form.render();
@@ -383,7 +377,7 @@
     //生成时删除sessionstorage
     $('#del').click(function () {
         sessionStorage.removeItem('session')
-        })
+    })
 
     $('.tbd').on('click','.remove', function(){
         let p = $(this).parents('tr');
@@ -394,13 +388,13 @@
             data:{id,num}
         })
         p.remove();
-    //     let id=p.find('.rukuform_xq_id').val();
-    // let num=p.find('.count').find('input').val();
-    // p.remove();
-    // $.ajax({
-    //     url:'/index/Table/huifu',
-    //     data:{id,num}
-    // })
+        //     let id=p.find('.rukuform_xq_id').val();
+        // let num=p.find('.count').find('input').val();
+        // p.remove();
+        // $.ajax({
+        //     url:'/index/Table/huifu',
+        //     data:{id,num}
+        // })
     })
 
     $('.close').on('click', function(){

@@ -10,6 +10,7 @@
 	<style type="text/css">
 		.layui-table th{text-align: center;font-weight: bold;}
 		.layui-table td{text-align: center;}
+		label{box-sizing: content-box;}
 	</style>
 	</head>
 	<body>
@@ -26,19 +27,19 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">出库仓库</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
 						</div>
 					</div>
 					<div class="layui-form-item">
 						<label class="layui-form-label">出库时间</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
 						<label class="layui-form-label">交货单号</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
+							<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($s_material_name)){echo $s_material_name;}?>"/>
 						</div>
 					</div>
 					<div class="layui-form-item">
@@ -75,7 +76,7 @@
 					<td>{$row.count}</td>
 					<td>
 						<a href="#" class="edit xq" style="margin-right: 15px;"><i class="ico" title="详情">&#xe619;</i></a>
-						<a href="{:url('Outbound/to_examine_yes','id='.$row.id)}" class="edit ks" title="审核通过"><i class="ico">&#xe602;</i></a>
+						<a href="{:url('Outbound/to_examine_yes',['id'=>$row.id,'transport_id'=>$row.transport_id,'reachout_name'=>$row.reachout_name,'task'=>'销售出库'])}" class="edit ks" title="审核通过"><i class="ico">&#xe602;</i></a>
 						<a href="{:url('Outbound/to_examine_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
 					</td>
 				</tr>

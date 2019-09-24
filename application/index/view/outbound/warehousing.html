@@ -10,6 +10,7 @@
 	<style type="text/css">
 		.layui-table th{text-align: center;font-weight: bold;}
 		.layui-table td{text-align: center;}
+		label{box-sizing: content-box;}
 	</style>
 	</head>
 	<body>
@@ -18,7 +19,7 @@
 				<span class="layui-breadcrumb">
 					<a href="/public/main.html" target="box">首页</a>
 					<a href="javascript:;">入库管理</a>
-					<a><cite>入库台账</cite></a>
+					<a><cite>出库台账</cite></a>
 				</span>
 			</div>
 			<div class="seach">
@@ -26,19 +27,19 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">出库仓库</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
 						</div>
 					</div>
 					<div class="layui-form-item">
 						<label class="layui-form-label">出库时间</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="delivery_time" name="s_delivery_time" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+							<input type="text" class="layui-input" id="delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
 						<label class="layui-form-label">交货单号</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
+							<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($s_material_name)){echo $s_material_name;}?>"/>
 						</div>
 					</div>
 					<div class="layui-form-item">
@@ -87,10 +88,18 @@
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script type="text/javascript">
-			layui.use('element', function () {
-				
+			layui.use(['element', 'laydate'],function () {
+				let element = layui.element,
+						laydate = layui.laydate;
+				laydate.render({
+					elem: '#delivery_time'
+					,range: '~'
+					,done: function(value){
+						$('#s_delivery_time').val(value)
+					}
+				})
 			})
-			
+
 			//详情
 			$('.xq').on('click',function () {
 				let id=$(this).parents('tr').find('td').eq(0).text();

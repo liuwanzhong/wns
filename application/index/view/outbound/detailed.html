@@ -3,11 +3,14 @@
 	<head>
 	<meta charset="utf-8"/>
 	<title>新增权限</title>
+		<link rel="stylesheet" href="/images/css.css">
+		<link rel="stylesheet" href="/images/boot.css">
 		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
 		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
 	<style type="text/css">
 		.layui-table th{text-align: center;font-weight: bold;}
 		.layui-table td{text-align: center;}
+		label{box-sizing: content-box;}
 	</style>
 	</head>
 	<body>
@@ -24,13 +27,13 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">出库仓库</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+							<input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
 						</div>
 					</div>
 					<div class="layui-form-item">
 						<label class="layui-form-label">发货日期</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
@@ -53,7 +56,6 @@
 					<th>发货日期</th>
 					<th>数量</th>
 					<th>净重</th>
-					<th>毛重</th>
 				</tr>
 				</thead>
 				<tbody class="tbd">
@@ -68,13 +70,13 @@
 					<td><?php if(!empty($row['delivery_time'])){echo date('Y-m-d',$row['delivery_time']);}?></td>
 					<td>{$row.ck_nums}</td>
 					<td>{$row.netweight}</td>
-					<td>{$row.Grossweight}</td>
-					<td></td>
-					<td></td>
 				</tr>
 				{/volist}
 				</tbody>
 			</table>
+			<div style="text-align:center; margin-bottom: 200px;">
+				{$rows->render()}
+			</div>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
