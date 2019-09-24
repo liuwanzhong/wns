@@ -39,7 +39,6 @@
 					<div class="layui-form-item">
 						<div class="layui-input-inline">
 							<button class="layui-btn save" lay-submit>查询</button>
-							<button class="layui-btn" id="dc">导出</button>
 						</div>
 					</div>
 				</form>
@@ -47,7 +46,6 @@
 			<table class="layui-table new_list" style="width: 96%; margin: 12px auto;">
 				<thead>
 				<tr>
-					<th><input type="checkbox" id="all"></th>
 					<th>ID</th>
 					<th>出库仓库</th>
 					<th>出库货物</th>
@@ -61,7 +59,6 @@
 				<tbody class="tbd">
 				{volist name='rows' id='row'}
 				<tr id="check" class="news_list">
-					<td><input type="checkbox" value="{$row.id}"></td>
 					<td>{$row.id}</td>
 					<td>{$row.w_name}</td>
 					<td>{$row.product_name}</td>
@@ -134,20 +131,6 @@
 						}
 					})
 				}
-			})
-			$('#dc').on('click', function() {
-				alert(1);
-				var data = sessionStorage.session_dc;
-				var params = {id: data};
-				$.post("{:url('Oukuorder/outExcel')}", params, function (res) {
-					console.log(res);
-					if (res.status) {
-						window.location.href = ("{:Url('index/Oukuorder/download')}?file=" + res.url);
-					} else {
-						layer.msg('系统错误，操作失败');
-
-					}
-				}, 'json')
 			})
 		</script>
 	</body>

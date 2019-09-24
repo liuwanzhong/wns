@@ -322,7 +322,7 @@ class Outbound extends Controller {
         $row=db('outbound_xq_from')->where('chukuid',$data['id'])->select();
         $time=time();
         foreach ($row as $r) {
-            $d=db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->field('rk_nums')->find();
+            $d=db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$r['ck_huowei_id'])->field('rk_nums')->find();
             $d=(int)$d['rk_nums'];
             $balance=$d-$r['ck_nums'];
             db('record')->insert(['time'=>$time,'odd_number'=>$data['transport_id'],'task'=>$data['task'],'customer'=>$data['reachout_name'],'early_stage'=>$d,'xx_chuku'=>$r['ck_nums'],'balance'=>$balance,'huowei'=>$r['ck_huowei_id']]);
@@ -331,6 +331,7 @@ class Outbound extends Controller {
             for($i=0;$i<count($rows);$i++){
                 if($rows[$i]['rk_nums']<1){
                     db('rukuform_xq')->where('id',$rows[$i]['id'])->update(['is_del'=>1]);
+                    db('record')->where('huowei',$rows[$i]['rk_huowei_id'])->update(['is_del'=>0]);
                 }
             }
         }
