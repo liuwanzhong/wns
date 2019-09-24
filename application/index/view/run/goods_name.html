@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>状态管理</title>
+    <link rel="stylesheet" href="/images/boot.css">
+    <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+    <style type="text/css">
+        .layui-table th{text-align: center;font-weight: bold;}
+        .layui-table td{text-align: center;}
+        #upload-add,#upload-edit{height: 30px;line-height: 30px;padding: 0 10px;margin-left: 10px;}
+    </style>
+</head>
+<body>
+<div class="note">
+    <div class="nav">
+        <span class="layui-breadcrumb">
+            <a href="/public/main.html" target="box">首页</a>
+            <a href="javascript:;">管理</a>
+            <a><cite>添加产品</cite></a>
+        </span>
+    </div>
+    <div class="handle">
+        <button type="button" class="layui-btn" id="dialog">添加</button>
+    </div>
+    <table class="layui-table" style="width: 96%; margin: 12px auto;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>产品名</th>
+                <th>说明</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {volist name='list' id='v'}
+            <tr>
+                <td>{$v.id}</td>
+                <td>{$v.name}</td>
+                <td>{$v.content}</td>
+                <td>{$v.create_time}</td>
+                <td style="width:300px">
+                    <a href="#" class="edits" title="编辑" style="margin-right: 15px;"><i class="ico">&#xe619;</i><input type="hidden" name="myids" value="{$v.id}"></a>
+                    <a href="{:url('Run/goods_name_del','id='.$v['id'])}" class="" title="删除"><i class="ico">&#xe605;</i></a>
+                </td>
+            </tr>
+            {/volist}
+        </tbody>
+    </table>
+    <div style="text-align:center; margin-bottom: 200px;">
+        {$list->render()}
+    </div>
+</div>
+
+<div class="model modeladd">
+    <div class="head">
+        <span>添加商品</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content">
+        <form action="{:url('Run/goods_name_add')}" method="post">
+            <div class="wrap">
+                <label>商品</label>
+                <input type="text" name="name">
+            </div>
+            <div class="wrap">
+                <label>状态说明</label>
+                <textarea name="content"></textarea>
+            </div>
+            <div class="wrap btn">
+                <input type="submit" class="save" value="确定"/>
+                <input type="reset" class="reset" value="重置"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="model modelshows">
+    <div class="head">
+        <span>状态查看</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content">
+        <form action="{:url('Run/goods_name')}" method="post">
+            <div class="wrap">
+                <label>状态名称</label>
+                <input type="text" name="title" class="showtitle" readonly>
+            </div>
+            <div class="wrap">
+                <label>状态说明</label>
+                <textarea name="content" class="showstatus" readonly></textarea>
+            </div>
+            <div class="wrap btn">
+                <input type="submit" class="save" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="model modeledit">
+    <div class="head">
+        <span>编辑产品</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content">
+        <form action="{:url('Run/goods_name_edit')}" method="post">
+            <input type="hidden" name="myid" class="myid">
+            <div class="wrap">
+                <label>产品名</label>
+                <input type="text" name="title" class="showtitle">
+            </div>
+            <div class="wrap">
+                <label>状态说明</label>
+                <textarea name="content" class="showstatus"></textarea>
+            </div>
+            <div class="wrap btn">
+                <input type="submit" class="save" value="确定"/>
+                <input type="reset" class="reset" value="重置"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+<script src="/layui/layui.js"></script>
+<script>
+    layui.use('element', function () {
+        let element = layui.element;
+    })
+</script>
+
+
+<script type="text/javascript">
+    $('#dialog').on('click', function(){
+        $('.modeladd').show();
+    })
+    $('.close').on('click', function(){
+        $('.modeladd').hide();
+    })
+    $('.close').on('click', function(){
+        $('.modelshows').hide();
+    })
+
+    $('.edits').on('click', function() {
+        //从隐藏域中拿到userID
+        let id=$(this).parents('tr').find('td').eq(0).text();
+        $.ajax({
+            type: "get",//请求方式有post，get请求方式，这里是post请求
+            url: '/index/Run/goods_name_show',//请求的方法的路径
+            data:{'id':id},
+            success: function(data){
+                if(data.error==0){
+                    layer.alert(data.msg, {
+                        icon: 6,
+                        yes:function(){
+                            location.href='/index/Run/goods_name';
+                        }
+                    });
+                }
+                $('.myid').val(data.id);
+                $(".showtitle").val(data.name);
+                $('.showstatus').val(data.content);
+            }
+        })
+        $('.modeledit').show();
+    })
+    $('.close').on('click', function(){
+        $('.modeledit').hide();
+    })
+
+</script>
+
+</body>
+</html>

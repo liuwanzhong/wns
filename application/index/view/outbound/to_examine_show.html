@@ -104,7 +104,6 @@
                         <th>产品日期</th>
                         <th>产品批次</th>
                         <th>备注</th>
-                        <th>毛重</th>
                         <th>净重</th>
                         <th class="ddbh">订单编号</th>
                     </tr>
@@ -112,7 +111,6 @@
                 <tbody class="tbd">
                     {volist name='cats' id='v'}
                     <tr>
-                        <input type="hidden" name="min" value="{$v.m}">
                         <input type="hidden" name="cd[]" value="{$v.id}">
                         <input type="hidden" name="gross_min" value="{$v.j}">
                         <td>
@@ -144,10 +142,6 @@
                         <td><input type="date" name="intime[]" class="layui-input" value="{$v.product_time}"></td>
                         <td><input type="text" name="storno[]" placeholder="请输入批次" value="{$v.product_batch}" class="layui-input"></td>
                         <td><textarea name="content[]" class="layui-textarea">{$v.content}</textarea></td>
-                        <td>
-                            <div class="groos"><input type="hidden" class="groos" name="Grossweight[]" value="{$v.Grossweight}" readonly></div>
-                            <span>{$v.Grossweight}</span>
-                        </td>
                         <td>
                             <div class="num"><input type="hidden" class="num" name="netweight[]" value="{$v.netweight}" readonly></div>
                             <span>{$v.netweight}</span>
@@ -221,10 +215,6 @@
                         <td><input type="date" name="intime[]" class="layui-input" value="{$v.product_time}"></td>
                         <td><input type="text" name="storno[]" placeholder="请输入批次" value="{$v.product_batch}" class="layui-input"></td>
                         <td><textarea name="content[]" class="layui-textarea">{$v.content}</textarea></td>
-                        <td>
-                            <div class="groos"><input type="hidden" class="groos" name="Grossweight[]" value="{$v.Grossweight}" readonly></div>
-                            <span>{$v.Grossweight}</span>
-                        </td>
                         <td>
                             <div class="num"><input type="hidden" class="num" name="netweight[]" value="{$v.netweight}" readonly></div>
                             <span>{$v.netweight}</span>

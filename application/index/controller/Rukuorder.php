@@ -229,15 +229,22 @@ class Rukuorder extends Controller {
             $this->error('缺少必要参数,请重试');
         }
         $s=db('rukuform_xq')
-            ->where('rukuid',$id)
-            ->select();
+                ->where('rukuid',$id)
+                ->select();
         foreach ($s as $c){
-            db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$data['odd_number'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums']]);
+            $jc='';
+            $a=db('record')->where('huowei',$c['rk_huowei_id'])->order('id desc')->limit(1)->select();
+            db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$c['transfers_id'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums'],'huowei'=>$c['rk_huowei_id']]);
         }
+
+
+
         try{
             $r=db('rukuform')->where('id',$id)->update(['state'=>1]);
             $s=db('rukuform_xq')->where('rukuid',$id)->update(['state'=>1]);
             if($r && $s) {
+                
+                
                 return redirect('to_examine');
                 Db::commit();
             }
@@ -501,7 +508,7 @@ class Rukuorder extends Controller {
                 echo fread($file,2048);
             }
             fclose($file);
-//            unlink($path);
+           unlink($path);
             exit();
         }
     }

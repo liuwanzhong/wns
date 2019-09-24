@@ -53,7 +53,6 @@
 					<th>发货日期</th>
 					<th>数量</th>
 					<th>净重</th>
-					<th>毛重</th>
 				</tr>
 				</thead>
 				<tbody class="tbd">
@@ -68,9 +67,6 @@
 					<td><?php if(!empty($row['delivery_time'])){echo date('Y-m-d',$row['delivery_time']);}?></td>
 					<td>{$row.ck_nums}</td>
 					<td>{$row.netweight}</td>
-					<td>{$row.Grossweight}</td>
-					<td></td>
-					<td></td>
 				</tr>
 				{/volist}
 				</tbody>
@@ -134,13 +130,12 @@
 				}
 			})
 			$('#dc').on('click', function() {
-				alert(1);
 				var data = sessionStorage.session_dc;
 				var params = {id: data};
-				$.post("{:url('Oukuorder/outExcel')}", params, function (res) {
+				$.post("{:url('Outbound/outExcel')}", params, function (res) {
 					console.log(res);
 					if (res.status) {
-						window.location.href = ("{:Url('index/Oukuorder/download')}?file=" + res.url);
+						window.location.href = ("{:Url('index/Outbound/download')}?file=" + res.url);
 					} else {
 						layer.msg('系统错误，操作失败');
 

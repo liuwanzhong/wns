@@ -224,4 +224,69 @@ class Run extends Controller {
             $this->error("删除失败");
         }
     }
+
+
+
+
+    //库存列表
+    public function goods_name(){
+        $list = db('goods_name')->where('is_del',0)->paginate(100);
+        return view('goods_name',['list'=>$list]);
+    }
+    //添加状态
+    public function goods_name_add(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $data = input();
+        array_shift($data);
+        $rs = db('goods_name')->insert($data);
+        if($rs){
+            return redirect('goods_name');
+        }else{
+            $this->error("添加失败");
+        }
+    }
+    //修改查看接口
+    public function goods_name_show($id){
+        $ms=$this->qx();
+        if($ms==0){
+            $msg=['error'=>0,'msg'=>'警告:越权操作'];
+            return $msg;
+        }
+        $list = db('goods_name')->where('is_del',0)->where('id',$id)->find();
+        return $list;
+    }
+    //修改
+    public function goods_name_edit(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $data = input();
+        array_shift($data);
+        $id = $data['myid'];
+        unset($data['myid']);
+        $data['update_time'] = time();
+        $rs = db('goods_name')->where('id',$id)->update($data);
+        if($rs){
+            return redirect('goods_name');
+        }else{
+            $this->error("修改失败");
+        }
+    }
+    //删除
+    public function goods_name_del($id){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $rs = db('goods_name')->where('id',$id)->update(['is_del'=>1]);
+        if($rs){
+            return redirect('goods_name');
+        }else{
+            $this->error("删除失败");
+        }
+    }
 }
