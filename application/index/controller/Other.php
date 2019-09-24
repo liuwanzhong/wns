@@ -72,19 +72,17 @@ class Other extends Controller {
         $rows=db('fayunbb')->where('state',0)->paginate(50);
         return view('transport_ss',['rows'=>$rows]);
     }
-    //修改
-//    public function edit()
-//    {
-//
-//        $data=input();
-//        array_shift($data);
-//        $r=db('fayunbb')->update($data);
-//        if($r){
-//            return redirect('transport_ss');
-//        }else{
-//            $this->error('修改失败，请联系管理员');
-//        }
-//    }
+
+    public function transport_ss_tab(){
+        $page = input('get.limit');
+        $list=db('fayunbb')->where('state',0)->paginate($page);
+        $arr = $list -> all();
+        $rows=db('fayunbb')->where('state',0)->select();
+        $rows_length = count($rows);
+
+        return ['code'=> 0, "count" => $rows_length, 'data' => $arr, 'page'=> $page];
+    }
+
     //审核
     public function shenhe($id)
     {

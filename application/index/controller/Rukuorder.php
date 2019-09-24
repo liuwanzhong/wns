@@ -390,9 +390,11 @@ class Rukuorder extends Controller {
             ->where('rukuform_xq.state',1)
             ->where("$search")
             ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
-            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+            ->paginate(1,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         //产品属性
         $status=db('kc_status')->where('is_del',0)->select();
+//        $a = $this->request->action();
+//        echo $a;exit;
         return view('detailed',['rows'=>$rows,'status'=>$status,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     //导出入库明细
