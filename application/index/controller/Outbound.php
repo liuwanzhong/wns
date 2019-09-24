@@ -348,15 +348,6 @@ class Outbound extends Controller {
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
         }
-        $data=input();
-        $row=db('outbound_xq_from')->where('chukuid',$data['id'])->select();
-        $time=time();
-        foreach ($row as $r) {
-            $d=db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->order('id desc')->limit(1)->select();
-            $rk_nums=$d['0']['rk_nums']-$r['ck_nums'];
-            db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->where('is_del',0)->update(['update_time'=>$time,'rk_nums'=>$rk_nums]);
-            db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->where('rk_nums <= 0')->update(['is_del'=>1]);
-        }
         try{
             $r=db('outbound_from')->where('id',$id)->update(['state'=>1]);
             $s=db('outbound_xq_from')->where('chukuid',$id)->update(['state'=>1]);

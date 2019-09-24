@@ -24,14 +24,16 @@
     </div>
     <div class="handle">
         <button type="button" class="layui-btn" id="dialog">添加</button>
+        <button type="button" class="layui-btn" id="dialog1">导入</button>
     </div>
     <table class="layui-table" style="width: 96%; margin: 12px auto;">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>产品名</th>
-                <th>说明</th>
-                <th>创建时间</th>
+                <th>毛重</th>
+                <th>净重</th>
+                <th>工厂</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -40,8 +42,9 @@
             <tr>
                 <td>{$v.id}</td>
                 <td>{$v.name}</td>
-                <td>{$v.content}</td>
-                <td>{$v.create_time}</td>
+                <td>{$v.mao}</td>
+                <td>{$v.jing}</td>
+                <td>{$v.gongchang}</td>
                 <td style="width:300px">
                     <a href="#" class="edits" title="编辑" style="margin-right: 15px;"><i class="ico">&#xe619;</i><input type="hidden" name="myids" value="{$v.id}"></a>
                     <a href="{:url('Run/goods_name_del','id='.$v['id'])}" class="" title="删除"><i class="ico">&#xe605;</i></a>
@@ -57,44 +60,30 @@
 
 <div class="model modeladd">
     <div class="head">
-        <span>添加商品</span>
+        <span>添加产品</span>
         <a href="javascript:" class="close">×</a>
     </div>
     <div class="content">
         <form action="{:url('Run/goods_name_add')}" method="post">
             <div class="wrap">
-                <label>商品</label>
+                <label>产品名称</label>
                 <input type="text" name="name">
             </div>
             <div class="wrap">
-                <label>状态说明</label>
-                <textarea name="content"></textarea>
+                <label>毛重</label>
+                <input type="text" name="mao">
+            </div>
+            <div class="wrap">
+                <label>净重</label>
+                <input type="text" name="jing">
+            </div>
+            <div class="wrap">
+                <label>工厂</label>
+                <input type="text" name="gongchang">
             </div>
             <div class="wrap btn">
                 <input type="submit" class="save" value="确定"/>
                 <input type="reset" class="reset" value="重置"/>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="model modelshows">
-    <div class="head">
-        <span>状态查看</span>
-        <a href="javascript:" class="close">×</a>
-    </div>
-    <div class="content">
-        <form action="{:url('Run/goods_name')}" method="post">
-            <div class="wrap">
-                <label>状态名称</label>
-                <input type="text" name="title" class="showtitle" readonly>
-            </div>
-            <div class="wrap">
-                <label>状态说明</label>
-                <textarea name="content" class="showstatus" readonly></textarea>
-            </div>
-            <div class="wrap btn">
-                <input type="submit" class="save" value="返回"/>
             </div>
         </form>
     </div>
@@ -109,12 +98,20 @@
         <form action="{:url('Run/goods_name_edit')}" method="post">
             <input type="hidden" name="myid" class="myid">
             <div class="wrap">
-                <label>产品名</label>
-                <input type="text" name="title" class="showtitle">
+                <label>产品名称</label>
+                <input type="text" name="name" class="name">
             </div>
             <div class="wrap">
-                <label>状态说明</label>
-                <textarea name="content" class="showstatus"></textarea>
+                <label>毛重</label>
+                <input type="text" name="mao" class="mao">
+            </div>
+            <div class="wrap">
+                <label>净重</label>
+                <input type="text" name="jing" class="jing">
+            </div>
+            <div class="wrap">
+                <label>工厂</label>
+                <input type="text" name="gongchang" class="gongchang">
             </div>
             <div class="wrap btn">
                 <input type="submit" class="save" value="确定"/>
@@ -123,15 +120,24 @@
         </form>
     </div>
 </div>
-
+<!-- 导入 -->
+<div class="model">
+    <div class="head">
+        <span>导入</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content">
+        <form action="{:url('Run/upload_excel')}" method="post" enctype="multipart/form-data">
+            <div class="wrap">
+                <input type="file" name="file" value="" />
+                <input type="submit" class="save" id="btn" value="确定"/>
+            </div>
+        </form>
+    </div>
+</div>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 <script src="/layui/layui.js"></script>
-<script>
-    layui.use('element', function () {
-        let element = layui.element;
-    })
-</script>
 
 
 <script type="text/javascript">
@@ -140,6 +146,13 @@
     })
     $('.close').on('click', function(){
         $('.modeladd').hide();
+    })
+    //导入
+    $('#dialog1').on('click', function(){
+        $('.model').show();
+    })
+    $('.close').on('click', function(){
+        $('.model').hide();
     })
     $('.close').on('click', function(){
         $('.modelshows').hide();
@@ -162,8 +175,10 @@
                     });
                 }
                 $('.myid').val(data.id);
-                $(".showtitle").val(data.name);
-                $('.showstatus').val(data.content);
+                $('.name').val(data.name);
+                $('.mao').val(data.mao);
+                $('.jing').val(data.jing);
+                $('.gongchang').val(data.gongchang);
             }
         })
         $('.modeledit').show();

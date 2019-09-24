@@ -154,4 +154,45 @@ class Instor extends Controller
             $this->error("删除失败");
         }
     }
+
+
+
+
+    //其他入库
+    public function other_rk()
+    {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告:越权操作');
+        }
+        //仓库
+        $cks = db('warehouse')->where('is_del',1)->select();
+        //产品名称
+        $goods_name=db('goods_name')->where('is_del',0)->select();
+        //产品属性
+        $kc=db('kc_status')->where('is_del',0)->select();
+        return view('other_rk',['cks'=>$cks,'goods_name'=>$goods_name,'kc'=>$kc]);
+    }
+    //货位选择
+    public function huowei($id)
+    {
+        $rows=db('cabinet')->where('is_del',1)->where('warehouse_id',$id)->select();
+        return $rows;
+    }
+    //绑定产品名称
+    public function bang($id)
+    {
+        $row=db('goods_name')->where('id',$id)->find();
+        return $row;
+    }
+    //毛净重计算
+    public function mj()
+    {
+        $mao=input('mao');
+        $jing=input('jing');
+        $num=input('num');
+        $mao=sprintf("%.3f",$mao*$num/1000);
+        $jing=sprintf("%.3f",$jing*$num/1000);
+        return ['mao'=>$mao,'jing'=>$jing];
+    }
 }

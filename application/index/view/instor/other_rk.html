@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/images/index.css" />
+    <link rel="stylesheet" href="/layui/css/layui.css" />
+    <style>
+        .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
+        .submit{margin-left: 30px;margin-top: 30px;}
+        .container{display: block;overflow-x: hidden;height: 580px;}
+        .container::-webkit-scrollbar{width: 0;}
+        input[type="date"]::-webkit-inner-spin-button {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="note">
+    <div class="nav">
+        <span class="layui-breadcrumb">
+            <a href="/public/main.html" target="box">首页</a>
+            <a href="javascript:;">入库管理</a>
+            <a><cite>其他入库</cite></a>
+        </span>
+    </div>
+
+    <form method="post" class="layui-form" action="{:url('Rukuorder/insert')}">
+        <div class="form_box">
+            <div class="layui-form-item">
+                <label class="layui-form-label">装运单号:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="shipmentnum" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">入库日期:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="userintime" autocomplete="off" class="layui-input" id="time">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">运输方式:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="transport" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">车牌号码:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="carid" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">装卸工:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="stevedore" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">入库仓库:</label>
+                <div class="layui-input-inline">
+                    <select name="ck_id" lay-filter="ck_id" id="table" onchange="showtable(this.value)">
+                        <option value="0">请选择仓库</option>
+                        <?php foreach($cks as $ck): ?>
+                        <option value="<?=$ck['id']?>"><?=$ck['name']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <table class="layui-table" style="width: 96%; margin: 12px auto;">
+                <thead>
+                    <tr>
+                        <th>出库工厂</th>
+                        <th>产品名称</th>
+                        <th>产品属性</th>
+                        <th>入库货位</th>
+                        <th>实收数量</th>
+                        <th>产品日期</th>
+                        <th>产品批次</th>
+                        <th>备注</th>
+                        <th>毛重</th>
+                        <th>净重</th>
+                        <th>订单编号</th>
+                    </tr>
+                </thead>
+                <tbody class="tbd">
+                    <tr>
+                        <td>
+                            <input type="text" value="" class="countnum layui-input" name="factory">
+                        </td>
+                        <td>
+                            <select name="product_name" onchange="bao(this.options[this.options.selectedIndex].value)" lay-search>
+                                <option value="">请选择产品名称</option>
+                                {volist name='goods_name' id='goods'}
+                                <option value="{$goods.id}">{$goods.name}</option>
+                                {/volist}
+                            </select>
+                        </td>
+                        <td>
+                            <select name="rk_status_id" id="">
+                                <option value="0">请选择产品属性</option>
+                                {volist name='kc' id='k'}
+                                <option value="{$k.id}">{$k.title}</option>
+                                {/volist}
+                            </select>
+                        </td>
+                        <td class="huowei">
+                            <select name='rk_huowei_id' class='showhuowei' lay-search>
+                                <option value=''>请选择货位</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" value="" class="countnum layui-input" name="rk_nums">
+                        </td>
+                        <td>
+                            <input type="text" value="" class="countnum layui-input" name="product_time">
+                        </td>
+                        <td>
+                            <input type="text" value="" class="countnum layui-input" name="product_batch">
+                        </td>
+                        <td>
+                            <input type="text" value="" class="countnum layui-input" name="content">
+                        </td>
+                        <td>
+                            <input type="text" value="" class="countnum layui-input" name="nums[]">
+                        </td>
+                        <td>
+                            <input type="text" value="" class="countnum layui-input" name="nums[]">
+                        </td>
+                        <td>
+                            <input type="text" value="" class="countnum layui-input" name="transfers_id">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="layui-btn submit" lay-submit lay-filter="formDemo" id="del">立即提交</button>
+        </div>
+
+    </form>
+</div>
+<script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['element', 'form','laydate'], function () {
+        let element = layui.element;
+        let form = layui.form;
+        let laydate = layui.laydate;
+        laydate.render({
+            elem: '#time',
+            type: 'date'
+        })
+        form.on('select(ck_id)', function(data){
+            let id = data.elem.value;
+            if(id != 0){
+                $('.showhuowei').empty();
+                $.ajax({
+                    type: "get",//请求方式有post，get请求方式，这里是post请求
+                    url: '/index/Instor/huowei/id/' + id,//请求的方法的路径
+                    dataType: 'json',//请求参数的格式为json.另外还有text等
+                    success: function(data){
+                        console.log(data)
+                        $('.showhuowei').append("<option value=''>请选择货位</option>");
+                        for (var i=0;i<data.length;i++)
+                        {
+                            $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
+                        }
+                        $(".forzentitle").val(data.title);
+                        $('.frozencount').val(data.goods_feel);
+                        $(".editfrozenid").val(data.id);
+                        form.render();
+                    }
+                })
+            }
+
+        })
+    })
+</script>
+</body>
+</html>
