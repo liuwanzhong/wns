@@ -161,6 +161,7 @@ class Outbound extends Controller {
     // 出库订单
     public function insert(){
         $data=input();
+//        dump($data);exit;
         if(!empty($data['huowei_name'])){
             for ($i=0;$i<count($data['huowei_name']);$i++){
                 if(!empty($data['huowei_name']['i'])){
@@ -179,11 +180,11 @@ class Outbound extends Controller {
                             'ck_huowei_id'=>$data['huowei_name'][$i],
                             'ck_nums'=>$data['huowei_out'][$i],
                             'netweight'=>$data['jin'][$i],
-                            'Grossweight'=> $data['mao'][$i],
                             'content'=>$data['detailed'][$i],
                             'create_time'=>time(),
                             'state'=>0,
-                            'chukuid'=>$id
+                            'total_shu'=>$data['all_count'][$i],
+                            'total_zhong'=>$data['all_weight'][$i],
                         ]);
                 }
                 $del=db('system_order')->where('id','in',$data['cd'])->update(['is_del'=>1]);
