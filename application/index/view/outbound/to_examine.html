@@ -10,6 +10,7 @@
 	<style type="text/css">
 		.layui-table th{text-align: center;font-weight: bold;}
 		.layui-table td{text-align: center;}
+		label{box-sizing: content-box;}
 	</style>
 	</head>
 	<body>
@@ -26,26 +27,28 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">出库仓库</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($data['transfers_id'])){echo $data['transfers_id'];}?>" />
+							<input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
 						</div>
 					</div>
 					<div class="layui-form-item">
 						<label class="layui-form-label">出库时间</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($data['delivery_time'])){echo $data['delivery_time'];}?>">
+							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
 						</div>
 					</div>
 						<input type="hidden" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
 					<div class="layui-form-item">
 						<div class="layui-input-inline">
 							<button class="layui-btn save" lay-submit>查询</button>
+							<button class="layui-btn" id="dc">导出</button>
 						</div>
 					</div>
 				</form>
 			</div>
-			<table class="layui-table" style="width: 96%; margin: 12px auto;">
+			<table class="layui-table new_list" style="width: 96%; margin: 12px auto;">
 				<thead>
 				<tr>
+					<th><input type="checkbox" id="all"></th>
 					<th>ID</th>
 					<th>审核</th>
 					<th>出库仓库</th>
@@ -56,9 +59,10 @@
 					<th>操作</th>
 				</tr>
 				</thead>
-				<tbody>
+				<tbody class="tbd">
 				{volist name='rows' id='row'}
-				<tr>
+				<tr id="check" class="news_list">
+					<td><input type="checkbox" value="{$row.id}"></td>
 					<td>{$row.id}</td>
 					<td>未审核</td>
 					<td>{$row.w_name}</td>
@@ -68,7 +72,7 @@
 					<td>{$row.count}</td>
 					<td>
 						<a href="#" class="edit xq" style="margin-right: 15px;"><i class="ico" title="详情">&#xe619;</i></a>
-						<a href="{:url('Outbound/to_examine_yes','id='.$row.id)}" class="edit ks" title="审核通过"><i class="ico">&#xe602;</i></a>
+						<a href="{:url('Outbound/to_examine_yes',['id'=>$row.id,'transport_id'=>$row.transport_id,'reachout_name'=>$row.reachout_name,'task'=>'销售出库'])}" class="edit ks" title="审核通过"><i class="ico">&#xe602;</i></a>
 						<a href="{:url('Outbound/to_examine_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
 					</td>
 				</tr>
@@ -111,6 +115,90 @@
 						$('#s_delivery_time').val(value)
 					}
 				});
+			})
+
+			//全选或全不选
+			$("#all").click(function(){
+				let session_list = JSON.parse(sessionStorage.getItem('session_ck'));
+				let arr = session_list == null ? [] : session_list;
+				if(this.checked){
+					$("#check :checkbox,#all").prop("checked", true);
+					let checks = $('.tbd ').find('input:checkbox');
+					checks.each(function () {
+						arr.push($(this)[0].value);
+					})
+					sessionStorage.setItem('session_ck',JSON.stringify(arr));
+				}else{
+					$("#check :checkbox,#all").prop("checked", false);
+					sessionStorage.removeItem('session_ck');
+				}
+			});
+
+			//单选
+			let session=[];
+			$('.tbd').on('click','input[type=checkbox]',function () {
+				let ses=JSON.parse(sessionStorage.getItem('session_ck'));
+				session = ses === null ? [] : ses;
+				if($(this)[0].checked == true){
+					session.push($(this).val());
+				}else{
+					let val = $(this).val();
+					for (let i in session){
+						if(session[i] == val){
+							session.splice(i,1);
+						}
+					}
+				}
+				sessionStorage.setItem('session_ck',JSON.stringify(session));
+			})
+
+
+			// 页面加载时判断哪些数据被选中,并显示选中状态
+			$(function () {
+				let array = [];
+				let list = JSON.parse(sessionStorage.getItem('session_ck'));
+				if(list != null){
+					$('.tbd input[type=checkbox]').each(function () {
+
+						if(list.includes($(this).val()) ){
+							$(this).prop('checked',true);
+						}
+						array.push($(this)[0].checked);
+					})
+
+					// 当前页是否每一项都选中,是则勾选全选框
+					let result = array.every(function (val) {
+						return val == true;
+					})
+					if(result){
+						$('.new_list #all').prop('checked', true);
+					}
+				}
+			})
+
+
+			// 导出
+			$('#dc').on('click', function() {
+				var data = sessionStorage.session_ck;
+				if(data !=  undefined || data != null){
+					var params = {id: data};
+					$.post("{:url('Outbound/outExcel')}", params, function (res) {
+						console.log(res)
+						if(res.error==0){
+							alert(res.msg);
+							return false;
+						}
+						if (res.status) {
+							window.location.href = ("{:Url('index/Outbound/download')}?file=" + res.url);
+						} else {
+							layer.msg('系统错误，操作失败');
+						}
+					}, 'json')
+				}
+				else {
+					layer.alert('请选择需要导出的数据',{icon:5})
+					return false;
+				}
 			})
 		</script>
 	</body>

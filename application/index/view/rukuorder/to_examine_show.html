@@ -127,7 +127,7 @@
                         <td>
                             <input type="number" value="{$v.rk_nums}" class="countnum layui-input" id="blur" name="nums[]">
                         </td>
-                        <td><input type="date" name="intime[]" class="layui-input" value="{$v.product_time}"></td>
+                        <td><input type="date" name="intime[]" class="layui-input" value="<?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);} ?>"></td>
                         <td><input type="text" name="storno[]" placeholder="请输入批次" value="{$v.product_batch}" class="layui-input"></td>
                         <td><textarea name="content[]" class="layui-textarea">{$v.content}</textarea></td>
                         <td>

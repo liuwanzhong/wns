@@ -4,12 +4,13 @@
 	<meta charset="utf-8"/>
 	<title>新增权限</title>
 		<link rel="stylesheet" href="/images/css.css">
-<!--		<link rel="stylesheet" href="/images/boot.css">-->
+		<link rel="stylesheet" href="/images/boot.css">
 		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
 		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
 	<style type="text/css">
 		.layui-table th{text-align: center;font-weight: bold;}
 		.layui-table td{text-align: center;}
+		label{box-sizing: content-box;}
 	</style>
 	</head>
 	<body>
@@ -110,9 +111,11 @@
 					}
 				});
 			})
-			//全选
+
+			//全选或全不选
 			$("#all").click(function(){
-				let arr = [];
+				let session_list = JSON.parse(sessionStorage.getItem('session_dc'));
+				let arr = session_list == null ? [] : session_list;
 				if(this.checked){
 					$("#check :checkbox,#all").prop("checked", true);
 					let checks = $('.tbd ').find('input:checkbox');
@@ -125,6 +128,7 @@
 					sessionStorage.removeItem('session_dc');
 				}
 			});
+
 			let session=[];
 			$('.tbd').on('click','input[type=checkbox]',function () {
 				let ses=JSON.parse(sessionStorage.getItem('session_dc'));
@@ -141,14 +145,27 @@
 				}
 				sessionStorage.setItem('session_dc',JSON.stringify(session));
 			})
+
+			// 页面加载时判断哪些数据被选中,并显示选中状态
 			$(function () {
+				let array = [];
 				let list = JSON.parse(sessionStorage.getItem('session_dc'));
 				if(list != null){
-					$('.new_list input[type=checkbox]').each(function () {
+					$('.tbd input[type=checkbox]').each(function () {
+
 						if(list.includes($(this).val()) ){
 							$(this).prop('checked',true);
 						}
+						array.push($(this)[0].checked);
 					})
+
+					// 当前页是否每一项都选中,是则勾选全选框
+					let result = array.every(function (val) {
+						return val == true;
+					})
+					if(result){
+						$('.new_list #all').prop('checked', true);
+					}
 				}
 			})
 

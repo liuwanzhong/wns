@@ -41,13 +41,13 @@ class Rukuorder extends Controller {
     public function show($id){
         $list = db('cabinet')
             ->where('cabinet.is_del',1)
-            ->where('cabinet.warehouse_id',$id)->select();
+            ->where('cabinet.warehouse_id',$id)
+            ->select();
         foreach ($list as $k=>$item) {
             $rows=db('rukuform_xq')->where('is_del',0)->select();
             foreach ($rows as $row) {
                 if($item['id']==$row['rk_huowei_id'] and $row['rk_nums']!=0){
                     unset($list[$k]);
-
                 }
             }
         }
@@ -69,7 +69,6 @@ class Rukuorder extends Controller {
     public function insert(){
         $data = input();
         $userintime=strtotime($data['userintime']);
-
         try{
             $id = db('rukuform')->insertGetId(['shipmentnum'=>$data['shipmentnum'],'userintime'=>$userintime,'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id']]);
             for ($i=0;$i<count($data['transfers_factory']);$i++){
@@ -99,8 +98,6 @@ class Rukuorder extends Controller {
         }
         $this->success('生成订单成功','index');
     }
-
-
 
     //入库计划
     public function to_examine() {
@@ -185,14 +182,12 @@ class Rukuorder extends Controller {
         $data=input();
         $userintime=strtotime($data['userintime']);
         array_shift($data);
-//        try{
         $r = db('rukuform')
             -> where('id', $data['id'])
             -> update(['shipmentnum' => $data['shipmentnum'], 'userintime' => $userintime, 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id']]);
         for ($i = 0; $i < count($data['transfers_factory']); $i++) {
             $t=strtotime($data['intime'][$i]);
             if (empty($data['cd'][$i])) {
-
                 db('rukuform_xq') -> insert(['factory'       => $data['transfers_factory'][$i],
                                                  'product_name'  => $data['material_name'][$i],
                                                  'rk_status_id'  => $data['status'][$i],
@@ -207,7 +202,7 @@ class Rukuorder extends Controller {
                                                  'rukuid'        => $data['id']]);
             }else{
                 $rs = db('rukuform_xq') -> where('id', $data['cd'][$i])
-                    -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id'  => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i], 'product_time'  => $t, 'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'     => $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
+                    -> update(['factory' => $data['transfers_factory'][$i],'product_name'=> $data['material_name'][$i], 'rk_status_id'=> $data['status'][$i], 'rk_huowei_id' => $data['huowei'][$i], 'rk_nums'=> $data['nums'][$i],'product_time'  => $t,'product_batch' => $data['storno'][$i], 'content' => $data['content'][$i], 'netweight'=> $data['netweight'][$i], 'Grossweight' => $data['Grossweight'][$i], 'transfers_id' => $data['transfers_id'][$i]]);
             }
         }
         if($r!==false  || $rs!==false){
@@ -400,6 +395,8 @@ class Rukuorder extends Controller {
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         //产品属性
         $status=db('kc_status')->where('is_del',0)->select();
+//        $a = $this->request->action();
+//        echo $a;exit;
         return view('detailed',['rows'=>$rows,'status'=>$status,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     //导出入库明细
@@ -444,7 +441,6 @@ class Rukuorder extends Controller {
                 $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['w_name']);
                 $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['c_name']);
                 $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, date('Y-m-d',$v['time']));
-
                 $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['product_time']);
                 $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['rk_nums']);
                 $phpExcel->getActiveSheet()->setCellValue('I' . $rownum, $v['netweight']);

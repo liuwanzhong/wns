@@ -177,10 +177,10 @@ class Outbound extends Controller {
         
             try{
                 $id = db('outbound_from')
-                ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id']]);
+                ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id'],'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight']]);
                 for ($i=0;$i<count($data['delivery_num']);$i++){
                     $rs = db('outbound_xq_from')->insert([
-                        'chukuid'=>$id,
+                            'chukuid'=>$id,
                             'delivery_id'=>$data['Delivery_id'][$i],
                             'product_name'=>$data['material_name'][$i],
                             'ck_huowei_id'=>$data['huowei_name'][$i],
@@ -215,15 +215,18 @@ class Outbound extends Controller {
     }
     // 出库计划
     public function to_examine() {
+        $s_transfers_id=input('s_transfers_id');
+        $s_delivery_time=input('s_delivery_time');
+        $s_material_name=input('s_material_name');
         $data=input();
         $search = '';
         // 出库货物
-        if (!empty($data['s_transfers_id'])) {
-            $search = 'warehouse.name like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+        if (!empty($s_transfers_id)) {
+            $search = 'warehouse.name like ' . "'%" . $s_transfers_id . '%' . "'";
         }
         // 时间转换
-        if (!empty($data['s_delivery_time'])) {
-            $time = explode('~', $data['s_delivery_time']);
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
             foreach ($time as $key) {
                 $time[] = strtotime($key);
                 array_shift($time);
@@ -236,8 +239,8 @@ class Outbound extends Controller {
             $search .= $time;
         }
         // 订单号
-        if (!empty($data['s_material_name'])) {
-            $material_name = $data['s_material_name'];
+        if (!empty($s_material_name)) {
+            $material_name = $s_material_name;
             if (!empty($search)) {
                 $material_name = ' and outbound_xq_from.delivery_id like ' . "'%" . $material_name . '%' . "'";
             } else {
@@ -253,8 +256,8 @@ class Outbound extends Controller {
             ->group('outbound_xq_from.chukuid')
             ->where($search)
             ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
-            ->paginate(100);
-        return view('to_examine',['rows'=>$rows]);
+            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+        return view('to_examine',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     // 出库订单详情
     public function to_examine_show($id) {
@@ -292,8 +295,8 @@ class Outbound extends Controller {
                 'transport_id' => $data['transport_id'],
                 'reachout_name' => $data['reachout_name'],
                 'delivery_time' => strtotime($data['userintime']),
-                'transport' => $data['transport'], 
-                'carid' => $data['carid'], 
+                'transport' => $data['transport'],
+                'carid' => $data['carid'],
                 'driver' => $data['driver'],
                 'driverphone' => $data['driverphone'],
                 'workers' => $data['workers'],
@@ -302,7 +305,7 @@ class Outbound extends Controller {
                 'ck_id' => $data['ck_id']
                 ]);
         for ($i = 0; $i < count($data['huowei']); $i++) {
-                $fs=db('outbound_xq_from') 
+                $fs=db('outbound_xq_from')
                 -> where('id', $data['cd'][$i])
                 -> update([
                     'delivery_id'  => $data['delivery_id'][$i],
@@ -316,7 +319,7 @@ class Outbound extends Controller {
                     'update_time'   => time(),
                     ]);
         }
-        if($r  || $rs){
+        if($r  || $fs){
             return redirect('to_examine');
         }else{
             $this->error('修改出库订单失败,请联系管理员');
@@ -325,6 +328,22 @@ class Outbound extends Controller {
     //出库审核
     public function to_examine_yes() {
         $id=input('id');
+        $data=input();
+        $row=db('outbound_xq_from')->where('chukuid',$data['id'])->select();
+        $time=time();
+        foreach ($row as $r) {
+            $d=db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->field('rk_nums')->find();
+            $d=(int)$d['rk_nums'];
+            $balance=$d-$r['ck_nums'];
+            db('record')->insert(['time'=>$time,'odd_number'=>$data['transport_id'],'task'=>$data['task'],'customer'=>$data['reachout_name'],'early_stage'=>$d,'xx_chuku'=>$r['ck_nums'],'balance'=>$balance,'huowei'=>$r['ck_huowei_id']]);
+            db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->update(['rk_nums'=>$balance]);
+            $rows=db('rukuform_xq')->where('is_del',0)->select();
+            for($i=0;$i<count($rows);$i++){
+                if($rows[$i]['rk_nums']<1){
+                    db('rukuform_xq')->where('id',$rows[$i]['id'])->update(['is_del'=>1]);
+                }
+            }
+        }
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
         }
@@ -365,15 +384,17 @@ class Outbound extends Controller {
     }
     // 出库台账
     public function warehousing() {
-        $data=input();
+        $s_transfers_id=input('s_transfers_id');
+        $s_delivery_time=input('s_delivery_time');
+        $s_material_name=input('s_material_name');
         $search = '';
         // 出库货物
-        if (!empty($data['s_transfers_id'])) {
-            $search = 'warehouse.name like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+        if (!empty($s_transfers_id)) {
+            $search = 'warehouse.name like ' . "'%" . $s_transfers_id . '%' . "'";
         }
         // 时间转换
-        if (!empty($data['s_delivery_time'])) {
-            $time = explode('~', $data['s_delivery_time']);
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
             foreach ($time as $key) {
                 $time[] = strtotime($key);
                 array_shift($time);
@@ -386,8 +407,8 @@ class Outbound extends Controller {
             $search .= $time;
         }
         // 订单号
-        if (!empty($data['s_material_name'])) {
-            $material_name = $data['s_material_name'];
+        if (!empty($s_material_name)) {
+            $material_name = $s_material_name;
             if (!empty($search)) {
                 $material_name = ' and outbound_xq_from.delivery_id like ' . "'%" . $material_name . '%' . "'";
             } else {
@@ -403,8 +424,8 @@ class Outbound extends Controller {
             ->group('outbound_from.id')
             ->where($search)
             ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
-            ->paginate(100);
-        return view('warehousing',['rows'=>$rows]);
+            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+        return view('warehousing',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     //订单详情
     public function warehousing_show($id) {
@@ -448,16 +469,18 @@ class Outbound extends Controller {
     }
     // 出库明细
     public function detailed() {
+        $s_transfers_id=input('s_transfers_id');//工厂
+        $s_delivery_time=input('s_delivery_time');//日期
         $data=input();
         $search = '';
         //工厂名
-        if (!empty($data['s_transfers_id'])) {
-            $data['s_transfers_id']=addslashes($data['s_transfers_id']);
-            $search = 'warehouse.name like ' . "'%" . $data['s_transfers_id'] . '%' . "'";
+        if (!empty($s_transfers_id)) {
+            $s_transfers_id=addslashes($s_transfers_id);
+            $search = 'warehouse.name like ' . "'%" . $s_transfers_id . '%' . "'";
         }
         // 时间转换
-        if (!empty($data['s_delivery_time'])) {
-            $time = explode('~', $data['s_delivery_time']);
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
             foreach ($time as $key) {
                 $time[] = strtotime($key);
                 array_shift($time);
@@ -478,61 +501,51 @@ class Outbound extends Controller {
             ->group('outbound_xq_from.id')
             ->where($search)
             ->field('outbound_xq_from.*,warehouse.name as w_name,outbound_from.transport_id as t_id,sum(outbound_xq_from.ck_nums) as count,outbound_from.reachout_name,outbound_from.delivery_time,cabinet.name as c_name')
-            ->paginate(100);
-        return view('detailed',['rows'=>$rows]);
+            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]]);
+        return view('detailed',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]);
     }
-    //导出出库明细
+
+
+    //导出
     public function outExcel(){
         $data = input();
-        unset($data['/index/outbound/outexcel_html']);
+        array_shift($data);
         $id=$data['id'];
         $da=str_replace('"', '', $id);
         $da=trim($da,'[');
         $da=trim($da,']');
-        $data=db('outbound_xq_from')
-            ->join('cabinet','outbound_xq_from.ck_huowei_id=cabinet.id','left')
-            ->join('outbound_from','outbound_xq_from.chukuid=outbound_from.id','left')
-            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
-            ->where("outbound_xq_from.id in ($da)")
-            ->field('outbound_xq_from.*,cabinet.name as c_name,warehouse.name as w_name,outbound_from.reachout_name as out_name,outbound_from.delivery_time')
+        $data=db('outbound_from')
+            ->where("outbound_from.id in ($da)")
+            ->join('warehouse','warehouse.id=outbound_from.ck_id')
+            ->field('outbound_from.*,warehouse.name')
             ->select();
-        echo db('outbound_xq_from')->getlastSql();exit;
-
         if(!empty($data)){
             Vendor('PHPExcel.PHPExcel');
             Vendor('PHPExcel.PHPExcel.IOFactory');
             $phpExcel = new \PHPExcel();
             $phpExcel->setActiveSheetIndex(0)
                 ->setCellValue('A1', '出库仓库')
-                ->setCellValue('B1', '出库货物')
-                ->setCellValue('C1', '出库货位')
-                ->setCellValue('D1', '送达方')
-                ->setCellValue('E1', '发货日期')
-                ->setCellValue('F1', '发货数量')
-                ->setCellValue('G1', '净重')
-                ->setCellValue('H1', '数量')
-                ->setCellValue('I1', '净重');
+                ->setCellValue('B1', '装运单号')
+                ->setCellValue('C1', '送达方')
+                ->setCellValue('D1', '出库日期')
+                ->setCellValue('E1', '总数量')
+                ->setCellValue('F1', '吨位');
             $len = count($data);
             for($i = 0 ; $i < $len ; $i++){
                 $v = $data[$i];
                 $rownum = $i+2;
-                $phpExcel->getActiveSheet()->setCellValue('A' . $rownum, $v['factory']);
-                $phpExcel->getActiveSheet()->setCellValue('B' . $rownum, $v['product_name']);
-                $phpExcel->getActiveSheet()->setCellValue('C' . $rownum, $v['k_name']);
-                $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['w_name']);
-                $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['c_name']);
-                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, date('Y-m-d',$v['time']));
-
-                $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['product_time']);
-                $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['rk_nums']);
-                $phpExcel->getActiveSheet()->setCellValue('I' . $rownum, $v['netweight']);
+                $phpExcel->getActiveSheet()->setCellValue('A' . $rownum, $v['name']);
+                $phpExcel->getActiveSheet()->setCellValue('B' . $rownum, $v['transport_id']);
+                $phpExcel->getActiveSheet()->setCellValue('C' . $rownum, $v['reachout_name']);
+                $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, date('Y-m-d',$v['delivery_time']));
+                $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['total_shu']);
+                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, $v['total_zhong']);
             }
             $phpExcel->setActiveSheetIndex(0);
             $filename=date('Y-m-d',time()).'.xlsx';
             $objWriter=\PHPExcel_IOFactory::createWriter($phpExcel,'Excel2007');
             $filePath =$filename;
             $objWriter->save($filePath);
-            return 1;
             if(!file_exists($filePath)){
                 $response = array(
                     'status' => 'false',
@@ -543,6 +556,7 @@ class Outbound extends Controller {
                 $response = array(
                     'status' => true,
                     'url' => $filename,
+                    'token'=>$this->getDownLoadToken($filename)
                 );
             }
         }else{
@@ -554,6 +568,7 @@ class Outbound extends Controller {
         }
         exit(json_encode($response));
     }
+    
     public function download(){
         $fileName = date('Y-m-d',time()).'.xlsx';
         $path = ROOT_PATH."\public/".$fileName;
@@ -580,4 +595,5 @@ class Outbound extends Controller {
     }
     
 
+    
 }

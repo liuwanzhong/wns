@@ -231,6 +231,16 @@ nav dd a:hover{background:#161a1e;color:#fff;}
 /*入库单*/
 .form_box{display: flex; flex-wrap: wrap;}
 
+/*合计*/
+.total{
+	width:96%;
+	margin: 35px auto;
+	display: flex;
+}
+.total p{width: 25%;}
+.sign{display: flex;width: 96%;margin: 35px auto 20px;}
+.sign span{width: 25%;}
+
 @media only screen and (max-width: 1360px) {
     .ckgc{width: 50px;}
     .ddbh{width: 50px;}

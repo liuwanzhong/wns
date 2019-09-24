@@ -57,13 +57,14 @@ class Instor extends Controller
                                -> where('a.is_del', 0) -> where('b.is_del', 1)
                                -> where('a.id', $v['rukuid'])->find()['name'];
         }
+
         //仓库
         $ware=db('warehouse')->where('is_del',1)->select();
         return view('index2',['orders'=>$orders,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     //查看入库产品
     public function show($id){
-        $rows=db('record')->where('rukuform_id',$id)->where('is_del',1)->select();
+        $rows=db('record')->where('huowei',$id)->where('is_del',1)->select();
         return view('show',['rows'=>$rows]);
     }
 
@@ -153,5 +154,4 @@ class Instor extends Controller
             $this->error("删除失败");
         }
     }
-
 }

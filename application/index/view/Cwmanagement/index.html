@@ -284,7 +284,8 @@
             })
             //全选或全不选
             $("#all").click(function(){
-                let arr = [];
+                let session_list = JSON.parse(sessionStorage.getItem('session'));
+                let arr = session_list == null ? [] : session_list;
                 if(this.checked){
                     $("#check :checkbox,#all").prop("checked", true);
                     let checks = $('.tbd ').find('input:checkbox');
@@ -356,7 +357,7 @@
                     }
                 });
             })
-
+            //单选
             let session=[];
             $('.tbd').on('click','input[type=checkbox]',function () {
                 let ses=JSON.parse(sessionStorage.getItem('session'));
@@ -374,27 +375,40 @@
                 sessionStorage.setItem('session',JSON.stringify(session));
             })
 
+            // 页面加载时判断哪些数据被选中,并显示选中状态
             $(function () {
+                let array = [];
                 let list = JSON.parse(sessionStorage.getItem('session'));
                 if(list != null){
-                    $('.new_list input[type=checkbox]').each(function () {
+                    $('.tbd input[type=checkbox]').each(function () {
+
                         if(list.includes($(this).val()) ){
                             $(this).prop('checked',true);
                         }
+                        array.push($(this)[0].checked);
                     })
+
+                    // 当前页是否每一项都选中,是则勾选全选框
+                    let result = array.every(function (val) {
+                        return val == true;
+                    })
+                    if(result){
+                        $('.new_list #all').prop('checked', true);
+                    }
                 }
             })
 
+         //生出入库单
         $("#rukuorder").on("click",function(){
             var orders = sessionStorage.getItem('session');
             location.href = "/index/Rukuorder/index/id/"+orders;
         })
 
+         // 导出
         $('#dc').on('click', function(){
             var data = sessionStorage.session;
             var params = {id:data};
             $.post("{:url('Cwmanagement/outExcel')}",params,function(res){
-                // alert(res.status);
                 if(res.status){
                     window.location.href = ("{:Url('index/Cwmanagement/download')}?file="+res.url);
                 }else{

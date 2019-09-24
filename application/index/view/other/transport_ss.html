@@ -22,7 +22,9 @@
             overflow-x: scroll;
             overflow-y: auto;
         }
-        .layui-input{min-width: 120px;border: 0;}
+        label{box-sizing: content-box;}
+
+        .tbd .layui-input{min-width: 120px;border: 0;}
         .layui-table td{
             padding: 3px 10px;
         }
@@ -38,49 +40,82 @@
                 <a><cite>报表审核</cite></a>
             </span>
         </div>
+        <div class="seach">
+            <form action="{:url('Other/transport_ss')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">目的地</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" id="transfers_i" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">发运日期</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">车牌号码</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($s_material_name)){echo $s_material_name;}?>"/>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">装运单号</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" id="" name="zydh"  value="<?php if(!empty($zydh)){echo $zydh;}?>"/>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-inline">
+                        <button class="layui-btn save" lay-submit>查询</button>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="bd_content1">
             <table class="layui-table layui-form" style="width: 100%;">
                 <thead>
                 <tr>
-                    <th rowspan="2">发运日期</th>
-                    <th rowspan="2">始发地</th>
-                    <th rowspan="2">目的地</th>
-                    <th rowspan="2">车牌号码</th>
-                    <th rowspan="2">司机姓名</th>
-                    <th rowspan="2">司机电话</th>
-                    <th rowspan="2">蒙牛订单日期</th>
-                    <th rowspan="2">蒙牛装运单号</th>
-                    <th rowspan="2">蒙牛订单吨位</th>
-                    <th rowspan="2">蒙牛订单数量</th>
-                    <th rowspan="2">实发吨位(毛重)</th>
-                    <th rowspan="2">实装数量</th>
-                    <th rowspan="2">合同结算吨位(净重)</th>
-                    <th rowspan="2">毛净重节约吨位</th>
-                    <th rowspan="2">毛净重节约费用</th>
-                    <th rowspan="2">公司标准运价</th>
-                    <th rowspan="2">合同单吨运价</th>
-                    <th rowspan="2">单吨运价节约金额</th>
-                    <th rowspan="2">单吨运价差额节约金额</th>
-                    <th colspan="5" style="text-align: center">支出运费</th>
-                    <th rowspan="2">承运人</th>
-                    <th rowspan="2">运输发票</th>
-                    <th rowspan="2">备注</th>
-                    <th rowspan="2">状态</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">发运日期</th>
+                    <th lay-data="{field:'origin', edit:true}" rowspan="2">始发地</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">目的地</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">车牌号码</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">司机姓名</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">司机电话</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">蒙牛订单日期</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">蒙牛装运单号</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">蒙牛订单吨位</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">蒙牛订单数量</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">实发吨位(毛重)</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">实装数量</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">合同结算吨位(净重)</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">毛净重节约吨位</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">毛净重节约费用</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">公司标准运价</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">合同单吨运价</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">单吨运价节约金额</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">单吨运价差额节约金额</th>
+                    <th lay-data="{}" colspan="5" style="text-align: center">支出运费</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">承运人</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">运输发票</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">备注</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">状态</th>
                     <th rowspan="2">操作</th>
                 </tr>
                 <tr>
-                    <th>总运费</th>
-                    <th>油卡</th>
-                    <th>满运宝支付</th>
-                    <th>银行支付</th>
-                    <th>余额</th>
+                    <th lay-data="{field:'delivery_time'}">总运费</th>
+                    <th lay-data="{field:'delivery_time'}">油卡</th>
+                    <th lay-data="{field:'delivery_time'}">满运宝支付</th>
+                    <th lay-data="{field:'delivery_time'}">银行支付</th>
+                    <th lay-data="{field:'delivery_time'}">余额</th>
                 </tr>
                 </thead>
                 <tbody class="tbd">
                 {volist name='rows' id='r'}
                     <tr>
                         <input type="hidden" name="id" value="{$r['id']}">
-                        <td><input type="date" value="{$r['delivery_time']}" class="layui-input" name="delivery_time"></td><!--发运日期-->
+                        <td><input type="date" value="<?php if(!empty($r['delivery_time'])){echo date('Y-m-d',$r['delivery_time']);} ?>" class="layui-input" name="delivery_time"></td><!--发运日期-->
                         <td><input type="text" value="{$r['origin']}" class="layui-input" name="origin"></td><!--始发地-->
                         <td><input type="text" value="{$r['destination']}" class="layui-input" name="destination"></td><!--目的地-->
                         <td><input type="text" value="{$r['license_plate']}" class="layui-input" name="license_plate"></td><!--车牌号码-->
@@ -116,9 +151,11 @@
                 {/volist}
                 </tbody>
             </table>
+
             <div style="text-align:center;">
                 {$rows->render()}
             </div>
+
         </div>
     </div>
 
@@ -126,9 +163,19 @@
     <script src="/layui/layui.js"></script>
 
     <script>
-        layui.use(['element', 'layer'], function () {
-            var layer = layui.layer;
+        layui.use(['element', 'laydate','layer','table'],function () {
+            let element = layui.element,
+                laydate = layui.laydate;
+            var table = layui.table;
+            laydate.render({
+                elem: '#s_delivery_time'
+                ,range: '~'
+                ,done: function(value){
+                    $('#s_delivery_time').val(value)
+                }
+            })
         })
+
         $('.tbd').on('click', '.submit', function () {
             let list = $(this).parents('tr').find('input');
             let obj = {}

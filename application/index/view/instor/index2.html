@@ -82,7 +82,7 @@
                 <td>{$v.rk_nums}</td>
                 <td>{$v.content}</td>
                 <td style="width:300px">
-                    <a href="{:url('instor/show','id='.$v['id'])}" class="layui-btn layui-btn-sm shows">查看</a>
+                    <a href="{:url('instor/show','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">查看</a>
                     <a href="#" class="layui-btn layui-btn-sm frozens">解冻<input type="hidden" name="myids" value="{$v.id}"></a>
                     <a href="#" class="layui-btn layui-btn-sm layui-btn-normal edit">分配</a>
                     <a href="{:url('instor/delete','id='.$v['id'])}" class="layui-btn layui-btn-sm layui-btn-danger">删除</a>
