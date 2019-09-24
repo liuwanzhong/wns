@@ -77,38 +77,38 @@
             <table class="layui-table layui-form" style="width: 100%;">
                 <thead>
                 <tr>
-                    <th rowspan="2">发运日期</th>
-                    <th rowspan="2">始发地</th>
-                    <th rowspan="2">目的地</th>
-                    <th rowspan="2">车牌号码</th>
-                    <th rowspan="2">司机姓名</th>
-                    <th rowspan="2">司机电话</th>
-                    <th rowspan="2">蒙牛订单日期</th>
-                    <th rowspan="2">蒙牛装运单号</th>
-                    <th rowspan="2">蒙牛订单吨位</th>
-                    <th rowspan="2">蒙牛订单数量</th>
-                    <th rowspan="2">实发吨位(毛重)</th>
-                    <th rowspan="2">实装数量</th>
-                    <th rowspan="2">合同结算吨位(净重)</th>
-                    <th rowspan="2">毛净重节约吨位</th>
-                    <th rowspan="2">毛净重节约费用</th>
-                    <th rowspan="2">公司标准运价</th>
-                    <th rowspan="2">合同单吨运价</th>
-                    <th rowspan="2">单吨运价节约金额</th>
-                    <th rowspan="2">单吨运价差额节约金额</th>
-                    <th colspan="5" style="text-align: center">支出运费</th>
-                    <th rowspan="2">承运人</th>
-                    <th rowspan="2">运输发票</th>
-                    <th rowspan="2">备注</th>
-                    <th rowspan="2">状态</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">发运日期</th>
+                    <th lay-data="{field:'origin', edit:true}" rowspan="2">始发地</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">目的地</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">车牌号码</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">司机姓名</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">司机电话</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">蒙牛订单日期</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">蒙牛装运单号</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">蒙牛订单吨位</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">蒙牛订单数量</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">实发吨位(毛重)</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">实装数量</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">合同结算吨位(净重)</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">毛净重节约吨位</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">毛净重节约费用</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">公司标准运价</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">合同单吨运价</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">单吨运价节约金额</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">单吨运价差额节约金额</th>
+                    <th lay-data="{}" colspan="5" style="text-align: center">支出运费</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">承运人</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">运输发票</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">备注</th>
+                    <th lay-data="{field:'delivery_time'}" rowspan="2">状态</th>
                     <th rowspan="2">操作</th>
                 </tr>
                 <tr>
-                    <th>总运费</th>
-                    <th>油卡</th>
-                    <th>满运宝支付</th>
-                    <th>银行支付</th>
-                    <th>余额</th>
+                    <th lay-data="{field:'delivery_time'}">总运费</th>
+                    <th lay-data="{field:'delivery_time'}">油卡</th>
+                    <th lay-data="{field:'delivery_time'}">满运宝支付</th>
+                    <th lay-data="{field:'delivery_time'}">银行支付</th>
+                    <th lay-data="{field:'delivery_time'}">余额</th>
                 </tr>
                 </thead>
                 <tbody class="tbd">
@@ -151,9 +151,11 @@
                 {/volist}
                 </tbody>
             </table>
+
             <div style="text-align:center;">
                 {$rows->render()}
             </div>
+
         </div>
     </div>
 
@@ -161,9 +163,10 @@
     <script src="/layui/layui.js"></script>
 
     <script>
-        layui.use(['element', 'laydate'],function () {
+        layui.use(['element', 'laydate','layer','table'],function () {
             let element = layui.element,
                 laydate = layui.laydate;
+            var table = layui.table;
             laydate.render({
                 elem: '#s_delivery_time'
                 ,range: '~'
@@ -172,6 +175,7 @@
                 }
             })
         })
+
         $('.tbd').on('click', '.submit', function () {
             let list = $(this).parents('tr').find('input');
             let obj = {}

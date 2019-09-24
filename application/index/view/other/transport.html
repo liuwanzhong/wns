@@ -17,7 +17,7 @@
             min-height:90px;
             height: auto !important;
             height: 90px;
-            max-height: 700px;
+            max-height: 570px;
             margin: 12px auto;
             overflow-x: scroll;
             overflow-y: auto;
@@ -77,7 +77,7 @@
             <button class="layui-btn" id="dc">导出</button>
         </div>
         <div class="bd_content1">
-            <table class="layui-table ">
+            <table class="layui-table new_list">
                 <thead>
                 <tr>
                     <th rowspan="2"><input type="checkbox" id="all"></th>
@@ -152,11 +152,12 @@
                 {/volist}
                 </tbody>
             </table>
-            <div style="text-align:center">
-                {$rows->render()}
-            </div>
+
+        </div>
+        <div style="text-align:center">
+            {$rows->render()}
+        </div>
     </div>
-</div>
 
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
@@ -235,7 +236,8 @@
         })
         //全选
         $("#all").click(function(){
-            let arr = [];
+            let session_list = JSON.parse(sessionStorage.getItem('session_cc'));
+            let arr = session_list == null ? [] : session_list;
             if(this.checked){
                 $("#check :checkbox,#all").prop("checked", true);
                 let checks = $('.tbd ').find('input:checkbox');
@@ -266,6 +268,30 @@
             }
             sessionStorage.setItem('session_cc',JSON.stringify(session));
         })
+
+        // 页面加载时判断哪些数据被选中,并显示选中状态
+        $(function () {
+            let array = [];
+            let list = JSON.parse(sessionStorage.getItem('session_cc'));
+            if(list != null){
+                $('.tbd input[type=checkbox]').each(function () {
+
+                    if(list.includes($(this).val()) ){
+                        $(this).prop('checked',true);
+                    }
+                    array.push($(this)[0].checked);
+                })
+
+                // 当前页是否每一项都选中,是则勾选全选框
+                let result = array.every(function (val) {
+                    return val == true;
+                })
+                if(result){
+                    $('.new_list #all').prop('checked', true);
+                }
+            }
+        })
+
         // 导出
         $('#dc').on('click', function() {
             var data = sessionStorage.session_cc;
