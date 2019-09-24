@@ -125,7 +125,6 @@
                     <td><?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);}?></td>
                     <td>{$v.product_batch}</td>
                     <td>{$v.content}</td>
-
                     <td>
                             {$v.netweight}
                     </td>
@@ -137,7 +136,7 @@
             </tbody>
         </table>
         <div class="btn">
-            <a class="layui-btn" href="{:url('Outbound/to_examine')}">返回</a>
+            <a class="layui-btn" href="{:url('Outbound/warehousing')}">返回</a>
         </div>
     </div>
 </div>

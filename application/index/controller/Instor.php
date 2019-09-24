@@ -57,11 +57,7 @@ class Instor extends Controller
                                -> where('a.is_del', 0) -> where('b.is_del', 1)
                                -> where('a.id', $v['rukuid'])->find()['name'];
         }
-        db('rukuform_xq')
-            ->join('rukuform','rukuform.id=rukuform_xq.rukuid',"left")
-            ->where('rukuform_xq.is_del',0)
-            ->field('rukuform_xq.*,rukuform.userintime as r_time')
-            ->select();
+
         //仓库
         $ware=db('warehouse')->where('is_del',1)->select();
         return view('index2',['orders'=>$orders,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);

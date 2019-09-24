@@ -119,48 +119,54 @@ class Outbound extends Controller {
         $cd=str_replace(array("[\""),"",$cd);
         $cd=str_replace(array("\"]"),"",$cd);
         $id=str_replace(array("[","]","\""),"",$cd);
-        $id=explode(',',$id);
-        // 发货日期
-        $fh=$rows = db('system_order')
-        ->field('delivery_time')
-        ->where('is_del',0)
-        ->where('id','in',$id)
-        ->group('delivery_time')
-        ->select();
-        $cfh=count($fh);
-        if($cfh!=1){
-            $this -> error('发货日期不一致');
-        }
-        // 装运单号
-        $zy=$rows = db('system_order')
-        ->field('transport_id')
-        ->where('is_del',0)
-        ->where('id','in',$id)
-        ->group('transport_id')
-        ->select();
-        $czy=count($zy);
-        if($czy!=1){
-            $this -> error('装运单号不一致');
-        }
-        // 售达方
-        $sd=$rows = db('system_order')
-        ->field('reachby_name')
-        ->where('is_del',0)
-        ->where('id','in',$id)
-        ->group('reachby_name')
-        ->select();
-        $rows = db('system_order')
-            ->field('sum(Delivery_num) as num,id,delivery_time,factory_id,factory_name,transport_id,Delivery_id,reachout_id,reachout_name,reachby_id,reachby_name,material_id,material_name,detailed')
+        if(!empty($id)){
+            $id=explode(',',$id);
+            // 发货日期
+            $fh=$rows = db('system_order')
+            ->field('delivery_time')
             ->where('is_del',0)
             ->where('id','in',$id)
-            ->group('material_name')
+            ->group('delivery_time')
             ->select();
-        $cks = db('warehouse')->where('is_del',1)->select();
-        return view('make_outbound_order',['rows'=>$rows,'fh'=>$fh,'zy'=>$zy,'sd'=>$sd,'cks'=>$cks,'id'=>$cd]);
+            $cfh=count($fh);
+            if($cfh!=1){
+                $this -> error('发货日期不一致');
+            }
+            // 装运单号
+            $zy=$rows = db('system_order')
+            ->field('transport_id')
+            ->where('is_del',0)
+            ->where('id','in',$id)
+            ->group('transport_id')
+            ->select();
+            $czy=count($zy);
+            if($czy!=1){
+                $this -> error('装运单号不一致');
+            }
+            // 售达方
+            $sd=$rows = db('system_order')
+            ->field('reachby_name')
+            ->where('is_del',0)
+            ->where('id','in',$id)
+            ->group('reachby_name')
+            ->select();
+            $rows = db('system_order')
+                ->field('sum(Delivery_num) as num,id,delivery_time,factory_id,factory_name,transport_id,Delivery_id,reachout_id,reachout_name,reachby_id,reachby_name,material_id,material_name,detailed')
+                ->where('is_del',0)
+                ->where('id','in',$id)
+                ->group('material_name')
+                ->select();
+            $cks = db('warehouse')->where('is_del',1)->select();
+            return view('make_outbound_order',['rows'=>$rows,'fh'=>$fh,'zy'=>$zy,'sd'=>$sd,'cks'=>$cks,'id'=>$cd]);
+        }else{
+            $this -> error('请选择至少一条数据');
+        }
     }
     // 出库订单
     public function insert(){
         $data=input();
+        $time=time();
+        // dump($data);exit;
         if(!empty($data['huowei_name'])){
             for ($i=0;$i<count($data['huowei_name']);$i++){
                 if(!empty($data['huowei_name']['i'])){
@@ -168,6 +174,7 @@ class Outbound extends Controller {
                 }
             }
         }
+
             try{
                 $id = db('outbound_from')
                 ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id'],'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight']]);
@@ -179,8 +186,11 @@ class Outbound extends Controller {
                             'ck_huowei_id'=>$data['huowei_name'][$i],
                             'ck_nums'=>$data['huowei_out'][$i],
                             'netweight'=>$data['jin'][$i],
+                            'product_time'=>strtotime($data['product_time'][$i]),
                             'content'=>$data['detailed'][$i],
-                            'state'=>0
+                            'create_time'=>$time,
+                            'state'=>0,
+                            'chukuid'=>$id
                         ]);
                 }
                 $del=db('system_order')->where('id','in',$data['cd'])->update(['is_del'=>1]);
@@ -337,6 +347,15 @@ class Outbound extends Controller {
         }
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
+        }
+        $data=input();
+        $row=db('outbound_xq_from')->where('chukuid',$data['id'])->select();
+        $time=time();
+        foreach ($row as $r) {
+            $d=db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->order('id desc')->limit(1)->select();
+            $rk_nums=$d['0']['rk_nums']-$r['ck_nums'];
+            db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->where('is_del',0)->update(['update_time'=>$time,'rk_nums'=>$rk_nums]);
+            db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->where('rk_nums <= 0')->update(['is_del'=>1]);
         }
         try{
             $r=db('outbound_from')->where('id',$id)->update(['state'=>1]);
@@ -581,8 +600,9 @@ class Outbound extends Controller {
                 echo fread($file,2048);
             }
             fclose($file);
-//            unlink($path);
+           unlink($path);
             exit();
         }
     }
+
 }

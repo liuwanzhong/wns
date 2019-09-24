@@ -36,12 +36,7 @@
 							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
 						</div>
 					</div>
-					<div class="layui-form-item">
-						<label class="layui-form-label">交货单号</label>
-						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($s_material_name)){echo $s_material_name;}?>"/>
-						</div>
-					</div>
+						<input type="hidden" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
 					<div class="layui-form-item">
 						<div class="layui-input-inline">
 							<button class="layui-btn save" lay-submit>查询</button>
@@ -50,7 +45,7 @@
 					</div>
 				</form>
 			</div>
-			<table class="layui-table" style="width: 96%; margin: 12px auto;">
+			<table class="layui-table new_list" style="width: 96%; margin: 12px auto;">
 				<thead>
 				<tr>
 					<th><input type="checkbox" id="all"></th>
@@ -121,13 +116,14 @@
 					}
 				});
 			})
-			//全选
+
+			//全选或全不选
 			$("#all").click(function(){
-				let arr = [];
+				let session_list = JSON.parse(sessionStorage.getItem('session_ck'));
+				let arr = session_list == null ? [] : session_list;
 				if(this.checked){
 					$("#check :checkbox,#all").prop("checked", true);
 					let checks = $('.tbd ').find('input:checkbox');
-					console.log(checks)
 					checks.each(function () {
 						arr.push($(this)[0].value);
 					})
@@ -137,6 +133,7 @@
 					sessionStorage.removeItem('session_ck');
 				}
 			});
+
 			//单选
 			let session=[];
 			$('.tbd').on('click','input[type=checkbox]',function () {
@@ -154,6 +151,32 @@
 				}
 				sessionStorage.setItem('session_ck',JSON.stringify(session));
 			})
+
+
+			// 页面加载时判断哪些数据被选中,并显示选中状态
+			$(function () {
+				let array = [];
+				let list = JSON.parse(sessionStorage.getItem('session_ck'));
+				if(list != null){
+					$('.tbd input[type=checkbox]').each(function () {
+
+						if(list.includes($(this).val()) ){
+							$(this).prop('checked',true);
+						}
+						array.push($(this)[0].checked);
+					})
+
+					// 当前页是否每一项都选中,是则勾选全选框
+					let result = array.every(function (val) {
+						return val == true;
+					})
+					if(result){
+						$('.new_list #all').prop('checked', true);
+					}
+				}
+			})
+
+
 			// 导出
 			$('#dc').on('click', function() {
 				var data = sessionStorage.session_ck;

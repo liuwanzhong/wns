@@ -101,57 +101,60 @@
         <div class="container">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
-                <tr>
-                    <th>交货单号</th>
-                    <th>产品名称</th>
-                    <th>总数量</th>
-                    <th>货位</th>
-                    <th>货位分配数</th>
-                    <th>实际重量</th>
-                    <th>货位剩余数</th>
-                    <th>备注</th>
-                    <th>操作</th>
+                    <tr>
+                        <th>产品名称</th>
+                        <th>总数量</th>
+                        <th>货位</th>
+                        <th>货位分配数</th>
+                        <th>实际重量</th>
+                        <th>货位剩余数</th>
+                        <th>产品日期</th>
+                        <th>批次</th>
+                        <th>备注</th>
+                        <th>操作</th>
                 </thead>
                 <tbody class="tbd">
-                {volist name='rows' id='v'}
-                <tr>
-                    <input type="hidden" name="cd[]" value="{$v.id}">
-                    <td>
+                    {volist name='rows' id='v'}
+                    <tr>
+                        <input type="hidden" name="cd[]" value="{$v.id}">
                         <input type="hidden" value="{$v.Delivery_id}" name="Delivery_id[]" readonly>
-                        {$v.Delivery_id}
-                    </td>
-                    <td class="status">
-                        <input type="hidden" value="{$v.material_name}" name="material_name[]" readonly>
-                        {$v.material_name}
-                    </td>
-                    <td>
-                        <input type="hidden" value="{$v.num}" name="delivery_num[]" readonly>
-                        {$v.num}
-                    </td>
-                    <td class="huowei">
-                        <botton class="layui-btn layui-btn-sm dia">点击</botton>
-                    </td>
-                    <td class="count">
-                        <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
-                        <span>0</span>
-                    </td>
-                    <td class="jin">
-                        <input type="hidden" value="jin" name="jin[]" readonly>
-                        <span>0</span>
-                    </td>
-                    <td class="sy_count">
-                        <input type="hidden" value="sy_count" name="sy_count[]" readonly>
-                        <span>0</span>
-                    </td>
-                    <td>
-                        <input type="hidden" value="{$v.detailed}" name="detailed[]" readonly>
-                        {$v.detailed}
-                    </td>
-                    <td>
-                        <button type="button" class="layui-btn layui-btn-sm add">
-                            <i class="layui-icon">&#xe654;</i>
-                        </button>
-                    </td>
+                        <td class="status">
+                            <input type="hidden" value="{$v.material_name}" name="material_name[]" readonly>
+                            {$v.material_name}
+                        </td>
+                        <td>
+                            <input type="hidden" value="{$v.num}" name="delivery_num[]" readonly>
+                            {$v.num}
+                        </td>
+                        <td class="huowei">
+                            <botton class="layui-btn layui-btn-sm dia">点击</botton>
+                        </td>
+                        <td class="count">
+                            <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
+                            <span>0</span>
+                        </td>
+                        <td class="jin">
+                            <input type="hidden" value="jin" name="jin[]" readonly>
+                            <span>0</span>
+                        </td>
+                        <td class="sy_count">
+                            <input type="hidden" value="sy_count" name="sy_count[]" readonly>
+                            <span>0</span>
+                        </td>
+                        <td>
+                            <input type="date" name="product_time[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd">
+                        </td>
+                        <td>
+                            <input type="text" value="" name="product_batch[]" class="layui-input" >
+                        </td>
+                        <td>
+                            <input type="text" value="{$v.detailed}" name="detailed[]" class="layui-input" >
+                        </td>
+                        <td>
+                            <button type="button" class="layui-btn layui-btn-sm add">
+                                <i class="layui-icon">&#xe654;</i>
+                            </button>
+                        </td>
 
                 </tr>
                 {/volist}
@@ -187,7 +190,6 @@
                 <th>货位名称</th>
                 <th>库存数量</th>
                 <th>出库数量</th>
-                <th>备注</th>
             </tr>
             </thead>
             <tbody class="kc_list"></tbody>
@@ -215,10 +217,7 @@
 
             let html = `<tr>
             <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
-            <td>
-                <input type="hidden" value="${child[1].innerText}" name="Delivery_id[]" readonly>
-                ${child[1].innerText}
-            </td>
+            <input type="hidden" value="${child[1].value}" name="Delivery_id[]" readonly>
             <td class="status">
                 <input type="hidden" value="${child[2].innerText}" name="material_name[]" readonly>
                 ${child[2].innerText}
@@ -231,7 +230,6 @@
                 <botton class="layui-btn layui-btn-sm dia">点击</botton>
             </td>
             <td class="count">
-<!--<<<<<<< HEAD-->
                 <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
                 <span>0</span>
             </td>
@@ -240,22 +238,17 @@
                 <span>0</span>
             </td>
             <td class="sy_count">
-                <input type="hidden" value="sy_count" name="sy_count[]" readonly>
-<!--=======-->
-<!--                <input type="hidden" value="0" name="huowei_out[]" readonly>-->
-<!--                <span>0</span>-->
-<!--            </td>-->
-<!--            <td class="jin">-->
-<!--                <input type="hidden" value="0" name="jin[]" readonly>-->
-<!--                <span>0</span>-->
-<!--            </td>-->
-<!--            <td class="sy_count">-->
-<!--                <input type="hidden" value="0" name="sy_count[]" readonly>-->
-<!--&gt;>>>>>> 82f974f62b2b5c4d3830be4700efe34173beb53f-->
+                <input type="hidden" value="" name="sy_count[]" readonly>
                 <span>0</span>
             </td>
             <td>
-                <input type="hidden" value="${child[8].innerText}" name="detailed[]" readonly>
+                <input type="date" name="product_time[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd">
+            </td>
+            <td class="product_batch">
+                <input type="text" value="" name="product_batch[]" >
+            </td>
+            <td>
+                <input type="text" value="${child[8].innerText}" name="detailed[]" >
                 ${child[8].innerText}
             </td>
             <td>
@@ -325,7 +318,6 @@
                             <td class="hw">${data[i].name}</td>
                             <td>${data[i].sy_count}</td>
                             <td><input type="text" class="layui-input" style="width: 80px;"></td>
-                            <td>${data[i].content}</td>
                         </tr>`;
                         }
                         $('.kc_list').append(html)
