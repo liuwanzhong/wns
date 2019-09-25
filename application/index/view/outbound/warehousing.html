@@ -11,6 +11,7 @@
 		.layui-table th{text-align: center;font-weight: bold;}
 		.layui-table td{text-align: center;}
 		label{box-sizing: content-box;}
+		.search{display: flex;}
 	</style>
 	</head>
 	<body>
@@ -22,7 +23,7 @@
 					<a><cite>出库台账</cite></a>
 				</span>
 			</div>
-			<div class="seach">
+			<div class="search">
 				<form action="{:url('Outbound/warehousing')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
 					<div class="layui-form-item">
 						<label class="layui-form-label">出库仓库</label>
@@ -36,7 +37,6 @@
 							<input type="text" class="layui-input" id="delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
 						</div>
 					</div>
-						<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
 					<div class="layui-form-item">
 						<div class="layui-input-inline">
 							<button class="layui-btn save" lay-submit>查询</button>
@@ -44,38 +44,40 @@
 					</div>
 				</form>
 			</div>
-			<table class="layui-table" style="width: 96%; margin: 12px auto;">
-				<thead>
-				<tr>
-					<th>ID</th>
-					<th>审核</th>
-					<th>出库仓库</th>
-					<th>装运单号</th>
-					<th>出库日期</th>
-					<th>总数量</th>
-					<th>操作</th>
-				</tr>
-				</thead>
-				<tbody>
-				{volist name='rows' id='row'}
-				<tr>
-					<td>{$row.id}</td>
-					<td>已审核</td>
-					<td>{$row.w_name}</td>
-					<td>{$row.transport_id}</td>
-					<td>{$row.delivery_time|date="Y-m-d",###}</td>
-					<td>{$row.count}</td>
-					<td>
-						<a href="#" class="edit xq" title="详情" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
-						<a href="{:url('Outbound/warehousing_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
-					</td>
-				</tr>
-				{/volist}
-				</tbody>
-			</table>
-			<div style="text-align:center; margin-bottom: 200px;">
-				{$rows->render()}
-			</div>
+			<main class="bd_content" style="margin-top: 12px;">
+				<table class="layui-table" style="width: 96%; margin: 12px auto;">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>审核</th>
+						<th>出库仓库</th>
+						<th>装运单号</th>
+						<th>出库日期</th>
+						<th>总数量</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+					<tbody>
+					{volist name='rows' id='row'}
+					<tr>
+						<td>{$row.id}</td>
+						<td>已审核</td>
+						<td>{$row.w_name}</td>
+						<td>{$row.transport_id}</td>
+						<td>{$row.delivery_time|date="Y-m-d",###}</td>
+						<td>{$row.count}</td>
+						<td>
+							<a href="#" class="edit xq" title="详情" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
+							<a href="{:url('Outbound/warehousing_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
+						</td>
+					</tr>
+					{/volist}
+					</tbody>
+				</table>
+				<div style="text-align:center; margin-bottom: 200px;">
+					{$rows->render()}
+				</div>
+			</main>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>

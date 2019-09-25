@@ -182,8 +182,18 @@ class Instor extends Controller
     //绑定产品名称
     public function bang($id)
     {
-        $row=db('goods_name')->where('id',$id)->find();
-        return $row;
+        $num=input('num');
+        $row=db('goods_name')->where('name',$id)->find();
+        $m = $row['mao'];
+        $j = $row['jing'];
+        if($num != ''){
+            $mao=sprintf("%.3f",$m*$num/1000);
+            $jing=sprintf("%.3f",$j*$num/1000);
+            return ['mao'=>$mao,'jing'=>$jing];
+        }
+        else{
+            return $row;
+        }
     }
     //毛净重计算
     public function mj()

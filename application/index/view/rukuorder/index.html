@@ -141,7 +141,7 @@
                     {/volist}
                 </tbody>
             </table>
-            <button class="layui-btn submit" lay-submit lay-filter="formDemo" id="del">立即提交</button>
+            <input type="button" class="layui-btn submit" value="立即提交" id="del" />
         </div>
 
     </form>
@@ -149,10 +149,11 @@
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
-    layui.use(['element', 'form','laydate'], function () {
+    layui.use(['element', 'form','laydate', 'layer'], function () {
         let element = layui.element;
         let form = layui.form;
         let laydate = layui.laydate;
+        var layer = layui.layer;
         laydate.render({
             elem: '#time',
             type: 'date'
@@ -260,10 +261,28 @@
             }
         })
     })
+
     //生成时删除sessionstorage
-    $('#del').click(function () {
-        sessionStorage.removeItem('session')
+    $('#del').on('click', function () {
+        let that = $(this);
+        let status = [];
+        $('.tbd ').find('.status select').each(function () {
+            status.push($(this).val());
         })
+        console.log(status)
+        let result = status.every(function (val) {
+            return val != '0';
+        })
+        if (!result){
+            layer.alert('请确定产品属性是否选择完毕',{icon:5});
+            return false;
+        }
+        else {
+            that.prop('type','submit');
+            sessionStorage.removeItem('session');
+        }
+
+    })
 
     $('.tbd').on('click','.remove', function(){
         let p = $(this).parents('tr');

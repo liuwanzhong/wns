@@ -39,7 +39,7 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">产品属性</label>
 						<div class="layui-input-inline">
-							<select name="s_material_name" id="">
+							<select name="s_material_name">
 								<option value="0">---请选择产品属性---</option>
 								{volist name='status' id='st'}
 								<option value="{$st.id}" <?php if($s_material_name==$st['id']){echo 'selected';} ?>>{$st.title}</option>
