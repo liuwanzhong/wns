@@ -36,7 +36,12 @@
 							<input type="text" class="layui-input" id="delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
 						</div>
 					</div>
-						<input type="text" class="layui-input" id="s_material_name" name="s_material_name"  value="<?php if(!empty($data['material_name'])){echo $data['material_name'];}?>"/>
+					<div class="layui-form-item">
+						<label class="layui-form-label">装运单号</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="s_material_name" name="s_material_name" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+						</div>
+					</div>
 					<div class="layui-form-item">
 						<div class="layui-input-inline">
 							<button class="layui-btn save" lay-submit>查询</button>

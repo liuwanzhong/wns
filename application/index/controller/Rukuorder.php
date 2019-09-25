@@ -238,8 +238,8 @@ class Rukuorder extends Controller {
             $r=db('rukuform')->where('id',$id)->update(['state'=>1]);
             $s=db('rukuform_xq')->where('rukuid',$id)->update(['state'=>1]);
             if($r && $s) {
-                
-                
+
+
                 return redirect('to_examine');
                 Db::commit();
             }
@@ -509,7 +509,4 @@ class Rukuorder extends Controller {
             exit();
         }
     }
-
-
-
 }

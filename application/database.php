@@ -13,15 +13,15 @@ return [
     // 数据库类型
     'type'            => 'mysql',
     // 服务器地址
-//    'hostname'        => '192.168.3.82',
-    'hostname'        => '127.0.0.1',
+    'hostname'        => '192.168.3.82',
+//    'hostname'        => '127.0.0.1',
     // 数据库名
     'database'        => 'wns',
     // 用户名
     'username'        => 'root',
     // 密码
-//    'password'        => 'qi_95624852_fa_phptxdy',
-    'password'        => 'root',
+    'password'        => 'qi_95624852_fa_phptxdy',
+//    'password'        => 'root',
     // 端口
     'hostport'        => '',
     // 连接dsn

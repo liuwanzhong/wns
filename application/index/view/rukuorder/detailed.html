@@ -66,7 +66,7 @@
 					<th>入库仓库</th>
 					<th>入库货位</th>
 					<th>入库时间</th>
-					<th>产品时间</th>
+					<th>产品日期</th>
 					<th>数量</th>
 					<th>净重</th>
 					<th>毛重</th>
@@ -83,7 +83,7 @@
 					<td>{$row.w_name}</td>
 					<td>{$row.c_name}</td>
 					<td><?php if(!empty($row['time'])){echo date('Y-m-d',$row['time']);} ?></td>
-					<td>{$row.product_time}</td>
+					<td><?php if(!empty($row['product_time'])){echo date('Y-m-d',$row['product_time']);}?></td>
 					<td>{$row.rk_nums}</td>
 					<td>{$row.netweight}</td>
 					<td>{$row.Grossweight}</td>
