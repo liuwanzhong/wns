@@ -55,45 +55,47 @@
 					</div>
 				</form>
 			</div>
-			<table class="layui-table new_list" style="width: 96%; margin: 12px auto;">
-				<thead>
-				<tr>
-					<th><input type="checkbox" id="all"></th>
-					<th>ID</th>
-					<th>工厂</th>
-					<th>产品名称</th>
-					<th>产品属性</th>
-					<th>入库仓库</th>
-					<th>入库货位</th>
-					<th>入库时间</th>
-					<th>产品时间</th>
-					<th>数量</th>
-					<th>净重</th>
-					<th>毛重</th>
-				</tr>
-				</thead>
-				<tbody class="tbd">
-				{volist name='rows' id='row'}
-				<tr id="check" class="news_list">
-					<td><input type="checkbox" value="{$row.id}"></td>
-					<td>{$row.id}</td>
-					<td>{$row.factory}</td>
-					<td>{$row.product_name}</td>
-					<td>{$row.k_name}</td>
-					<td>{$row.w_name}</td>
-					<td>{$row.c_name}</td>
-					<td><?php if(!empty($row['time'])){echo date('Y-m-d',$row['time']);} ?></td>
-					<td>{$row.product_time}</td>
-					<td>{$row.rk_nums}</td>
-					<td>{$row.netweight}</td>
-					<td>{$row.Grossweight}</td>
-				</tr>
-				{/volist}
-				</tbody>
-			</table>
-			<div style="text-align:center; margin-bottom: 200px;">
-				{$rows->render()}
-			</div>
+			<main class="bd_content">
+				<table class="layui-table new_list" style="width: 96%; margin: 12px auto;">
+					<thead>
+					<tr>
+						<th><input type="checkbox" id="all"></th>
+						<th>ID</th>
+						<th>工厂</th>
+						<th>产品名称</th>
+						<th>产品属性</th>
+						<th>入库仓库</th>
+						<th>入库货位</th>
+						<th>入库时间</th>
+						<th>产品时间</th>
+						<th>数量</th>
+						<th>净重</th>
+						<th>毛重</th>
+					</tr>
+					</thead>
+					<tbody class="tbd">
+					{volist name='rows' id='row'}
+					<tr id="check" class="news_list">
+						<td><input type="checkbox" value="{$row.id}"></td>
+						<td>{$row.id}</td>
+						<td>{$row.factory}</td>
+						<td>{$row.product_name}</td>
+						<td>{$row.k_name}</td>
+						<td>{$row.w_name}</td>
+						<td>{$row.c_name}</td>
+						<td><?php if(!empty($row['time'])){echo date('Y-m-d',$row['time']);} ?></td>
+						<td>{$row.product_time}</td>
+						<td>{$row.rk_nums}</td>
+						<td>{$row.netweight}</td>
+						<td>{$row.Grossweight}</td>
+					</tr>
+					{/volist}
+					</tbody>
+				</table>
+				<div style="text-align:center; margin-bottom: 200px;">
+					{$rows->render()}
+				</div>
+			</main>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
