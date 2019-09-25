@@ -3,6 +3,8 @@ namespace app\index\controller;
 use think\Controller;
 use think\Db;
 use think\Request;
+use think\response\Redirect;
+
 class Instor extends Controller
 {
     //货物列表
@@ -306,27 +308,47 @@ class Instor extends Controller
         return view('xiangxi', ['list' => $list]);
     }
     //添加其他入库
-    public function tj_rk() {
-        $data=input();
-        $time=time();
+    public function tj_rk()
+    {
+        $data = input();
+        $product_time = strtotime($data['product_time']);//产品日期
+        $userintime = strtotime($data['userintime']);//入库日期
         array_shift($data);
-        $r=db('record')->where('is_del',1)->where('huowei',$data['rk_huowei_id'])->count();
-        if($r){
-            $c=db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$data['rk_huowei_id'])->find();
-            $num=$c['rk_nums']+$data['rk_nums'];
-            //存在则添加记录
-            $s=db('record')->insert(['time'=>$time,'odd_number'=>$data['odd_number'],'task'=>'其他入库','customer'=>$data['customer'],'early_stage'=>$c['rk_nums'],'qt_ruku'=>$data['rk_nums'],'balance'=>$num,'huowei'=>$data['rk_huowei_id']]);
-            if(!$s){
-                $this->error('其他入库失败');
-            }else{
-                db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$data['rk_huowei_id'])->update(['rk_nums'=>$num]);
+        $r = db('record')->where('is_del', 1)->where('huowei', $data['rk_huowei_id'])->count();
+        if ($r) {
+            try {
+                $c = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $data['rk_huowei_id'])->find();
+                $num = $c['rk_nums'] + $data['rk_nums'];
+                //存在则添加记录
+                $s = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'customer' => $data['customer'], 'early_stage' => $c['rk_nums'], 'qt_ruku' => $data['rk_nums'], 'balance' => $num, 'huowei' => $data['rk_huowei_id'], 'count' => $data['content']]);
+                //修改实时数量
+                $a = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $data['rk_huowei_id'])->update(['rk_nums' => $num]);
+                if ($s && $a) {
+                    // 提交事务
+                    Db::commit();
+                }
+            } catch (\Exception $e) {
+                $this->error('其他入库失败，请联系管理员1');
+                // 回滚事务
+                Db::rollback();
             }
-        }else{
-            //不存在则添加库存
-            $userintime=strtotime($data['userintime']);
-            $id=db('rukuform')->insertGetId(['shipmentnum'=>$data['shipmentnum'],'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id'],'userintime'=>$userintime]);
-            db('rukuform_xq')->insert(['factory'=>$data['factory'],'transfers_id'=>$data['odd_number'],'product_name'=>$data['customer'],'rk_status_id'=>$data['rk_status_id'],'rk_huowei_id'=>$data['rk_huowei_id'],'rk_nums'=>$data['rk_nums'],'product_time'=>$userintime,'netweight'=>$data['mao'],'Grossweight'=>$data['jing'],'state'=>1,'rukuid'=>$id]);
-            db('record')->insert(['time'=>$time,'odd_number'=>$data['odd_number'],'task'=>'其他入库','customer'=>$data['factory'],'early_stage'=>0,'qt_ruku'=>$data['rk_nums'],'balance'=>$data['rk_nums'],'huowei'=>$data['rk_huowei_id']]);
+            return redirect('index');
+        } else {
+            try {
+                //不存在则添加库存
+                $id = db('rukuform')->insertGetId(['shipmentnum' => $data['shipmentnum'], 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id'], 'userintime' => $userintime, 'intime' => $userintime]);
+                $f = db('rukuform_xq')->insert(['factory' => $data['factory'], 'transfers_id' => $data['odd_number'], 'product_name' => $data['customer'], 'rk_status_id' => $data['rk_status_id'], 'rk_huowei_id' => $data['rk_huowei_id'], 'rk_nums' => $data['rk_nums'], 'product_time' => $userintime, 'netweight' => $data['mao'], 'Grossweight' => $data['jin'], 'state' => 1, 'rukuid' => $id]);
+                $p = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'customer' => $data['factory'], 'early_stage' => 0, 'qt_ruku' => $data['rk_nums'], 'balance' => $data['rk_nums'], 'huowei' => $data['rk_huowei_id'], 'count' => $data['content']]);
+                if ($id && $f && $p) {
+                    // 提交事务
+                    Db::commit();
+                }
+            } catch (\Exception $e) {
+                $this->error('其他入库失败，请联系管理员2');
+                // 回滚事务
+                Db::rollback();
+            }
+            return redirect('index');
         }
     }
 
@@ -344,30 +366,39 @@ class Instor extends Controller
     }
     //提交出库
     public function tj_ck() {
-
         $data=input();
-
         array_shift($data);
-        $id = db('outbound_from')->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id'],'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight'],'state'=>1]);
-        for ($i=0;$i<count($data['delivery_num']);$i++){
-            $time=time();
-            db('outbound_xq_from')->insert([
-                'chukuid'=>$id,
-                'product_name'=>$data['material_name'][$i],
-                'ck_huowei_id'=>$data['huowei_name'][$i],
-                'ck_nums'=>$data['huowei_out'][$i],
-                'netweight'=>$data['jin'][$i],
-                'product_time'=>strtotime($data['product_time'][$i]),
-                'content'=>$data['detailed'][$i],
-                'create_time'=>$time,
-                'state'=>0
-            ]);
-            $r=db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$data['huowei_name'][$i])->find();
-            $count=(int)$r['rk_nums']-(int)$data['huowei_out'][$i];
-            db('record')->insert(['time'=>$time,'odd_number'=>$data['transport_id'],'task'=>'其他出库','customer'=>$data['reachout_name'],'early_stage'=>$r['rk_nums'],'qt_chuku'=>$data['huowei_out'][$i],'balance'=>$count,'huowei'=>$data['huowei_name'][$i]]);
-            db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$data['huowei_name'][$i])->update(['rk_nums'=>$count]);
+        $delivery_time=strtotime($data['delivery_time']);
+        try{
+            $id = db('outbound_from')->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id'],'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight'],'state'=>1]);
+            for ($i=0;$i<count($data['delivery_num']);$i++){
+                $time=time();
+                $a=db('outbound_xq_from')->insert([
+                    'chukuid'=>$id,
+                    'product_name'=>$data['material_name'][$i],
+                    'ck_huowei_id'=>$data['huowei_name'][$i],
+                    'ck_nums'=>$data['huowei_out'][$i],
+                    'netweight'=>$data['jin'][$i],
+                    'product_time'=>strtotime($data['product_time'][$i]),
+                    'content'=>$data['detailed'][$i],
+                    'create_time'=>$time,
+                    'state'=>0
+                ]);
+                $r=db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$data['huowei_name'][$i])->find();
+                $count=(int)$r['rk_nums']-(int)$data['huowei_out'][$i];
+                $q=db('record')->insert(['time'=>$delivery_time,'odd_number'=>$data['transport_id'],'task'=>'其他出库','customer'=>$data['reachout_name'],'early_stage'=>$r['rk_nums'],'qt_chuku'=>$data['huowei_out'][$i],'balance'=>$count,'huowei'=>$data['huowei_name'][$i],'count'=>$data['detailed'][$i]]);
+                $x=db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$data['huowei_name'][$i])->update(['rk_nums'=>$count]);
+            }
+            if ($id && $a && $q && $x) {
+                // 提交事务
+                Db::commit();
+            }
+        } catch (\Exception $e) {
+            $this->error('其他入库失败，请联系管理员2');
+            // 回滚事务
+            Db::rollback();
         }
-
+        return redirect('index');
     }
 
 
@@ -449,16 +480,17 @@ class Instor extends Controller
     public function tj_db() {
         $data=input();
         array_shift($data);
-//        dump($data);exit;
         //调拨出库
+        //调出
         $r=db('rukuform_xq')->where('id',$data['rk_id'])->find();
+        //调入
+        $c=db('rukuform_xq')->where('is_del',0)->where('id',$data['huowei_name'])->find();
         $s=(int)$r['rk_nums']-(int)$data['shu'];
         $c_time=strtotime($data['c_time']);
         $d_time=strtotime($data['d_time']);
         db('record')->insert(['time'=>$d_time,'odd_number'=>$r['transfers_id'],'task'=>'调拨出库','early_stage'=>$r['rk_nums'],'db_chuku'=>$data['shu'],'balance'=>$s,'customer'=>'调拨出库','huowei'=>$r['rk_huowei_id']]);
         db('rukuform_xq')->where('id',$data['rk_id'])->update(['rk_nums'=>$s]);
         //调拨入库
-        $c=db('rukuform_xq')->where('is_del',0)->where('id',$data['huowei_name'])->find();
         if($c){
             //修改
             $p=(int)$data['shu']+$c['rk_nums'];
@@ -468,6 +500,26 @@ class Instor extends Controller
             db('rukuform_xq')->insert(['product_name'=>$data['goods'],'rk_huowei_id'=>$data['huowei_name'],'rk_nums'=>$data['shu'],'product_time'=>$c_time,'state'=>1]);
             db('record')->insert(['time'=>$d_time,'task'=>'调拨入库','customer'=>'调拨入库','early_stage'=>0,'db_ruku'=>$data['shu'],'balance'=>$data['shu'],'huowei'=>$data['huowei_name']]);
         }
+        $rows=db('rukuform_xq')->where('is_del',0)->select();
+        $dc_name=db('cabinet')->where('id',$r['rk_huowei_id'])->find();
+        $dr_name=db('cabinet')->where('id',$c['rk_huowei_id'])->find();
+            db('db_list')->insert(['db_time'=>$d_time,'cp_time'=>$c_time,'cp_name'=>$data['goods'],'dc_name'=>$dc_name['name'],'dr_name'=>$dr_name['name'],'db_num'=>$data['shu']]);
+
+        for($i=0;$i<count($rows);$i++){
+            if($rows[$i]['rk_nums']<1){
+                db('rukuform_xq')->where('id',$rows[$i]['id'])->update(['is_del'=>1]);
+                db('record')->where('huowei',$rows[$i]['rk_huowei_id'])->update(['is_del'=>0]);
+            }
+        }
         return redirect('index');
+    }
+
+
+
+    //调拨列表
+    public function db()
+    {
+        $rows=db('db_list')->select();
+        return view('db_list',['rows'=>$rows]);
     }
 }

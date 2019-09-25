@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<a href="{:url('Instor/other_db')}" class="layui-btn ">调拨</a>
+<table border="1">
+    <tr>
+        <th>产品名称</th>
+        <th>调拨日期</th>
+        <th>产品日期</th>
+        <th>调出货位</th>
+        <th>调入货位</th>
+        <th>调拨数量</th>
+    </tr>
+    {volist name='rows' id='row'}
+    <tr>
+        <td>{$row['cp_name']}</td>
+        <td><?php if(!empty($row['db_time'])){echo date('Y-m-d',$row['db_time']);}?></td>
+        <td><?php if(!empty($row['cp_time'])){echo date('Y-m-d',$row['cp_time']);}?></td>
+        <td>{$row['dc_name']}</td>
+        <td>{$row['dr_name']}</td>
+        <td>{$row['db_num']}</td>
+    </tr>
+    {/volist}
+</table>
+</body>
+</html>
