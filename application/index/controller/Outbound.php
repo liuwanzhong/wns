@@ -174,7 +174,7 @@ class Outbound extends Controller {
                 }
             }
         }
-        
+
             try{
                 $id = db('outbound_from')
                 ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id'],'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight']]);
@@ -333,7 +333,7 @@ class Outbound extends Controller {
         $row=db('outbound_xq_from')->where('chukuid',$data['id'])->select();
         $time=time();
         foreach ($row as $r) {
-            $d=db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->field('rk_nums')->find();
+            $d=db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$r['ck_huowei_id'])->field('rk_nums')->find();
             $d=(int)$d['rk_nums'];
             $balance=$d-$r['ck_nums'];
             db('record')->insert(['time'=>$time,'odd_number'=>$data['transport_id'],'task'=>$data['task'],'customer'=>$data['reachout_name'],'early_stage'=>$d,'xx_chuku'=>$r['ck_nums'],'balance'=>$balance,'huowei'=>$r['ck_huowei_id']]);
@@ -342,20 +342,12 @@ class Outbound extends Controller {
             for($i=0;$i<count($rows);$i++){
                 if($rows[$i]['rk_nums']<1){
                     db('rukuform_xq')->where('id',$rows[$i]['id'])->update(['is_del'=>1]);
+                    db('record')->where('huowei',$rows[$i]['rk_huowei_id'])->update(['is_del'=>0]);
                 }
             }
         }
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
-        }
-        $data=input();
-        $row=db('outbound_xq_from')->where('chukuid',$data['id'])->select();
-        $time=time();
-        foreach ($row as $r) {
-            $d=db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->order('id desc')->limit(1)->select();
-            $rk_nums=$d['0']['rk_nums']-$r['ck_nums'];
-            db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->where('is_del',0)->update(['update_time'=>$time,'rk_nums'=>$rk_nums]);
-            db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->where('rk_nums <= 0')->update(['is_del'=>1]);
         }
         try{
             $r=db('outbound_from')->where('id',$id)->update(['state'=>1]);
@@ -569,7 +561,17 @@ class Outbound extends Controller {
         }
         exit(json_encode($response));
     }
-    
+    private function getDownLoadToken($filename,$length = 10){
+        $str = null;
+        $strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+        $max = strlen($strPol)-1;
+
+        for($i=0;$i<$length;$i++){
+            $str.=$strPol[rand(0,$max)];//rand($min,$max)生成介于min和max两个数之间的一个随机整数
+        }
+        $res = md5($str.time());
+        return $res;
+    }
     public function download(){
         $fileName = date('Y-m-d',time()).'.xlsx';
         $path = ROOT_PATH."\public/".$fileName;
@@ -594,7 +596,5 @@ class Outbound extends Controller {
             exit();
         }
     }
-    
 
-    
 }

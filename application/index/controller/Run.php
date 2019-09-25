@@ -5,6 +5,8 @@ namespace app\index\controller;
 
 
 use think\Controller;
+use think\Db;
+use think\Loader;
 
 class Run extends Controller {
     //地区库房列表
@@ -287,6 +289,52 @@ class Run extends Controller {
             return redirect('goods_name');
         }else{
             $this->error("删除失败");
+        }
+    }
+
+
+    //导入
+    public function upload_excel() {
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
+        //设置文件上传的最大限制
+        ini_set('memory_limit', '1024M');
+        //加载第三方类文件
+        Loader ::import("PHPExcel.PHPExcel");
+        //防止乱码
+        header("Content-type:application/vnd.ms-excel");
+        //实例化主文件
+        //$model = new \PHPExcel();
+        //接收前台传过来的execl文件
+        $file = $_FILES['file'];
+        //截取文件的后缀名，转化成小写
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if ($extension == "xlsx") {
+            //2007(相当于是打开接收的这个excel)
+            $objReader = \PHPExcel_IOFactory ::createReader('Excel2007');
+        } else {
+            //2003(相当于是打开接收的这个excel)
+            $objReader = \PHPExcel_IOFactory ::createReader('Excel5');
+        }
+
+        $objContent   = $objReader -> load($file['tmp_name']);
+        $sheetContent = $objContent -> getSheet(0) -> toArray();
+        unset($sheetContent[0],$sheetContent[1]);
+        foreach ($sheetContent as $k => $v) {
+            $arr['name']                = $v[0];//调拨订单号
+            $arr['mao']                 = $v[1];//交付单号
+            $arr['jing']               = $v[2];//交货单实际出库日期
+            $arr['gongchang']           = $v[3];//调拨出库工厂
+            $res[] = $arr;
+        }
+        set_time_limit(0);
+        $res = Db ::name('goods_name') -> insertAll($res);
+        if ($res) {
+            return redirect('goods_name');
+        } else {
+            $this -> error('添加失败');
         }
     }
 }
