@@ -101,7 +101,7 @@
 
 			//详情
 			$('.xq').on('click',function () {
-				let id=$(this).parents('tr').find('td').eq(0).text();
+				let id=$(this).parents('tr').find('td').eq(1).text();
 				location.href='/index/Outbound/to_examine_show?id='+id;
 			})
 			layui.use(['element','laydate','form'], function(){

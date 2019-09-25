@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta charset="UTF-8">
+		<title>后台管理系统</title>
+        <link rel="stylesheet" href="/images/boot.css">
+        <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+        <link rel="stylesheet" href="/images/css.css">
+        <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+        <style>
+            .search{margin-top: 20px;margin-left: 30px;}
+            .search .layui-form-label{width: auto;}
+        </style>
+	</head>
+	<body>
+		<div class="note">
+            <div class="nav">
+				<span class="layui-breadcrumb">
+					<a href="/public/main.html" target="box">首页</a>
+					<a href="javascript:;">在库管理</a>
+					<a><cite>在库盘点</cite></a>
+				</span>
+            </div>
+            <div class="form_box layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">仓库:</label>
+                    <div class="layui-input-inline">
+                        <select name="ck_id" lay-filter="ck_id" id="table">
+                            <option value="0">请选择仓库</option>
+                            <?php foreach($cks as $ck): ?>
+                            <option value="<?=$ck['id']?>"><?=$ck['name']?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-inline">
+                        <button class="layui-btn pandian" lay-submit>新建盘点</button>
+                    </div>
+                </div>
+            </div>
+            <main class="bd_content">
+                <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
+                    <thead>
+                    <tr>
+                        <th>仓库</th>
+                        <th>盘点时间</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody class="tbd">
+                        {volist name='list' id='l'}
+                        <tr>
+                            <th>{$l.w_name}</th>
+                            <th><?php if(!empty($l['create_time'])){echo date('Y-m-d',$l['create_time']);}?></th>
+                            <th>{$l.count}</th>
+                            <th><a href="{:url('Instor/xiangxi',['time'=>$l.create_time])}">详细</a></th>
+                        </tr>
+                        {/volist}
+                    </tbody>
+                </table>
+                <div style="text-align:center; margin-bottom: 200px;">
+                </div>
+            </main>
+        </div>
+        <script src="/static/jquery-1.9.1.min.js"></script>
+        <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+        <script src="/layui/layui.js"></script>
+        <script type="text/javascript">
+
+        layui.use(['element','form'], function(){
+            let form = layui.form;
+        })
+         $('.pandian').on('click',  function (){
+             let id = $('#table').val();
+             console.log(id);
+                if(id == 0){
+                    layer.alert('请选择仓库',{icon:5});
+                    return false;
+                }else{
+                    window.location.href="/index/Instor/add_pandian?id="+id;
+                }
+         })
+        </script>
+	</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" href="/images/index.css" />
+    <link rel="stylesheet" href="/layui/css/layui.css" />
+    <style>
+        .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
+        .submit{margin-left: 30px;margin-top: 30px;}
+        .container{display: block;overflow-x: hidden;height: 580px;}
+        .container::-webkit-scrollbar{width: 0;}
+        .layui-form-radio{margin: 0;padding: 0;}
+    </style>
+</head>
+<body>
+<div class="note">
+    <div class="nav">
+        <span class="layui-breadcrumb">
+            <a href="/public/main.html" target="box">首页</a>
+            <a href="javascript:;">入库管理</a>
+            <a><cite>入库单</cite></a>
+        </span>
+    </div>
+
+    <form method="post" class="layui-form" action="{:url('Instor/pandian')}">
+        
+        <div class="container">
+            <table class="layui-table" style="width: 96%; margin: 12px auto;">
+                <thead>
+                    <tr>
+                        <th>仓库名</th>
+                        <th>货位</th>
+                        <th>产品名</th>
+                        <th>生产日期</th>
+                        <th>盘点数量</th>
+                        <th>实时数量</th>
+                        <th>差异</th>
+                    </tr>
+                </thead>
+                <tbody class="tbd">
+                {volist name='list' id='l'}
+                <tr>
+                    <th>
+                        <input type="text" class="text" readonly value="{$l['w_name']}" name="w_name">
+                    </th>
+                    <th>
+                        <input type="text" class="text" readonly value="{$l['c_name']}" name="c_name">
+                    </th>
+                    <th>
+                        <input type="text" class="text" readonly value="{$l['product_name']}" name="product_name">
+                    </th>
+                    <th>
+                        <input type="text" class="text" readonly value="<?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?>" name="product_time">
+                    </th>
+                    <th>
+                        <input type="text" class="text"  readonly value="{$l['pd_num']}" name="pd_num">
+                    </th>
+                    <th>
+                        <input type="text" class="text" readonly value="{$l['rk_nums']}" name="rk_nums">
+                    </th>
+                    <th>
+                        <input type="text" class="text" readonly value="{$l['chayi']}" name="chayi">
+                    </th>
+                </tr>
+                {/volist}
+                </tbody>
+                <button class="layui-btn submit" lay-submit lay-filter="formDemo">返回</button>
+            </table>
+    </form>
+</div>
+<script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/layui/layui.js"></script>
+<script type="text/javascript">
+    
+
+</script>
+</body>
+</html>

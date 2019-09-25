@@ -195,4 +195,103 @@ class Instor extends Controller
         $jing=sprintf("%.3f",$jing*$num/1000);
         return ['mao'=>$mao,'jing'=>$jing];
     }
+
+    // 库存转结
+    public function show_month(){
+        $id=db('record')
+        ->field('huowei')
+        ->group('huowei')
+        ->select();
+        $month =  date('m',time());
+        $year = date('Y',time());
+        $xx=array();
+        foreach($id as $rid){
+            //初期及结存
+            $goods_name=db('rukuform_xq')
+            ->where('rk_huowei_id',$rid['huowei'])
+            ->field('product_name')
+            ->select();
+            $jiecun=db('record')
+            ->where('YEAR(from_unixtime(time))='."'$year'")
+            ->where('MONTH(from_unixtime(time))='."'$month'")
+            ->where('huowei='.$rid['huowei'])
+            ->field('record.balance jiecun')
+            ->order('time desc')
+            ->limit(1)
+            ->select();
+            $chuqi=db('record')
+            ->join('cabinet','cabinet.id=record.huowei','left')
+            ->where('YEAR(from_unixtime(time))='."'$year'")
+            ->where('MONTH(from_unixtime(time))='."'$month'")
+            ->where('huowei='.$rid['huowei'])
+            ->field('cabinet.name,record.early_stage chuqi')
+            ->order('time asc')
+            ->limit(1)
+            ->select();
+            //出入库统计
+            $cr=db('record')
+            ->where('YEAR(from_unixtime(time))='."'$year'")
+            ->where('MONTH(from_unixtime(time))='."'$month'")
+            ->where('huowei='.$rid['huowei'])
+            ->field('SUM(dh_ruku) rdh,SUM(db_ruku) rdb,SUM(qt_ruku) rqt,SUM(xx_chuku) cxx,SUM(db_chuku) cdb,SUM(qt_chuku) cqt')
+            ->select();
+            if(!empty($chuqi)){
+                $cr['chuqi']=$chuqi[0]['chuqi'];
+                $cr['name']=$chuqi[0]['name'];
+                $cr['jiecun']=$jiecun[0]['jiecun'];
+            }
+            $cr['goods_name']=$goods_name[0]['product_name'];
+            $cr['ru']=$cr[0]['rdh']+$cr[0]['rdb']+$cr[0]['rqt'];
+            $cr['chu']=$cr[0]['cxx']+$cr[0]['cdb']+$cr[0]['cqt'];
+            $xx[]=$cr;
+        }
+        return view('show_month',['xx'=>$xx]);
+    }
+
+    // 库存盘点
+    public function pandian(){
+        $cks = db('warehouse')->where('is_del',1)->select();
+        $list = db('pandian')
+        ->group('create_time')
+        ->where('is_del',0)
+        ->select();
+        return view('pandian',['cks'=>$cks,'list'=>$list]);
+    }
+    // 添加盘点页
+    public function add_pandian(){
+        $id=input('id');
+        $list=db('rukuform_xq')
+        ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id','left')
+        ->join('warehouse','cabinet.warehouse_id=warehouse.id','left')
+        ->where('warehouse.id',$id)
+        ->field('cabinet.name c_name,warehouse.name w_name,rukuform_xq.*')
+        ->group('rukuform_xq.id')
+        ->select();
+        return view('add_pandian',['list'=>$list]);
+    }
+    // 执行添加
+    public function do_add(){
+        $data=input();
+        // dump($data);exit;
+        for ($i=0;$i<count($data['w_name']);$i++){
+            db('pandian')
+            ->insert([
+                'w_name'=>$data['w_name'][$i],
+                'c_name'=>$data['c_name'][$i],
+                'product_name'=>$data['product_name'][$i],
+                'product_time'=>$data['product_time'][$i],
+                'pd_num'=>$data['pd_num'][$i],
+                'rk_nums'=>$data['rk_nums'][$i],
+                'chayi'=>$data['rk_nums'][$i]-$data['pd_num'][$i],
+                'create_time'=>time(),
+            ]);
+        }
+    }
+    public function xiangxi(){
+        $time=input('time');
+        $list=db('pandian')
+        ->where('create_time',$time)
+        ->select();
+        return view('xiangxi',['list'=>$list]);
+    }
 }
