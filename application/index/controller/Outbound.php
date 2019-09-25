@@ -284,6 +284,7 @@ class Outbound extends Controller {
                 $cats[$k]['j']=0;
             }
         }
+        dump($cats);exit;
         return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet]);
     }
     //出库修改订单
