@@ -43,37 +43,39 @@
 					</div>
 				</form>
 			</div>
-			<table class="layui-table new_list" style="width: 96%; margin: 12px auto;">
-				<thead>
-				<tr>
-					<th>ID</th>
-					<th>出库仓库</th>
-					<th>出库货物</th>
-					<th>出库货位</th>
-					<th>送达方</th>
-					<th>发货日期</th>
-					<th>数量</th>
-					<th>净重</th>
-				</tr>
-				</thead>
-				<tbody class="tbd">
-				{volist name='rows' id='row'}
-				<tr id="check" class="news_list">
-					<td>{$row.id}</td>
-					<td>{$row.w_name}</td>
-					<td>{$row.product_name}</td>
-					<td>{$row.c_name}</td>
-					<td>{$row.reachout_name}</td>
-					<td><?php if(!empty($row['delivery_time'])){echo date('Y-m-d',$row['delivery_time']);}?></td>
-					<td>{$row.ck_nums}</td>
-					<td>{$row.netweight}</td>
-				</tr>
-				{/volist}
-				</tbody>
-			</table>
-			<div style="text-align:center; margin-bottom: 200px;">
-				{$rows->render()}
-			</div>
+			<main class="bd_content" style="margin-top: 12px;">
+				<table class="layui-table new_list" style="width: 96%; margin: 12px auto;">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>出库仓库</th>
+						<th>出库货物</th>
+						<th>出库货位</th>
+						<th>送达方</th>
+						<th>发货日期</th>
+						<th>数量</th>
+						<th>净重</th>
+					</tr>
+					</thead>
+					<tbody class="tbd">
+					{volist name='rows' id='row'}
+					<tr id="check" class="news_list">
+						<td>{$row.id}</td>
+						<td>{$row.w_name}</td>
+						<td>{$row.product_name}</td>
+						<td>{$row.c_name}</td>
+						<td>{$row.reachout_name}</td>
+						<td><?php if(!empty($row['delivery_time'])){echo date('Y-m-d',$row['delivery_time']);}?></td>
+						<td>{$row.ck_nums}</td>
+						<td>{$row.netweight}</td>
+					</tr>
+					{/volist}
+					</tbody>
+				</table>
+				<div style="text-align:center; margin-bottom: 200px;">
+					{$rows->render()}
+				</div>
+			</main>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>

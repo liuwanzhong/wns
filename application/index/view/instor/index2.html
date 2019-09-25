@@ -8,12 +8,8 @@
     <link href="/images/index.css" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
     <style type="text/css">
-        .button1{margin:2rem auto;width:600px;}
-        .button1 a{padding:15px 60px;border-radius:4px;margin:0 10px;color:#fff;font-size:1.2em}
-
         .layui-table th{text-align: center;font-weight: bold;}
         .layui-table td{text-align: center;}
-        #upload-add,#upload-edit{height: 30px;line-height: 30px;padding: 0 10px;margin-left: 10px;}
     </style>
 </head>
 <body>
@@ -51,7 +47,7 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <div class="layui-input-inline">
+                <div class="layui-input-inline" style="width: auto;">
                     <button class="layui-btn save" lay-submit>查询</button>
                     <a href="{:url('Instor/other_rk')}" class="layui-btn ">其他入库</a>
                 </div>
@@ -59,8 +55,9 @@
         </form>
     </div>
 
-    <table class="layui-table" style="width: 96%; margin: 12px auto;">
-        <thead>
+    <main class="bd_content">
+        <table class="layui-table" style="width: 96%; margin: 12px auto;">
+            <thead>
             <tr>
                 <th>仓库名称</th>
                 <th>货位</th>
@@ -70,8 +67,8 @@
                 <th>备注</th>
                 <th>操作</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {volist name='orders' id='v'}
             <tr>
                 <td>{$v.ckname}</td>
@@ -80,7 +77,7 @@
                 <td><?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);} ?></td>
                 <td>{$v.rk_nums}</td>
                 <td>{$v.content}</td>
-                <td style="width:300px">
+                <td>
                     <a href="{:url('instor/show','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">查看</a>
                     <a href="#" class="layui-btn layui-btn-sm frozens">解冻<input type="hidden" name="myids" value="{$v.id}"></a>
                     <a href="#" class="layui-btn layui-btn-sm layui-btn-normal edit">分配</a>
@@ -88,8 +85,9 @@
                 </td>
             </tr>
             {/volist}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </main>
 </div>
 
 <script src="/static/jquery-1.9.1.min.js"></script>

@@ -10,7 +10,6 @@
     <style type="text/css">
         .layui-table th{text-align: center;font-weight: bold;}
         .layui-table td{text-align: center;}
-        #upload-add,#upload-edit{height: 30px;line-height: 30px;padding: 0 10px;margin-left: 10px;}
     </style>
 </head>
 <body>
@@ -26,8 +25,9 @@
         <button type="button" class="layui-btn" id="dialog">添加</button>
         <button type="button" class="layui-btn" id="dialog1">导入</button>
     </div>
-    <table class="layui-table" style="width: 96%; margin: 12px auto;">
-        <thead>
+    <main class="bd_content" style="margin-top: 12px;">
+        <table class="layui-table" style="width: 96%; margin: 12px auto;">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>产品名</th>
@@ -36,8 +36,8 @@
                 <th>工厂</th>
                 <th>操作</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {volist name='list' id='v'}
             <tr>
                 <td>{$v.id}</td>
@@ -51,11 +51,12 @@
                 </td>
             </tr>
             {/volist}
-        </tbody>
-    </table>
-    <div style="text-align:center; margin-bottom: 200px;">
-        {$list->render()}
-    </div>
+            </tbody>
+        </table>
+        <div style="text-align:center; margin-bottom: 200px;">
+            {$list->render()}
+        </div>
+    </main>
 </div>
 
 <div class="model modeladd">
@@ -141,6 +142,12 @@
 
 
 <script type="text/javascript">
+    layui.use('element', function () {
+        
+    })
+    
+    
+    
     $('#dialog').on('click', function(){
         $('.modeladd').show();
     })

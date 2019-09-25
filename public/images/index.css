@@ -68,9 +68,9 @@ nav dd a:hover{background:#161a1e;color:#fff;}
 .nav{height: 40px;line-height: 40px;border-bottom: 1px dashed #ddd;margin: 0 30px 15px;}
 .handle{margin: 0 30px;}
 
-.ks{margin-right: 20px;}
+.ks{margin-right: 15px;}
 
-.bd_content{height: 100%;overflow-x: hidden;}
+.bd_content{height: 100%;overflow-x: hidden;margin-top: 12px;}
 .bd_content::-webkit-scrollbar{display: none;}
 .bd_content .layui-form{width: 90%;margin: 0 auto;}
 .bd_content .layui-form .layui-input-block{display: flex;}
