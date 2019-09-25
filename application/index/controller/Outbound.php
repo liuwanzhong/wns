@@ -189,8 +189,7 @@ class Outbound extends Controller {
                             'product_time'=>strtotime($data['product_time'][$i]),
                             'content'=>$data['detailed'][$i],
                             'create_time'=>$time,
-                            'state'=>0,
-                            'chukuid'=>$id
+                            'state'=>0
                         ]);
                 }
                 $del=db('system_order')->where('id','in',$data['cd'])->update(['is_del'=>1]);
@@ -402,9 +401,9 @@ class Outbound extends Controller {
         if (!empty($s_material_name)) {
             $material_name = $s_material_name;
             if (!empty($search)) {
-                $material_name = ' and outbound_xq_from.delivery_id like ' . "'%" . $material_name . '%' . "'";
+                $material_name = ' and outbound_from.transport_id like ' . "'%" . $material_name . '%' . "'";
             } else {
-                $material_name = ' outbound_xq_from.delivery_id like ' . "'%" . $material_name . '%' . "'";
+                $material_name = ' outbound_from.transport_id like ' . "'%" . $material_name . '%' . "'";
             }
             $search .= $material_name;
         }
@@ -591,7 +590,7 @@ class Outbound extends Controller {
                 echo fread($file,2048);
             }
             fclose($file);
-           unlink($path);
+            unlink($path);
             exit();
         }
     }
