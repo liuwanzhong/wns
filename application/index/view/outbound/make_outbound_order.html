@@ -46,8 +46,14 @@
                 <label class="layui-form-label">发货日期:</label>
                 <div class="layui-input-inline">
                     {volist name='fh' id='fh'}
-                    <input type="text" name="delivery_time" autocomplete="off" class="layui-input" id="time" value="{$fh.delivery_time}">
+                    <input type="text" name="delivery_time" class="layui-input" value="<?php if(!empty($fh['delivery_time'])){echo date('Y-m-d',$fh['delivery_time']);}?>" readonly>
                     {/volist}
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">出库日期:</label>
+                <div class="layui-input-inline">
+                    <input type="date" class="layui-input" name="ck_time">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -127,6 +133,7 @@
                             {$v.num}
                         </td>
                         <td class="huowei">
+                            <input type="hidden" name="huowei[]" value="">
                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
                         </td>
                         <td class="count">
@@ -141,14 +148,15 @@
                             <input type="hidden" value="sy_count" name="sy_count[]" readonly>
                             <span>0</span>
                         </td>
-                        <td>
-                            <input type="date" name="product_time[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd">
+                        <td class="indate">
+                            <input type="hidden" name="product_time[]" id="" class="layui-input" style="border:0">
+                            <span>0</span>
                         </td>
                         <td>
                             <input type="text" value="" name="product_batch[]" class="layui-input" >
                         </td>
                         <td>
-                            <input type="text" value="{$v.detailed}" name="detailed[]" class="layui-input" >
+                            <input type="text" value="" name="detailed[]" class="layui-input" >
                         </td>
                         <td>
                             <button type="button" class="layui-btn layui-btn-sm add">
@@ -194,7 +202,7 @@
             </thead>
             <tbody class="kc_list"></tbody>
         </table>
-        <button class="layui-btn sure" style="margin-top: 20px;">确定</button>
+        <button class="layui-btn sure" style="margin: 20px auto 100px;">确定</button>
     </div>
 
 </div>
@@ -227,6 +235,7 @@
                 <span>0</span>
             </td>
             <td class="huowei">
+                <input type="hidden" name="huowei[]" value="">
                 <botton class="layui-btn layui-btn-sm dia">点击</botton>
             </td>
             <td class="count">
@@ -241,20 +250,17 @@
                 <input type="hidden" value="" name="sy_count[]" readonly>
                 <span>0</span>
             </td>
-            <td>
-                <input type="date" name="product_time[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd">
+             <td class="indate">
+                <input type="hidden" name="product_time[]" id="" class="layui-input" style="border:0">
+                <span>0</span>
             </td>
             <td class="product_batch">
-                <input type="text" value="" name="product_batch[]" >
+                <input type="text" value="" name="product_batch[]" class="layui-input">
             </td>
             <td>
-                <input type="text" value="${child[8].innerText}" name="detailed[]" >
-                ${child[8].innerText}
+                <input type="text" value="" name="detailed[]" class="layui-input">
             </td>
             <td>
-                <button type="button" class="layui-btn layui-btn-sm add">
-                    <i class="layui-icon">&#xe654;</i>
-                </button>
                 <button type="button" class="layui-btn layui-btn-sm remove ">
                     <i class="layui-icon">&#xe640;</i>
                 </button>
@@ -340,18 +346,21 @@
             let num = tr.find('input[type=text]').val();
             let allcount = $('.all_count').text();
             let allweight = $('.all_weight').text();
+            let time = tr.find('td:eq(2)').text();
             $.ajax({
                 url:'/index/Table/houwei_cd',
                 data:{id, m, j, count:num},
                 success:function (d) {
                     par.find('.rukuform_xq_id').val(id);
-                    par.find('.huowei').html(`<input type="hidden" value="${c_id}" name="huowei_name[]" readonly><span>${hw}</span>`);
+                    par.find('.huowei').html(`<input type="hidden" value="${c_id}" name="huowei[]" readonly><span>${hw}</span>`);
                     par.find('.count').find('span').text(num);
                     par.find('.count').find('input').val(num);
                     par.find('.jin').find('span').text(d.m);
                     par.find('.jin').find('input').val(d.m);
                     par.find('.sy_count').find('span').text(d.sy);
                     par.find('.sy_count').find('input').val(d.sy);
+                    par.find('.indate').find('input').val(time);
+                    par.find('.indate').find('span').text(time);
                     let count = Number(allcount) + Number(num);
                     let weight = [(Number(allweight) + Number(d.m))*1000]/1000;
                     let we=Math.round(weight*1000)/1000;
@@ -397,13 +406,6 @@
             data:{id,num}
         })
         p.remove();
-        //     let id=p.find('.rukuform_xq_id').val();
-        // let num=p.find('.count').find('input').val();
-        // p.remove();
-        // $.ajax({
-        //     url:'/index/Table/huifu',
-        //     data:{id,num}
-        // })
     })
 
     $('.close').on('click', function(){

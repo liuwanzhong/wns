@@ -4,12 +4,14 @@
     <meta charset="utf-8"/>
     <title>在库管理</title>
     <link rel="stylesheet" href="/images/css.css">
-<!--    <link rel="stylesheet" href="/images/boot.css">-->
+    <link rel="stylesheet" href="/images/boot.css">
     <link href="/images/index.css" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
     <style type="text/css">
         .layui-table th{text-align: center;font-weight: bold;}
         .layui-table td{text-align: center;}
+        label{box-sizing: content-box;}
+
     </style>
 </head>
 <body>
@@ -67,6 +69,7 @@
                 <th>生产日期</th>
                 <th>实时数量</th>
                 <th>备注</th>
+                <th>状态</th>
                 <th>操作</th>
             </tr>
             </thead>
@@ -79,16 +82,24 @@
                 <td><?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);} ?></td>
                 <td>{$v.rk_nums}</td>
                 <td>{$v.content}</td>
+                <td><?php if($v['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
                 <td>
                     <a href="{:url('instor/show','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">查看</a>
-                    <a href="#" class="layui-btn layui-btn-sm frozens">解冻<input type="hidden" name="myids" value="{$v.id}"></a>
-                    <a href="#" class="layui-btn layui-btn-sm layui-btn-normal edit">分配</a>
+                    <a href="#" class="layui-btn layui-btn-sm frozens">结存<input type="hidden" name="myids" value="{$v.id}"></a>
+                    <?php if($v['state']==1): ?>
+                    <a href="{:url('Instor/frozen','id='.$v.id)}" class="layui-btn layui-btn-sm">冻结</a>
+                    <?php else: ?>
+                    <a href="{:url('Instor/frozen_j','id='.$v.id)}" class="layui-btn layui-btn-sm">解除冻结</a>
+                    <?php endif; ?>
                     <a href="{:url('instor/delete','id='.$v['id'])}" class="layui-btn layui-btn-sm layui-btn-danger">删除</a>
                 </td>
             </tr>
             {/volist}
             </tbody>
         </table>
+        <div style="text-align:center; margin-bottom: 200px;">
+            {$order->render()}
+        </div>
     </main>
 </div>
 

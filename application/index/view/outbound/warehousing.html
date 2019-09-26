@@ -40,7 +40,7 @@
 					<div class="layui-form-item">
 						<label class="layui-form-label">装运单号</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="s_material_name" name="s_material_name" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+							<input type="text" class="layui-input" id="s_material_name" name="s_material_name" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_material_name)){echo $s_material_name;}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
@@ -70,7 +70,7 @@
 						<td>已审核</td>
 						<td>{$row.w_name}</td>
 						<td>{$row.transport_id}</td>
-						<td>{$row.delivery_time|date="Y-m-d",###}</td>
+						<td><?php if(!empty($row['ck_time'])){echo date('Y-m-d',$row['ck_time']);} ?></td>
 						<td>{$row.count}</td>
 						<td>
 							<a href="#" class="edit xq" title="详情" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>

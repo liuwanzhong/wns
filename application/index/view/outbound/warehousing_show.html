@@ -20,7 +20,7 @@
         <span class="layui-breadcrumb">
             <a href="/public/main.html" target="box">首页</a>
             <a href="javascript:;">入库管理</a>
-            <a><cite>入库台账详情</cite></a>
+            <a><cite>出库台账详情</cite></a>
         </span>
     </div>
     <div class="container">
@@ -36,6 +36,12 @@
                     <label class="layui-form-label">发货日期:</label>
                     <div class="layui-input-inline">
                         <input type="text" name="userintime" value="<?php if(!empty($rows['delivery_time'])){echo date('Y-m-d',$rows['delivery_time']);}?>" autocomplete="off" class="layui-input" id="time" readonly>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">出库日期:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="userintime" value="<?php if(!empty($rows['ck_time'])){echo date('Y-m-d',$rows['ck_time']);}?>" autocomplete="off" class="layui-input" readonly>
                     </div>
                 </div>
                 <div class="layui-form-item">
