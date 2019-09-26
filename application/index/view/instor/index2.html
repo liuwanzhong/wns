@@ -85,7 +85,7 @@
                 <td><?php if($v['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
                 <td>
                     <a href="{:url('instor/show','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">查看</a>
-                    <a href="#" class="layui-btn layui-btn-sm frozens">结存<input type="hidden" name="myids" value="{$v.id}"></a>
+                    <a href="{:url('instor/jiecun','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">结存</a>
                     <?php if($v['state']==1): ?>
                     <a href="{:url('Instor/frozen','id='.$v.id)}" class="layui-btn layui-btn-sm">冻结</a>
                     <?php else: ?>

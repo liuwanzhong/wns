@@ -75,7 +75,13 @@ class Instor extends Controller
     }
     //查看入库产品
     public function show($id){
-        $rows=db('record')->where('huowei',$id)->where('is_del',1)->select();
+        $time=db('record')->where('huowei',$id)->where('task','结存')->where('is_del',1)->field('time')->order('time desc')->limit(1)->select();
+        if(empty($time)){
+            $rows=db('record')->where('huowei',$id)->where('is_del',1)->select();
+        }else{
+            $time=$time[0]['time'];
+            $rows=db('record')->where('huowei',$id)->where("time >= $time")->where('is_del',1)->select();
+        }
         return view('show',['rows'=>$rows]);
     }
     //添加数据
@@ -174,63 +180,99 @@ class Instor extends Controller
         return ['mao'=>$mao,'jing'=>$jing];
     }
     // 库存转结
-    public function show_month(){
-        $id=db('record')
-        ->field('huowei')
-        ->group('huowei')
-        ->select();
+//    public function show_month() {
+//        $id = db('record')
+//            -> field('huowei')
+//            -> group('huowei')
+//            -> select();
+//    }
+    // 结存
+    public function jiecun(){
+        $id=input('id');
+        $time=time();
         $month =  date('m',time());
         $year = date('Y',time());
         $xx=array();
-        foreach($id as $rid){
-            //初期及结存
-            $goods_name=db('rukuform_xq')
-            ->where('rk_huowei_id',$rid['huowei'])
-            ->field('product_name')
-            ->select();
-            $jiecun=db('record')
-            ->where('YEAR(from_unixtime(time))='."'$year'")
-            ->where('MONTH(from_unixtime(time))='."'$month'")
-            ->where('huowei='.$rid['huowei'])
-            ->field('record.balance jiecun')
-            ->order('time desc')
-            ->limit(1)
-            ->select();
-            $chuqi=db('record')
-            ->join('cabinet','cabinet.id=record.huowei','left')
-            ->where('YEAR(from_unixtime(time))='."'$year'")
-            ->where('MONTH(from_unixtime(time))='."'$month'")
-            ->where('huowei='.$rid['huowei'])
-            ->field('cabinet.name,record.early_stage chuqi')
-            ->order('time asc')
-            ->limit(1)
-            ->select();
-            //出入库统计
-            $cr=db('record')
-            ->where('YEAR(from_unixtime(time))='."'$year'")
-            ->where('MONTH(from_unixtime(time))='."'$month'")
-            ->where('huowei='.$rid['huowei'])
-            ->field('SUM(dh_ruku) rdh,SUM(db_ruku) rdb,SUM(qt_ruku) rqt,SUM(xx_chuku) cxx,SUM(db_chuku) cdb,SUM(qt_chuku) cqt')
-            ->select();
-            if(!empty($chuqi)){
-                $cr['chuqi']=$chuqi[0]['chuqi'];
-                $cr['name']=$chuqi[0]['name'];
-                $cr['jiecun']=$jiecun[0]['jiecun'];
-            }
-            $cr['goods_name']=$goods_name[0]['product_name'];
-            $cr['ru']=$cr[0]['rdh']+$cr[0]['rdb']+$cr[0]['rqt'];
-            $cr['chu']=$cr[0]['cxx']+$cr[0]['cdb']+$cr[0]['cqt'];
-            $xx[]=$cr;
+        // 初期数量
+        $chuqi=db('record')
+        ->where('huowei',$id)
+        ->where('is_del',1)
+        ->where("time <= $time")
+        ->field('balance')
+        ->order('time asc')
+        ->limit(1)
+        ->select();
+        dump($chuqi);
+        // 结存数量
+        $jiecun=db('record')
+        ->where('huowei',$id)
+        ->where('is_del',1)
+        ->where("time <= $time")
+        ->field('balance')
+        ->order('time desc')
+        ->limit(1)
+        ->select();
+        dump($jiecun);
+        $insert['early_stage']=$chuqi[0]['balance'];
+        $insert['balance']=$jiecun[0]['balance'];
+        $insert['huowei']=$id;
+        $insert['time']=$time;
+        $insert['task']='结存';
+        $into=db('record')
+        ->insert($insert);
+        dump($into);exit;
+    }
+    // 月度统计
+    public function show_month(){
+        $rows=array();
+        if(!empty(input('time'))){
+            $time=input('time');
+        }else{
+            $time='';
         }
-        return view('show_month',['xx'=>$xx]);
+        if(!empty($time)){
+            $times=explode('-',$time);
+            $y=$times[0];
+            $m=$times[1];
+            $rows=db('record')
+            ->where('record.is_del',1)
+            ->where("date_format(from_unixtime(time),'%m')=$m")
+            ->where("date_format(from_unixtime(time),'%Y')=$y")
+            ->join('rukuform_xq','rukuform_xq.rk_huowei_id=record.huowei','left')
+            ->join('cabinet','cabinet.id=record.huowei','left')
+            ->join('warehouse','warehouse.id=cabinet.warehouse_id','left')
+            ->group('record.huowei')
+            ->field('warehouse.name w_name,cabinet.name c_name,rukuform_xq.product_name rk_name,record.huowei huowei')
+            ->select();
+        }
+        return view('show_month',['rows'=>$rows,'time'=>$time]);
+    }
+    /**
+     * 月度统计详细
+     */
+    public function show_month_xx(){
+        $time=input('time');
+        $huowei=input('huowei');
+        $times=explode('-',$time);
+        $y=$times[0];
+        $m=$times[1];
+        $rows=db('record')
+        ->where('record.is_del',1)
+        ->where("date_format(from_unixtime(time),'%m')=$m")
+        ->where("date_format(from_unixtime(time),'%Y')=$y")
+        ->where('huowei',$huowei)
+        ->order('time asc')
+        ->select();
+        return view('show_month_xx',['rows'=>$rows,'time'=>$time]);
     }
     // 库存盘点
     public function pandian(){
         $cks = db('warehouse')->where('is_del',1)->select();
         $list = db('pandian')
         ->group('create_time')
+        ->order('create_time desc')
         ->where('is_del',0)
-        ->select();
+        ->paginate(100);
         return view('pandian',['cks'=>$cks,'list'=>$list]);
     }
     // 添加盘点页
@@ -240,6 +282,7 @@ class Instor extends Controller
         ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id','left')
         ->join('warehouse','cabinet.warehouse_id=warehouse.id','left')
         ->where('warehouse.id',$id)
+        ->where('rukuform_xq.rk_nums != 0')
         ->field('cabinet.name c_name,warehouse.name w_name,rukuform_xq.*')
         ->group('rukuform_xq.id')
         ->select();
@@ -248,27 +291,50 @@ class Instor extends Controller
     // 执行添加
     public function do_add(){
         $data=input();
-        // dump($data);exit;
-        for ($i=0;$i<count($data['w_name']);$i++){
-            db('pandian')
-            ->insert([
-                'w_name'=>$data['w_name'][$i],
-                'c_name'=>$data['c_name'][$i],
-                'product_name'=>$data['product_name'][$i],
-                'product_time'=>$data['product_time'][$i],
-                'pd_num'=>$data['pd_num'][$i],
-                'rk_nums'=>$data['rk_nums'][$i],
-                'chayi'=>$data['rk_nums'][$i]-$data['pd_num'][$i],
-                'create_time'=>time(),
-            ]);
+        if(!empty($data['w_name']) && !empty($data['pd_num'])){
+            for ($i=0;$i<count($data['w_name']);$i++){
+                db('pandian')
+                ->insert([
+                    'w_name'=>$data['w_name'][$i],
+                    'c_name'=>$data['c_name'][$i],
+                    'product_name'=>$data['product_name'][$i],
+                    'product_time'=>$data['product_time'][$i],
+                    'pd_num'=>$data['pd_num'][$i],
+                    'rk_nums'=>$data['rk_nums'][$i],
+                    'chayi'=>$data['rk_nums'][$i]-$data['pd_num'][$i],
+                    'create_time'=>time(),
+                ]);
+            }
+            return redirect('Instor/pandian');
+        }else{
+            $this -> error('数据为空');
         }
     }
+    /**
+     * 盘点详细
+     */
     public function xiangxi() {
         $time = input('time');
         $list = db('pandian')
             -> where('create_time', $time)
+            -> where('is_del', 0)
             -> select();
         return view('xiangxi', ['list' => $list]);
+    }
+    /**
+     * 盘点删除
+     */
+    public function del_pandian() {
+        $time = input('time');
+        $list = db('pandian')
+            -> where('create_time', $time)
+            -> update(['is_del' => 1]);
+        if($list){
+            return redirect('Instor/pandian');
+        }else{
+            $this -> error('删除失败');
+        }
+
     }
     //添加其他入库
     public function tj_rk()
@@ -563,31 +629,31 @@ class Instor extends Controller
      * 添加损耗单
      */
     public function wastage_inset() {
-        Db::startTrans();
-        $data=input();
-        $time=strtotime($data['d_time']);//损耗日期
+        Db ::startTrans();
+        $data = input();
+        $time = strtotime($data['d_time']);//损耗日期
         array_shift($data);
-        $row=db('rukuform_xq')->where('is_del',0)->where('id',$data['rk_id'])->find();
-        $count=(int)$row['rk_nums']-(int)$data['count'];
-        try{
-            $a=db('record')->insert(['time'=>$time,'odd_number'=>$row['transfers_id'],'task'=>'损耗单','customer'=>'损耗单','early_stage'=>$row['rk_nums'],'qt_chuku'=>$data['count'],'balance'=>$count,'huowei'=>$row['rk_huowei_id'],'count'=>$data['center']]);
-            $b=db('rukuform_xq')->where('is_del',0)->where('id',$data['rk_id'])->update(['rk_nums'=>$count]);
-            $rows=db('rukuform_xq')->where('is_del',0)->select();
-            for($i=0;$i<count($rows);$i++){
-                if($rows[$i]['rk_nums']<1){
-                    db('rukuform_xq')->where('id',$rows[$i]['id'])->update(['is_del'=>1]);
-                    db('record')->where('huowei',$rows[$i]['rk_huowei_id'])->update(['is_del'=>0]);
+        $row   = db('rukuform_xq') -> where('is_del', 0) -> where('id', $data['rk_id']) -> find();
+        $count = (int)$row['rk_nums'] - (int)$data['count'];
+        try {
+            $a    = db('record') -> insert(['time' => $time, 'odd_number' => $row['transfers_id'], 'task' => '损耗单', 'customer' => '损耗单', 'early_stage' => $row['rk_nums'], 'qt_chuku' => $data['count'], 'balance' => $count, 'huowei' => $row['rk_huowei_id'], 'count' => $data['center']]);
+            $b    = db('rukuform_xq') -> where('is_del', 0) -> where('id', $data['rk_id']) -> update(['rk_nums' => $count]);
+            $rows = db('rukuform_xq') -> where('is_del', 0) -> select();
+            for ($i = 0; $i < count($rows); $i++) {
+                if ($rows[$i]['rk_nums'] < 1) {
+                    db('rukuform_xq') -> where('id', $rows[$i]['id']) -> update(['is_del' => 1]);
+                    db('record') -> where('huowei', $rows[$i]['rk_huowei_id']) -> update(['is_del' => 0]);
                 }
             }
-            $h=db('cabinet')->where('id',$row['rk_huowei_id'])->find();
-            $r=db('wastage_list')->insert(['name'=>$data['goods'],'huowei'=>$h['name'],'count'=>$data['count'],'time'=>$time,'center'=>$data['center']]);
-            if($a && $b && $r) {
-                Db::commit();
+            $h = db('cabinet') -> where('id', $row['rk_huowei_id']) -> find();
+            $r = db('wastage_list') -> insert(['name' => $data['goods'], 'huowei' => $h['name'], 'count' => $data['count'], 'time' => $time, 'center' => $data['center']]);
+            if ($a && $b && $r) {
+                Db ::commit();
             }
         } catch (\Exception $e) {
-            $this->error('添加失败,请重试');
+            $this -> error('添加失败,请重试');
             // 回滚事务
-            Db::rollback();
+            Db ::rollback();
         }
         return redirect('wastage_list');
     }
