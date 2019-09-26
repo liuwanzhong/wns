@@ -340,4 +340,52 @@ class Run extends Controller {
             $this -> error('添加失败');
         }
     }
+    /** 
+     * 托盘管理
+     */
+    public function tray(){
+        $rows=db('tray')
+        ->where('tray.warehouse_id',7)  
+        ->join('warehouse','warehouse.id=tray.warehouse_id','left')
+        ->where('tray.is_del',0)
+        ->select();
+        $cks = db('warehouse')->where('is_del',1)->select();
+        // dump($cks);exit;
+        return view('tray',['cks'=>$cks,'rows'=>$rows]);
+    }
+    /**
+     * 托盘详细
+     */
+    public function tray_xx(){
+        return view('tray_xx');
+    }
+    /**
+     * 新增托盘
+     */
+    public function tray_add(){
+        dump(input());
+        $data=input();
+        
+        exit;
+        $text='123456';                  // 生成的二维码 内容
+        $outfile = 'trayimg/'.$text.'.png';     // 生成的二维码 文件名，false为 不保存
+        $level = 'QR_ECLEVEL_L';         //级别,也是容错率。下面会有介绍
+        $size = 10;                      //大小
+        $margin = 4;                     //外边距
+        $saveandprint=true;              //是否 保存和打印。true为保存并打印
+        //不带LOGO
+        Vendor('phpqrcode.phpqrcode');
+        //生成二维码图片
+        $object = new \QRcode();
+        $object->png($text, $outfile, $level, $size,$margin, $saveandprint); 
+        echo ROOT_PATH.'public\trayimg/'.$data['tp_num'].'.png';
+        $res=db('tray')
+        ->insert([
+            'tp_num'=>$data['tp_num'],
+            'warehouse_id'=>$data['warehouse_id'],
+            'create_time'=>time(),
+            'pic'=>''
+        ]);
+        return view('tray_add');  
+    }
 }

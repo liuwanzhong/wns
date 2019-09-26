@@ -25,7 +25,7 @@
         </span>
     </div>
 
-    <form method="post" class="layui-form" action="{:url('Rukuorder/insert')}">
+    <form method="post" class="layui-form" action="{:url('Instor/tj_rk')}">
         <div class="form_box">
             <div class="layui-form-item">
                 <label class="layui-form-label">装运单号:</label>
@@ -92,7 +92,7 @@
                             <input type="text" value="" class="countnum layui-input" name="factory">
                         </td>
                         <td>
-                            <select class="product_name" name="product_name" lay-filter="product_name" lay-search>
+                            <select class="product_name" lay-filter="product_name" name="customer" lay-search>
                                 <option value="">请选择产品名称</option>
                                 {volist name='goods_name' id='goods'}
                                 <option value="{$goods.name}">{$goods.name}</option>
@@ -116,7 +116,7 @@
                             <input type="text" value="" class="rk_nums layui-input" name="rk_nums">
                         </td>
                         <td>
-                            <input type="text" value="" class="layui-input" name="product_time">
+                            <input type="date" value="" class="layui-input" name="product_time">
                         </td>
                         <td>
                             <input type="text" value="" class="layui-input" name="product_batch">
@@ -125,22 +125,21 @@
                             <input type="text" value="" class="layui-input" name="content">
                         </td>
                         <td class="mao">
-                            <input type="hidden" value="" class="layui-input" name="mao[]">
+                            <input type="hidden" value="" class="layui-input" name="mao">
                             <span style="min-width: 28px;display: inline-block;"></span>
                         </td>
                         <td class="jin">
-                            <input type="hidden" value="" class="layui-input" name="jin[]">
+                            <input type="hidden" value="" class="layui-input" name="jin">
                             <span style="min-width: 28px;display: inline-block;"></span>
                         </td>
                         <td>
-                            <input type="text" value="" class="layui-input" name="transfers_id">
+                            <input type="text" value="" class="layui-input" name="odd_number">
                         </td>
                     </tr>
                 </tbody>
             </table>
             <button class="layui-btn submit" lay-submit lay-filter="formDemo" id="del">立即提交</button>
         </div>
-
     </form>
 </div>
 <script src="/static/jquery-1.9.1.min.js"></script>
@@ -225,7 +224,7 @@
                 })
             }
             else {
-               layer.alert('请先选择产品名称',{icon:5});
+                layer.alert('请先选择产品名称',{icon:5});
             }
 
         })

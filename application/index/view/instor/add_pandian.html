@@ -23,12 +23,7 @@
             <a><cite>入库单</cite></a>
         </span>
     </div>
-
     <form method="post" class="layui-form" action="{:url('Instor/do_add')}">
-        <span>
-            备注<input type="text" class="text"name="count"value="">
-        </span>
-        
         <div class="container">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
@@ -65,15 +60,20 @@
                 </tr>
                 {/volist}
                 </tbody>
+                <span>
+                    备注<input type="text" class="text"name="count"value="">
+                </span>
                 <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
+                <button class="layui-btn fanhui" lay-submit>返回</button>
             </table>
     </form>
 </div>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
-    
-
+    $('.fanhui').on('click',  function (){
+            window.location.href="/index/Instor/pandian";
+        })
 </script>
 </body>
 </html>

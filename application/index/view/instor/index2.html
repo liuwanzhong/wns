@@ -50,6 +50,8 @@
                 <div class="layui-input-inline" style="width: auto;">
                     <button class="layui-btn save" lay-submit>查询</button>
                     <a href="{:url('Instor/other_rk')}" class="layui-btn ">其他入库</a>
+                    <a href="{:url('Instor/other_ck')}" class="layui-btn ">其他出库</a>
+
                 </div>
             </div>
         </form>
@@ -79,6 +81,7 @@
                 <td>{$v.content}</td>
                 <td>
                     <a href="{:url('instor/show','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">查看</a>
+                    <a href="{:url('instor/jiecun','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">结存</a>
                     <a href="#" class="layui-btn layui-btn-sm frozens">解冻<input type="hidden" name="myids" value="{$v.id}"></a>
                     <a href="#" class="layui-btn layui-btn-sm layui-btn-normal edit">分配</a>
                     <a href="{:url('instor/delete','id='.$v['id'])}" class="layui-btn layui-btn-sm layui-btn-danger">删除</a>

@@ -18,46 +18,50 @@
                 <a><cite>仓储查询</cite></a>
             </span>
     </div>
-    <table class="layui-table" style="width: 96%; margin: 12px auto;">
-        <thead>
-        <tr>
-            <th rowspan="2">日期</th>
-            <th rowspan="2">单号</th>
-            <th rowspan="2">作业类型</th>
-            <th rowspan="2">客户</th>
-            <th rowspan="2">初期数量</th>
-            <th colspan="3">入库</th>
-            <th colspan="3">出库</th>
-            <th rowspan="2">结存</th>
-        </tr>
-        <tr>
-            <th>到货入库</th>
-            <th>调拨入库</th>
-            <th>其他入库</th>
-            <th>销售出库</th>
-            <th>调拨出库</th>
-            <th>其他出库</th>
-        </tr>
-        </thead>
-        <tbody>
-        {volist name='rows' id='row'}
-        <tr>
-            <td><?php if(!empty($row['time'])){echo date('Y-m-d',$row['time']);} ?></td>
-            <td>{$row.odd_number}</td>
-            <td>{$row.task}</td>
-            <td>{$row.customer}</td>
-            <td>{$row.early_stage}</td>
-            <td>{$row.dh_ruku}</td>
-            <td>{$row.db_ruku}</td>
-            <td>{$row.qt_ruku}</td>
-            <td>{$row.xx_chuku}</td>
-            <td>{$row.db_chuku}</td>
-            <td>{$row.qt_chuku}</td>
-            <td>{$row.balance}</td>
-        </tr>
-        {/volist}
-        </tbody>
-    </table>
+    <div class="bd_content">
+        <table class="layui-table" style="width: 96%; margin: 12px auto 80px;">
+            <thead>
+            <tr>
+                <th rowspan="2">日期</th>
+                <th rowspan="2">单号</th>
+                <th rowspan="2">作业类型</th>
+                <th rowspan="2">客户</th>
+                <th rowspan="2">初期数量</th>
+                <th colspan="3">入库</th>
+                <th colspan="3">出库</th>
+                <th rowspan="2">结存</th>
+                <th rowspan="2">备注</th>
+            </tr>
+            <tr>
+                <th>到货入库</th>
+                <th>调拨入库</th>
+                <th>其他入库</th>
+                <th>销售出库</th>
+                <th>调拨出库</th>
+                <th>其他出库</th>
+            </tr>
+            </thead>
+            <tbody>
+            {volist name='rows' id='row'}
+            <tr>
+                <td><?php if(!empty($row['time'])){echo date('Y-m-d',$row['time']);} ?></td>
+                <td>{$row.odd_number}</td>
+                <td>{$row.task}</td>
+                <td>{$row.customer}</td>
+                <td>{$row.early_stage}</td>
+                <td>{$row.dh_ruku}</td>
+                <td>{$row.db_ruku}</td>
+                <td>{$row.qt_ruku}</td>
+                <td>{$row.xx_chuku}</td>
+                <td>{$row.db_chuku}</td>
+                <td>{$row.qt_chuku}</td>
+                <td>{$row.balance}</td>
+                <td>{$row.count}</td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 

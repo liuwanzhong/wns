@@ -24,30 +24,25 @@
         </span>
     </div>
 
-    <form method="post" class="layui-form" action="{:url('Outbound/insert')}">
+    <form method="post" class="layui-form" action="{:url('Instor/tj_ck')}">
+
         <div class="form_box">
             <div class="layui-form-item">
                 <label class="layui-form-label">装运单号:</label>
                 <div class="layui-input-inline">
-                    {volist name='zy' id='zy'}
-                    <input type="text" name="transport_id" autocomplete="off" class="layui-input" value="{$zy.transport_id}">
-                    {/volist}
+                    <input type="text" name="transport_id" autocomplete="off" class="layui-input" value="">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">售达方:</label>
                 <div class="layui-input-inline">
-                    {volist name='sd' id='sd'}
-                    <input type="text" name="reachout_name" autocomplete="off" class="layui-input" value="{$sd.reachby_name}" >
-                    {/volist}
+                    <input type="text" name="reachout_name" autocomplete="off" class="layui-input" value="" >
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">发货日期:</label>
+                <label class="layui-form-label">出库日期:</label>
                 <div class="layui-input-inline">
-                    {volist name='fh' id='fh'}
-                    <input type="text" name="delivery_time" autocomplete="off" class="layui-input" id="time" value="{$fh.delivery_time}">
-                    {/volist}
+                    <input type="text" name="delivery_time" autocomplete="off" class="layui-input" id="time" value="">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -114,17 +109,17 @@
                         <th>操作</th>
                 </thead>
                 <tbody class="tbd">
-                    {volist name='rows' id='v'}
                     <tr>
-                        <input type="hidden" name="cd[]" value="{$v.id}">
-                        <input type="hidden" value="{$v.Delivery_id}" name="Delivery_id[]" readonly>
                         <td class="status">
-                            <input type="hidden" value="{$v.material_name}" name="material_name[]" readonly>
-                            {$v.material_name}
+                            <select lay-filter="product_name" name="material_name[]" lay-search>
+                                <option value="">请选择产品名称</option>
+                                {volist name='goods_name' id='goods'}
+                                <option value="{$goods.name}">{$goods.name}</option>
+                                {/volist}
+                            </select>
                         </td>
                         <td>
-                            <input type="hidden" value="{$v.num}" name="delivery_num[]" readonly>
-                            {$v.num}
+                            <input type="text" value="" name="delivery_num[]" class="layui-input">
                         </td>
                         <td class="huowei">
                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
@@ -148,7 +143,7 @@
                             <input type="text" value="" name="product_batch[]" class="layui-input" >
                         </td>
                         <td>
-                            <input type="text" value="{$v.detailed}" name="detailed[]" class="layui-input" >
+                            <input type="text" value="" name="detailed[]" class="layui-input" >
                         </td>
                         <td>
                             <button type="button" class="layui-btn layui-btn-sm add">
@@ -157,7 +152,6 @@
                         </td>
 
                 </tr>
-                {/volist}
                 </tbody>
             </table>
             <div class="total">
@@ -194,7 +188,7 @@
             </thead>
             <tbody class="kc_list"></tbody>
         </table>
-        <button class="layui-btn sure" style="margin: 20px auto 100px;">确定</button>
+        <button class="layui-btn sure" style="margin-top: 20px;">确定</button>
     </div>
 
 </div>
@@ -214,17 +208,20 @@
         $('.layui-table').on('click', '.add', function(){
             let _tr = $(this).parents('tr');
             let child = _tr[0].children;
-
+            console.log(child)
+            let status = child[0].children[0];
+            let str = '';
+            for(let i = 0; i<status.length; i++){
+                str += `<option value="${status[i].value}">${status[i].text}</option>`
+            }
             let html = `<tr>
-            <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
-            <input type="hidden" value="${child[1].value}" name="Delivery_id[]" readonly>
             <td class="status">
-                <input type="hidden" value="${child[2].innerText}" name="material_name[]" readonly>
-                ${child[2].innerText}
+                <select name="material_name[]" lay-filter="test" lay-search>
+                    ${str}
+                </select>
             </td>
             <td>
-                <input type="hidden" value="0" name="delivery_num[]" readonly>
-                <span>0</span>
+                <input type="text" value="" name="delivery_num[]" class="layui-input">
             </td>
             <td class="huowei">
                 <botton class="layui-btn layui-btn-sm dia">点击</botton>
@@ -245,10 +242,10 @@
                 <input type="date" name="product_time[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd">
             </td>
             <td class="product_batch">
-                <input type="text" value="" name="product_batch[]" >
+                <input type="text" value="" name="product_batch[]" class="layui-input">
             </td>
             <td>
-                <input type="text" value="${child[8].innerText}" name="detailed[]" >
+                <input type="text" value="${child[8].innerText}" name="detailed[]" class="layui-input">
                 ${child[8].innerText}
             </td>
             <td>
