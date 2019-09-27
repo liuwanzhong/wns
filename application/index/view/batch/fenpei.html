@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>货物出库</title>
+    <title>货物入库</title>
     <link rel="stylesheet" href="/images/index.css">
     <link rel="stylesheet" href="/layui/css/layui.css">
     <style>
@@ -17,43 +17,31 @@
 </head>
 <body>
 <div class="note">
-    <form method="post" class="layui-form" action="{:url('batch/tray_ck_insert',['tp_num'=>$tp_num ])}">
+    <form method="post" class="layui-form" action="{:url('batch/tray_rk_insert',['tp_num'=>$tp_num ])}">
         <input type="hidden" name="tp_num" value="$tp_num">
         <div class="form_box">
             <div class="layui-form-item">
                 <label class="layui-form-label">货物名:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="goods_name" value="{$res['0']['goods_name']}" readonly autocomplete="off" class="layui-input">
+                    <input type="text" name="goods_name" value="" required autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">货物数量:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="num" value="{$res['0']['num']}" readonly autocomplete="off" class="layui-input">
+                    <input type="text" name="num" value="" required autocomplete="off" class="layui-input">
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">装运单号:</label>
+                <label class="layui-form-label">产品日期:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="order" value=""  required autocomplete="off" class="layui-input">
+                    <input type="date" class="layui-input" name="ck_time">
                 </div>
             </div>
             <div class="layui-form-item">
-                    <label class="layui-form-label">产品日期:</label>
-                    <div class="layui-input-inline">
-                        <input type="text" class="layui-input" readonly name="ck_time" value="<?php if(!empty($res[0]['goods_time'])){echo date('Y-m-d',$res[0]['goods_time']);}?>">
-                    </div>
-                </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">售达方:</label>
+                <label class="layui-form-label">入库仓库:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="delivery" value=""  required autocomplete="off" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">出库仓库:</label>
-                <div class="layui-input-inline">
-                    <input type="text"  value="{$res[0]['name']}" required autocomplete="off" class="layui-input" readonly>
+                    <input type="text"  value="{$res[0]['name']}" autocomplete="off" class="layui-input" readonly>
                 </div>
             </div>
         </div>
@@ -62,20 +50,24 @@
                 <thead>
                     <tr>
                         <th class="ckgc">批次</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody class="tbd">
                     <tr>
                         <td>
-                        {foreach $batch as $b} 
-                            <input type="text" name="batch[]" value="{$b}" readonly class="layui-input">
-                        {/foreach} 
-                        </td>  
+                            <input type="text" name="batch[]" placeholder="请输入批次" required class="layui-input">
+                        </td>
+                        <td>
+                            <button type="button" class="layui-btn layui-btn-sm add">
+                                <i class="layui-icon">&#xe654;</i>
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
             <div class="btn">
-                <button class="layui-btn submit" lay-submit lay-filter="formDemo" >出库</button>
+                <button class="layui-btn submit" lay-submit lay-filter="formDemo" >保存</button>
             </div>
         </div>
     </form>

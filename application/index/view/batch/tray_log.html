@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>新增权限</title>
+		<link rel="stylesheet" href="/images/boot.css">
+		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
+		<link rel="stylesheet" href="/images/css.css">
+		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+		<style type="text/css">
+			.layui-table th{text-align: center;font-weight: bold;}
+			.layui-table td{text-align: center;}
+		</style>
+	<body>
+		<div class="note">
+			<div class="nav">
+				<span class="layui-breadcrumb">
+					<a href="/public/main.html" target="box">首页</a>
+					<a href="javascript:;">管理</a>
+					<a><cite>货位管理</cite></a>
+				</span>
+			</div>
+			<div class="search">
+                <form action="{:url('batch/tray_log')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">仓库</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="transfers_i" name="name" value="<?php if(!empty($name)){echo $name;}?>" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">托盘编号</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="s_delivery_time" name="tp_num" autocomplete="off" placeholder=" - " value="<?php if(!empty($tp_num)){echo $tp_num;}?>">
+                        </div>
+					</div>
+					<div class="layui-form-item">
+							<label class="layui-form-label">批次查找</label>
+							<div class="layui-input-inline">
+								<input type="text" class="layui-input"  name="batch" autocomplete="off" placeholder=" - " value="<?php if(!empty($batch)){echo $batch;}?>">
+							</div>
+						</div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <button class="layui-btn save" lay-submit>查询</button>
+                        </div>
+                    </div>
+                 </form>
+            </div>
+			<main class="bd_content">
+				<table class="layui-table" style="width: 96%; margin: 12px auto;">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>类型</th>
+						<th>托盘编号</th>
+						<th>所属仓库</th>
+						<th>装载货物</th>
+						<th>数量</th>
+						<th>客户</th>
+						<th>批次</th>
+					</tr>
+					</thead>
+					<tbody>
+                            {volist name='res' id='r'}
+                            <tr>
+                                <th>{$r['t_id']}</th>
+                                <th><?php if($r['t_state']==0){echo "入库";}else{echo "出库";}?></th>
+                                <th>{$r['tp_num']}</th>
+                                <th>{$r['w_name']}</th>
+                                <th>{$r['t_goods_name']}</th>
+                                <th>{$r['t_num']}</th>
+                                <th>{$r['t_delivery']}</th>
+                                <th><button class="layui-btn batch" lay-submit lay-filter="formDemo">查看</button></th>
+                            </tr>
+                            {/volist}
+                    </tbody>
+				</table>
+			</main>
+		</div>
+
+        <!--批次-->
+        <div class="model_table" style="display: none; top: 45%; overflow: hidden;">
+                <div class="head">
+                    <span>修改商品</span>
+                    <a href="javascript:" class="close">×</a>
+                </div>
+                <div class="content" style="height: 100%;overflow-x: hidden;">
+                    <table class="layui-table layui-form">
+                        <thead>
+                        <tr>
+                            <th>批次</th>
+                        </tr>
+                        </thead>
+                        <tbody class="kc_list"></tbody>
+                    </table>
+                </div>
+            </div>
+		<script src="/static/jquery-1.9.1.min.js"></script>
+		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/layui/layui.js"></script>
+		<script>
+			layui.use('element', function () {
+				let element = layui.element;
+			})
+		</script>
+
+		<script type="text/javascript">
+			//批次
+			$('.batch').on('click', function(){
+				$('.model_table').show();
+			})
+			$('.close').on('click', function(){
+				$('.model_table').hide();
+			})
+			//查看数据
+			$('.batch').click(function () {
+				let id=$(this).parents('tr').find('th').eq(0).text();
+				console.log(id);
+                $('.kc_list').empty();
+				$.ajax({
+					url:'/index/Batch/tray_log_batch',
+					type:'post',
+					data:{"id":id},
+					success:function (data) {
+						let html = '';
+                        for (let i =0; i<data.length; i++){
+                            html += ` <tr>
+                                        <td>
+                                        <input type="text" id="id" class="layui-input" value="${data[i]}" readonly>
+                                        </td>
+                                    </tr>`;
+                        }
+                        $('.kc_list').append(html)
+                        }
+                })
+			})
+		</script>
+	</body>
+</html>

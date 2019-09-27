@@ -21,7 +21,7 @@
 				</span>
 			</div>
 			<div class="search">
-                <form action="{:url('Run/tray')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+                <form action="{:url('batch/show_tray')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
                     <div class="layui-form-item">
                         <label class="layui-form-label">仓库</label>
                         <div class="layui-input-inline">
@@ -33,7 +33,13 @@
                         <div class="layui-input-inline">
                             <input type="text" class="layui-input" id="s_delivery_time" name="tp_num" autocomplete="off" placeholder=" - " value="<?php if(!empty($tp_num)){echo $tp_num;}?>">
                         </div>
-                    </div>
+					</div>
+					<div class="layui-form-item">
+							<label class="layui-form-label">批次查找</label>
+							<div class="layui-input-inline">
+								<input type="text" class="layui-input"  name="batch" autocomplete="off" placeholder=" - " value="<?php if(!empty($batch)){echo $batch;}?>">
+							</div>
+						</div>
                     <div class="layui-form-item">
                         <div class="layui-input-inline">
                             <button class="layui-btn save" lay-submit>查询</button>
@@ -41,9 +47,6 @@
                     </div>
                  </form>
             </div>
-			<div class="handle">
-				<button type="button" class="layui-btn" id="add">添加</button>
-			</div>
 			<main class="bd_content">
 				<table class="layui-table" style="width: 96%; margin: 12px auto;">
 					<thead>
@@ -51,84 +54,48 @@
 						<th>ID</th>
 						<th>托盘编号</th>
 						<th>所属仓库</th>
-						<th>创建时间</th>
+						<th>装载货物</th>
+						<th>数量</th>
+						<th>批次</th>
 						<th>操作</th>
 					</tr>
 					</thead>
 					<tbody>
-                        {volist name='rows' id='rows'}
+                        {volist name='res' id='r'}
                         <tr>
-                            <th>{$rows.id}</th>
-                            <th>{$rows.tp_num}</th>
-                            <th>{$rows.name}</th>
-                            <th><?php if(!empty($rows['create_time'])){echo date('Y-m-d',$rows['create_time']);}?></th>
+                            <th>{$r['id']}</th>
+                            <th>{$r['tp_num']}</th>
+                            <th>{$r['name']}</th>
+                            <th>{$r['goods_name']}</th>
+                            <th>{$r['num']}</th>
+                            <th><button class="layui-btn batch" lay-submit lay-filter="formDemo">查看</button></th>
                             <th>
-								<a href="#" class="edit ks" title="">详细</a>
-								<a href="#" class="del" title="">删除</a>
-							</th>
+                                <button class="layui-btn del" lay-submit lay-filter="formDemo">清空托盘</button>
+                            </th>
                         </tr>
                         {/volist}
                     </tbody>
-				</div>
+				</table>
 			</main>
 		</div>
 
-		<!--添加-->
-		<div class="model">
-			<div class="head">
-				<span>添加</span>
-				<a href="javascript:" class="close">×</a>
-			</div>
-			<div class="content">
-				<form action="{:url('Run/tray_add')}" method="post">
-					<div class="wrap">
-						<label>托盘编号:</label>
-						<input type="text" name="tp_num" value="" required oninput="setCustomValidity('')" placeholder='请不要重复'/>
-					</div>
-					<div class="wrap">
-						<label>所属仓库:</label>
-						<select name="warehouse_id">
-							<option value="0">---请选择所属仓库---</option>
-							{volist name='cks' id='c'}
-							<option value="{$c['id']}">{$c['name']}</option>
-							{/volist}
-						</select>
-					</div>
-					<div class="wrap btn">
-						<input type="submit" class="save" value="确定"/>
-						<input type="reset" class="reset" value="重置"/>
-					</div>
-				</form>
-			</div>
-		</div>
-		<!--修改-->
-		<div class="model_edit">
-			<div class="head">
-				<span>详细</span>
-				<a href="javascript:" class="close_edit">×</a>
-			</div>
-			<div class="content">
-				<form action="{:url('Run/cabinet_edit')}" method="post">
-					<input type="hidden" name="id" id="id">
-					<div class="wrap">
-						<label>托盘编号:</label>
-						<input type="text" name="tp_num" id="tp_num" value="" required oninput="setCustomValidity('')" readonly/>
-					</div>
-					<div class="wrap">
-						<label>所属仓库:</label>
-						<input type="text" name="name" id="name" value="" required oninput="setCustomValidity('')" readonly/>
-					</div>
-					<div class="wrap">
-						<label>二维码</label>
-						<img id="path" src="" alt="">
-					</div>
-					<div class="wrap btn">
-						<input type="submit" class="save" value="确定"/>
-						<input type="reset" class="reset" value="重置"/>
-					</div>
-				</form>
-			</div>
-		</div>
+        <!--批次-->
+        <div class="model_table" style="display: none; top: 45%; overflow: hidden;">
+                <div class="head">
+                    <span>修改商品</span>
+                    <a href="javascript:" class="close">×</a>
+                </div>
+                <div class="content" style="height: 100%;overflow-x: hidden;">
+                    <table class="layui-table layui-form">
+                        <thead>
+                        <tr>
+                            <th>批次</th>
+                        </tr>
+                        </thead>
+                        <tbody class="kc_list"></tbody>
+                    </table>
+                </div>
+            </div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
@@ -139,12 +106,12 @@
 		</script>
 
 		<script type="text/javascript">
-			//添加
-			$('#add').on('click', function(){
-				$('.model').show();
+			//批次
+			$('.batch').on('click', function(){
+				$('.model_table').show();
 			})
 			$('.close').on('click', function(){
-				$('.model').hide();
+				$('.model_table').hide();
 			})
 
 			//删除
@@ -156,34 +123,40 @@
 			})
 
 			//查看数据
-			$('.ks').click(function () {
+			$('.batch').click(function () {
 				let id=$(this).parents('tr').find('th').eq(0).text();
 				console.log(id);
 				$.ajax({
-					url:'/index/Run/tray_xx',
+					url:'/index/Batch/tray_batch',
 					type:'post',
 					data:{"id":id},
 					success:function (data) {
-						var path =data.path
-						$('#tp_num').val(data.tp_num)
-						$('#name').val(data.name)
-						$('#path').attr('src',path)
-					}
-				})
+                        console.log(data);
+						let html = '';
+                        for (let i =0; i<data.length; i++){
+                            html += ` <tr>
+                                        <td>
+                                        <input type="text" id="id" class="layui-input" value="${data[i]}" readonly>
+                                        </td>
+                                    </tr>`;
+                        }
+                        $('.kc_list').append(html)
+                        }
+                })
 			})
 			$('.del').click(function () {
 				let id=$(this).parents('tr').find('th').eq(0).text();
 				let p = $(this).parents('tr');
 				console.log(id);
 				$.ajax({
-					url:'/index/Run/tray_del',
+					url:'/index/Run/clean',
 					type:'post',
 					data:{"id":id},
 					success:function (data) {
 						if(data){
 							p.remove();
 						}else{
-							alert('删除失败')
+							alert('清空失败')
 						}
 					}
 				})

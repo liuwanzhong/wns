@@ -202,9 +202,7 @@ class Instor extends Controller
         ->order('state_time desc')
         ->limit(1)
         ->select();
-        // dump($cq);exit;
         if($cq){
-            dump($cq);
             $chuqi=$cq[0]['balance'];
         }else{
             $res=db('record')
@@ -418,7 +416,6 @@ class Instor extends Controller
         $data=input();
         array_shift($data);
         $delivery_time=strtotime($data['delivery_time']);
-//        dump($data);exit;
         try{
             $id = db('outbound_from')->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>$delivery_time,'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id'],'state'=>1]);
             for ($i=0;$i<count($data['delivery_num']);$i++){
