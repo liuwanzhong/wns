@@ -222,33 +222,50 @@ class Instor extends Controller
         $year = date('Y',time());
         $xx=array();
         // 初期数量
-        $chuqi=db('record')
+        $cq= db('record')
         ->where('huowei',$id)
         ->where('is_del',1)
         ->where("time <= $time")
-        ->field('balance')
-        ->order('time asc')
+        ->where('task','结存')
+        ->order('state_time desc')
         ->limit(1)
         ->select();
-        dump($chuqi);
-        // 结存数量
+        // dump($cq);exit;
+        if($cq){
+            dump($cq);
+            $chuqi=$cq[0]['balance'];
+        }else{
+            $res=db('record')
+            ->where('huowei',$id)
+            ->where('is_del',1)
+            ->where("time <= $time")
+            ->field('early_stage')
+            ->order('state_time asc')
+            ->limit(1)
+            ->select();
+            $chuqi=$res[0]['early_stage'];
+        }
         $jiecun=db('record')
         ->where('huowei',$id)
         ->where('is_del',1)
         ->where("time <= $time")
         ->field('balance')
-        ->order('time desc')
+        ->order('state_time desc')
         ->limit(1)
         ->select();
-        dump($jiecun);
-        $insert['early_stage']=$chuqi[0]['balance'];
+        $insert['early_stage']=$chuqi;
         $insert['balance']=$jiecun[0]['balance'];
         $insert['huowei']=$id;
         $insert['time']=$time;
         $insert['task']='结存';
         $into=db('record')
         ->insert($insert);
-        dump($into);exit;
+        if($into){
+            return redirect('Instor/index');
+        }else{
+            $this -> error('未知错误');
+        }
+        
     }
     // 月度统计
     public function show_month(){
@@ -289,6 +306,7 @@ class Instor extends Controller
         ->where("date_format(from_unixtime(time),'%m')=$m")
         ->where("date_format(from_unixtime(time),'%Y')=$y")
         ->where('huowei',$huowei)
+        ->where("task != '结存'")
         ->order('time asc')
         ->select();
         return view('show_month_xx',['rows'=>$rows,'time'=>$time]);

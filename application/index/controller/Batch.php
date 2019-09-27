@@ -46,7 +46,7 @@ class Batch extends Controller {
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
         ->where('tray.is_del',0)
         ->select();
-        dump($res);
+        // dump($res);
         // exit;
         return view('ruku_ck',['res'=>$res]);
     }
