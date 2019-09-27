@@ -67,6 +67,7 @@ class Rukuorder extends Controller {
     }
     //添加入库订单
     public function insert(){
+        Db::startTrans();
         $data = input();
         $userintime=strtotime($data['userintime']);
         try{
@@ -213,6 +214,7 @@ class Rukuorder extends Controller {
     }
     //审核
     public function to_examine_yes() {
+        Db::startTrans();
         $ms=$this->qx();
         if($ms==0){
             $this->error('警告：越权操作');
@@ -223,24 +225,17 @@ class Rukuorder extends Controller {
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
         }
-        $s=db('rukuform_xq')
+        try{
+            $s=db('rukuform_xq')
                 ->where('rukuid',$id)
                 ->select();
-        foreach ($s as $c){
-            $jc='';
-            $a=db('record')->where('huowei',$c['rk_huowei_id'])->order('id desc')->limit(1)->select();
-            db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$c['transfers_id'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums'],'huowei'=>$c['rk_huowei_id']]);
-        }
-
-
-
-        try{
+            foreach ($s as $c){
+                $a=db('record')->where('huowei',$c['rk_huowei_id'])->order('id desc')->limit(1)->select();
+                $b=db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$c['transfers_id'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums'],'huowei'=>$c['rk_huowei_id']]);
+            }
             $r=db('rukuform')->where('id',$id)->update(['state'=>1]);
             $s=db('rukuform_xq')->where('rukuid',$id)->update(['state'=>1]);
-            if($r && $s) {
-
-
-                return redirect('to_examine');
+            if($r && $s && $b) {
                 Db::commit();
             }
         } catch (\Exception $e) {
@@ -248,6 +243,7 @@ class Rukuorder extends Controller {
             // 回滚事务
             Db::rollback();
         }
+        return redirect('to_examine');
     }
     //删除
     public function to_examine_del() {
@@ -442,7 +438,7 @@ class Rukuorder extends Controller {
                 $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['w_name']);
                 $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['c_name']);
                 $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, date('Y-m-d',$v['time']));
-                $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['product_time']);
+                $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, date('Y-m-d',$v['product_time']));
                 $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['rk_nums']);
                 $phpExcel->getActiveSheet()->setCellValue('I' . $rownum, $v['netweight']);
                 $phpExcel->getActiveSheet()->setCellValue('J' . $rownum, $v['Grossweight']);

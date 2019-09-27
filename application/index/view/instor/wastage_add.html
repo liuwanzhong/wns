@@ -20,11 +20,11 @@
         <span class="layui-breadcrumb">
             <a href="/public/main.html" target="box">首页</a>
             <a href="javascript:;">入库管理</a>
-            <a><cite>调拨</cite></a>
+            <a><cite>损耗单</cite></a>
         </span>
     </div>
 
-    <form method="post" class="layui-form" action="{:url('Instor/tj_db')}">
+    <form method="post" class="layui-form" action="{:url('Instor/wastage_inset')}">
         <div class="form_box">
             <div class="layui-form-item">
                 <label class="layui-form-label">仓库:</label>
@@ -43,13 +43,11 @@
                 <thead>
                     <tr>
                         <th>产品名称</th>
-                        <th>产品日期</th>
-                        <th>调拨日期</th>
-                        <th>调出货位</th>
-                        <th>调出货位产品数量</th>
-                        <th>调拨数量</th>
-                        <th>调入货位</th>
-                        <th>调入货位产品数量</th>
+                        <th>损耗日期</th>
+                        <th>货位</th>
+                        <th>产品数量</th>
+                        <th>损耗数量</th>
+                        <th>备注</th>
                 </thead>
                 <tbody class="tbd">
                     <tr>
@@ -62,27 +60,20 @@
                             </select>
                         </td>
                         <td class="jin">
-                            <input type="date" value="" name="c_time" class="layui-input">
-                        </td>
-                        <td class="jin">
                             <input type="date" value="" name="d_time" class="layui-input">
                         </td>
                         <td class="huowei">
                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
                         </td>
                         <td class="count">
-                            <input type="hidden" value="huowei_out" name="huowei_out" readonly>
+                            <input type="hidden" value="huowei_out" name="huowei_out" class="layui-input">
                             <span>0</span>
                         </td>
-                        <td class="jin">
-                            <input type="text" value="" name="shu" class="layui-input">
+                        <td>
+                            <input type="text" name="count" class="layui-input">
                         </td>
-                        <td class="huowei_r">
-                            <botton class="layui-btn layui-btn-sm dia_r">点击</botton>
-                        </td>
-                        <td class="count_ss">
-                            <input type="hidden" value="huowei_out_ss" name="huowei_out_ss" readonly>
-                            <span>0</span>
+                        <td class="center">
+                            <input type="text" value="" name="center" class="layui-input">
                         </td>
                 </tr>
                 </tbody>
@@ -194,6 +185,7 @@
                     url:'/index/Instor/houwei_ck',
                     data: {id,name},
                     success:function (data) {
+                        console.log(data)
                         let html = '';
                         for (let i =0; i<data.length; i++){
                             html += ` <tr>
@@ -248,6 +240,7 @@
                     url:'/index/Instor/huowei_ck_r',
                     data: {id},
                     success:function (data) {
+                        console.log(data)
                         let html = '';
                         for (let i =0; i<data.length; i++){
                             html += ` <tr>
@@ -255,7 +248,6 @@
                             <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
                             <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
                             <input type="hidden" id="c_id" class="layui-input" value="${data[i].c_id}">
-
                             <td><input type="radio" name="redio" value="nan" title=""></td>
                             <td>${data[i].product_name}</td>
                             <td>${data[i].product_time}</td>

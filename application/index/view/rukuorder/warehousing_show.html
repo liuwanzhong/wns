@@ -36,6 +36,12 @@
                     </div>
                 </div>
                 <div class="layui-form-item">
+                    <label class="layui-form-label">入库日期:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="userintime" value="{$rows.userintime|date='Y-m-d',###}" readonly class="layui-input" >
+                    </div>
+                </div>
+                <div class="layui-form-item">
                     <label class="layui-form-label">运输方式:</label>
                     <div class="layui-input-inline">
                         <input type="text" name="transport" value="{$rows['transport']}" readonly class="layui-input">

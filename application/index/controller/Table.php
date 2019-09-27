@@ -47,6 +47,7 @@ class Table extends Controller {
             $md[$k]['j']=$row['netweight']/$row['rk_nums'];
             $md[$k]['sy']=$row['rk_nums']-$sy;
             $md[$k]['c_id']=$row['c_id'];
+            $md[$k]['product_time']=date('Y-m-d',$row['product_time']);
         }
         return $md;
     }
