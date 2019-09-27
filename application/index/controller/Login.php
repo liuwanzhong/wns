@@ -130,4 +130,9 @@ class Login extends Controller
         Session::delete('zt');
         return redirect('login');
     }
+
+
+    public function cm() {
+        return view('em');
+    }
 }

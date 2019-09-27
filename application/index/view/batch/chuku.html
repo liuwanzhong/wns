@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>货物出库</title>
+    <link rel="stylesheet" href="/images/index.css">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <style>
+        .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
+        .btn{margin-left: 30px;margin-top: 30px;}
+        .container{display: block;overflow-x: hidden;height: 580px;}
+        .container::-webkit-scrollbar{width: 0;}
+        input[type="date"]::-webkit-inner-spin-button {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="note">
+    <form method="post" class="layui-form" action="{:url('batch/tray_ck_insert',['tp_num'=>$tp_num ])}">
+        <input type="hidden" name="tp_num" value="$tp_num">
+        <div class="form_box">
+            <div class="layui-form-item">
+                <label class="layui-form-label">货物名:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="goods_name" value="{$res['0']['goods_name']}" readonly autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">货物数量:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="num" value="{$res['0']['num']}" readonly autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">装运单号:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="order" value=""  required autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                    <label class="layui-form-label">产品日期:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" readonly name="ck_time" value="<?php if(!empty($res[0]['goods_time'])){echo date('Y-m-d',$res[0]['goods_time']);}?>">
+                    </div>
+                </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">售达方:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="delivery" value=""  required autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">出库仓库:</label>
+                <div class="layui-input-inline">
+                    <input type="text"  value="{$res[0]['name']}" required autocomplete="off" class="layui-input" readonly>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <table class="layui-table" style="width: 96%; margin: 12px auto;">
+                <thead>
+                    <tr>
+                        <th class="ckgc">批次</th>
+                    </tr>
+                </thead>
+                <tbody class="tbd">
+                    <tr>
+                        <td>
+                        {foreach $batch as $b} 
+                            <input type="text" name="batch[]" value="{$b}" readonly class="layui-input">
+                        {/foreach} 
+                        </td>  
+                    </tr>
+                </tbody>
+            </table>
+            <div class="btn">
+                <button class="layui-btn submit" lay-submit lay-filter="formDemo" >出库</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['element', 'form','laydate'], function () {
+        let laydate = layui.laydate;
+        let form = layui.form;
+        laydate.render({
+            elem: '#time',
+            type: 'date'
+        })
+
+        // 点加按钮添加一行数据
+        $('.layui-table').on('click', '.add', function(){
+            let html = `<tr>
+                        <td>
+                            <input type="text" name="batch[]" placeholder="请输入批次" required class="layui-input">
+                        </td>
+                        <td>
+                            <button type="button" class="layui-btn layui-btn-sm remove">
+                                <i class="layui-icon">&#xe640;</i>
+                            </button>
+                        </td>
+                    </tr>`;
+            $('.tbd').append(html);
+            form.render();
+
+        })
+    })
+
+    // 点击删除按钮移除当前行
+    $('.tbd').on('click','.remove', function(){
+        let p = $(this).parents('tr');
+        p.remove();
+    })
+
+</script>
+</body>
+</html>

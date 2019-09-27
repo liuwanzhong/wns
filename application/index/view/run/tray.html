@@ -20,8 +20,29 @@
 					<a><cite>货位管理</cite></a>
 				</span>
 			</div>
+			<div class="search">
+                <form action="{:url('Run/tray')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">仓库</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="transfers_i" name="name" value="<?php if(!empty($name)){echo $name;}?>" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">托盘编号</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="s_delivery_time" name="tp_num" autocomplete="off" placeholder=" - " value="<?php if(!empty($tp_num)){echo $tp_num;}?>">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <button class="layui-btn save" lay-submit>查询</button>
+                        </div>
+                    </div>
+                 </form>
+            </div>
 			<div class="handle">
-				<button type="button" class="layui-btn" id="dialog">添加</button>
+				<button type="button" class="layui-btn" id="add">添加</button>
 			</div>
 			<main class="bd_content">
 				<table class="layui-table" style="width: 96%; margin: 12px auto;">
@@ -40,8 +61,11 @@
                             <th>{$rows.id}</th>
                             <th>{$rows.tp_num}</th>
                             <th>{$rows.name}</th>
-                            <th>{$rows.create_time}</th>
-                            <th></th>
+                            <th><?php if(!empty($rows['create_time'])){echo date('Y-m-d',$rows['create_time']);}?></th>
+                            <th>
+								<a href="#" class="edit ks" title="">详细</a>
+								<a href="#" class="del" title="">删除</a>
+							</th>
                         </tr>
                         {/volist}
                     </tbody>
@@ -59,7 +83,7 @@
 				<form action="{:url('Run/tray_add')}" method="post">
 					<div class="wrap">
 						<label>托盘编号:</label>
-						<input type="text" name="tp_num" value="" required oninput="setCustomValidity('')" placeholder='A001'/>
+						<input type="text" name="tp_num" value="" required oninput="setCustomValidity('')" placeholder='请不要重复'/>
 					</div>
 					<div class="wrap">
 						<label>所属仓库:</label>
@@ -80,7 +104,7 @@
 		<!--修改-->
 		<div class="model_edit">
 			<div class="head">
-				<span>修改</span>
+				<span>详细</span>
 				<a href="javascript:" class="close_edit">×</a>
 			</div>
 			<div class="content">
@@ -88,20 +112,15 @@
 					<input type="hidden" name="id" id="id">
 					<div class="wrap">
 						<label>托盘编号:</label>
-						<input type="text" name="tp_num" id="name" value="" required oninput="setCustomValidity('')" placeholder='A001'/>
+						<input type="text" name="tp_num" id="tp_num" value="" required oninput="setCustomValidity('')" readonly/>
 					</div>
 					<div class="wrap">
 						<label>所属仓库:</label>
-						<select name="warehouse_id" id="warehouse_id">
-							<option value="0">---请选择所属仓库---</option>
-							{volist name='cks' id='c'}
-							<option value="{$c['id']}">{$c['name']}</option>
-							{/volist}
-						</select>
+						<input type="text" name="name" id="name" value="" required oninput="setCustomValidity('')" readonly/>
 					</div>
 					<div class="wrap">
-						<label>货位说明</label>
-						<textarea name="content" id="content" cols="30" rows="10"></textarea>
+						<label>二维码</label>
+						<img id="path" src="" alt="">
 					</div>
 					<div class="wrap btn">
 						<input type="submit" class="save" value="确定"/>
@@ -121,14 +140,14 @@
 
 		<script type="text/javascript">
 			//添加
-			$('#dialog').on('click', function(){
+			$('#add').on('click', function(){
 				$('.model').show();
 			})
 			$('.close').on('click', function(){
 				$('.model').hide();
 			})
 
-			//修改
+			//删除
 			$('.edit').on('click', function(){
 				$('.model_edit').show();
 			})
@@ -138,24 +157,34 @@
 
 			//查看数据
 			$('.ks').click(function () {
-				let id=$(this).parents('tr').find('td').eq(0).text();
+				let id=$(this).parents('tr').find('th').eq(0).text();
+				console.log(id);
 				$.ajax({
-					url:'/index/Run/cabinet_select',
+					url:'/index/Run/tray_xx',
 					type:'post',
 					data:{"id":id},
 					success:function (data) {
-						if(data.error==0){
-							layer.alert(data.msg, {
-								icon: 6,
-								yes:function(){
-									location.href='/index/Run/cabinet';
-								}
-							});
-						}
+						var path =data.path
+						$('#tp_num').val(data.tp_num)
 						$('#name').val(data.name)
-						$('#content').val(data.content)
-						$('#warehouse_id').val(data.warehouse_id)
-						$('#id').val(data.id)
+						$('#path').attr('src',path)
+					}
+				})
+			})
+			$('.del').click(function () {
+				let id=$(this).parents('tr').find('th').eq(0).text();
+				let p = $(this).parents('tr');
+				console.log(id);
+				$.ajax({
+					url:'/index/Run/tray_del',
+					type:'post',
+					data:{"id":id},
+					success:function (data) {
+						if(data){
+							p.remove();
+						}else{
+							alert('删除失败')
+						}
 					}
 				})
 			})

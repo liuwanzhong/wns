@@ -275,7 +275,6 @@
             url:'/index/Rukuorder/blur',
             data:{'min':min,'max':max,'groos_min':gross_min},
             success:function (data) {
-                console.log(data)
                 parent.find('.num').next().text(data.number)
                 parent.find('.groos').next().text(data.groos)
                 parent.find('.groos').val(data.groos)
