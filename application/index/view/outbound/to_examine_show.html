@@ -198,6 +198,13 @@
                     {/volist}
                 </tbody>
             </table>
+            <div class="total">
+                <input type="hidden" name="all_count" value="">
+                <input type="hidden" name="all_weight" value="">
+                <p>合计数量：<span class="all_count">0</span></p>
+                <p>合计重量：<span class="all_weight">0</span></p>
+                <p>派车人签字：</p>
+            </div>
             <div class="btn">
                 <button class="layui-btn submit" lay-submit lay-filter="formDemo" id="del">立即提交</button>
                 <a class="layui-btn" href="{:url('Outbound/to_examine')}">返回</a>
@@ -250,6 +257,7 @@
                 str += `<option value="${status[i].value}">${status[i].text}</option>`
             }
             let html = `<tr>
+                        <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
                         <input type="hidden" name="gross_min" value="{$v.j}">
                         <input type="hidden" name="delivery_id[]" value="{$v.delivery_id}">
                         <td>
@@ -265,15 +273,15 @@
                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
                         </td>
                         <td class="count">
-                            <input type="hidden" value="nums" name="nums[]" readonly>
+                            <input type="hidden" value="0" name="nums[]" readonly>
                             <span>{$v.ck_nums}</span>
                         </td>
                         <td class="jin">
-                            <input type="hidden" value="jin" name="netweight[]" readonly>
+                            <input type="hidden" value="0" name="netweight[]" readonly>
                             <span>0</span>
                         </td>
                         <td class="sy_count">
-                            <input type="hidden" value="sy_count" name="sy_count[]" readonly>
+                            <input type="hidden" value="0" name="sy_count[]" readonly>
                             <span>0</span>
                         </td>
                         <td class="indate">
@@ -292,32 +300,32 @@
             form.render();
 
         })
-
-        // 入库货位 数据请求
-        form.on('select(ck_id)', function(data){
-            let id = data.elem.value;
-            if(id != 0){
-                $('.showhuowei').empty();
-                $.ajax({
-                    type: "get",//请求方式有post，get请求方式，这里是post请求
-                    url: '/index/table/show/id/' + id,//请求的方法的路径
-                    dataType: 'json',//请求参数的格式为json.另外还有text等
-                    success: function(data){
-                        var data = JSON.parse(data);
-                        console.log(data);
-                        $('.showhuowei').append("<option value='0'>请选择货位</option>");
-                        for (var i=0;i<data.length;i++)
-                        {
-                            $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
-                        }
-                        $(".forzentitle").val(data.title);
-                        $('.frozencount').val(data.goods_feel);
-                        $(".editfrozenid").val(data.id);
-                        form.render();
-                    }
-                })
-            }
-        })
+        //
+        // // 入库货位 数据请求
+        // form.on('select(ck_id)', function(data){
+        //     let id = data.elem.value;
+        //     if(id != 0){
+        //         $('.showhuowei').empty();
+        //         $.ajax({
+        //             type: "get",//请求方式有post，get请求方式，这里是post请求
+        //             url: '/index/table/show/id/' + id,//请求的方法的路径
+        //             dataType: 'json',//请求参数的格式为json.另外还有text等
+        //             success: function(data){
+        //                 var data = JSON.parse(data);
+        //                 console.log(data);
+        //                 $('.showhuowei').append("<option value='0'>请选择货位</option>");
+        //                 for (var i=0;i<data.length;i++)
+        //                 {
+        //                     $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
+        //                 }
+        //                 $(".forzentitle").val(data.title);
+        //                 $('.frozencount').val(data.goods_feel);
+        //                 $(".editfrozenid").val(data.id);
+        //                 form.render();
+        //             }
+        //         })
+        //     }
+        // })
 
 
         let par = '';
@@ -401,6 +409,23 @@
     // 点击删除按钮移除当前行
     $('.tbd').on('click','.remove', function(){
         let p = $(this).parents('tr');
+        let id=p.find('.rukuform_xq_id').val();
+        let num=p.find('.count').find('input').val();
+        let jin = p.find('.jin input').val();
+        let allcount = $('.all_count').text();
+        let allweight = $('.all_weight').text();
+        if(jin != 0 || num != 0){
+            let weight = [(Number(allweight) - Number(jin))*1000]/1000;
+            let we=Math.round(weight*1000)/1000;
+            $('.all_count').text(Number(allcount) - Number(num));
+            $('.all_weight').text(we);
+            $('input[name=all_count]').val(Number(allcount) - Number(num));
+            $('input[name=all_weight]').val(we);
+        }
+        $.ajax({
+            url:'/index/Table/huifu',
+            data:{id,num}
+        })
         p.remove();
     })
 
@@ -412,19 +437,15 @@
     // 修改商品数量
     $('.tbd').on('blur', '.countnum', function(){
         let parent =$(this).parents('tr');
-        console.log(parent)
         //净重
         let min = parent.find('input[name=gross_min]').val();
-        console.log(min);
         //毛重
         let gross_min = $(this).parents('tr').find('input[name=min]').val();
-        console.log(gross_min)
         let max = $(this).val()
         $.ajax({
             url:'/index/Rukuorder/blur',
             data:{'min':min,'max':max,'groos_min':gross_min},
             success:function (data) {
-                console.log(data)
                 parent.find('.num').next().text(data.number)
                 parent.find('.groos').next().text(data.groos)
                 parent.find('.groos').val(data.groos)
@@ -432,6 +453,7 @@
             }
         })
     })
+
     $('.close').on('click', function(){
         $('.model_table').hide();
 

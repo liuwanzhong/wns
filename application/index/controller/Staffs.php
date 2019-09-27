@@ -18,6 +18,10 @@ class Staffs extends Controller {
     }
     //添加管理员视图
     public function staffs_add() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $rows=db('department')->where('is_del',1)->select();
         $this->read(0);
         $md=self::$md;
@@ -25,10 +29,6 @@ class Staffs extends Controller {
     }
     //添加管理员
     public function staffs_insert() {
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
         $data=input();
         if($data['department_id']==0){
             $msg=["error"=>103,'ts'=>"请选择部门"];
@@ -277,27 +277,14 @@ class Staffs extends Controller {
         }
         return $msg;
     }
-    //修改权限状态
-    public function pow_state($id)
-    {
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
-        $state=db('pow')->where('id',$id)->find();
-        if($state['cj']==3){
-            $this->error('该规则不能显示');
-        }
-        if($state['state']=='正常'){
-            db('pow')->where('id',$id)->update(['state'=>'隐藏']);
-        }else{
-            db('pow')->where('id',$id)->update(['state'=>'正常']);
-        }
-        return redirect('Staffs/pow');
-    }
     //数据回显
     public function pow_up_edit()
     {
+        $ms=$this->qx();
+        if($ms==0){
+            $msg=['error'=>0,'msg'=>'警告:越权操作'];
+            return $msg;
+        }
         $id=$_POST['id'];
         $row=db('pow')->where('id',$id)->find();
         return $row;

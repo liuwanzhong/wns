@@ -110,6 +110,10 @@ class Outbound extends Controller {
     }
     // 生成出库单
     public function make_outbound_order(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $f=db('rukuform_xq')->where('state',1)->select();
         for($i=0;$i<count($f);$i++){
             db('rukuform_xq')->where('id',$f[$i]['id'])->update(['sy_count'=>$f[$i]['rk_nums']]);
@@ -265,6 +269,10 @@ class Outbound extends Controller {
     }
     // 出库订单详情
     public function to_examine_show($id) {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $f=db('rukuform_xq')->where('state',1)->select();
         for($i=0;$i<count($f);$i++){
             db('rukuform_xq')->where('id',$f[$i]['id'])->update(['sy_count'=>$f[$i]['rk_nums']]);
@@ -311,7 +319,7 @@ class Outbound extends Controller {
                 'transport_unit' => $data['transport_unit'],
                 'update_time' => time(),
                 'ck_id' => $data['ck_id'],
-                'ck_time'=>strtotime($data['userintime'])
+                'ck_time'=>strtotime($data['userintime']),'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight']
                 ]);
         for($i=0;$i<count($data['material_name']);$i++){
             if(empty($data['cd'][$i])){
@@ -352,6 +360,10 @@ class Outbound extends Controller {
     }
     //出库审核
     public function to_examine_yes() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         Db::startTrans();
         $id=input('id');
         $data=input();
@@ -476,6 +488,10 @@ class Outbound extends Controller {
     }
     //删除
     public function warehousing_del() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $id=input('id');
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
@@ -491,6 +507,7 @@ class Outbound extends Controller {
     public function detailed() {
         $s_transfers_id=input('s_transfers_id');//工厂
         $s_delivery_time=input('s_delivery_time');//日期
+        $s_material_name=input('s_material_name');//产品名称
         $data=input();
         $search = '';
         //工厂名
@@ -512,6 +529,16 @@ class Outbound extends Controller {
             }
             $search .= $time;
         }
+        // 产品名称
+        if (!empty($s_material_name)) {
+            $material_name = $s_material_name;
+            if (!empty($search)) {
+                $material_name = ' and outbound_xq_from.product_name like ' . "'%" . $material_name . '%' . "'";
+            } else {
+                $material_name = ' outbound_xq_from.product_name like' . "'%" . $material_name . '%' . "'";
+            }
+            $search .= $material_name;
+        }
         $rows=db('outbound_xq_from')
             ->join('outbound_from','outbound_from.id=outbound_xq_from.chukuid','left')
             ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
@@ -521,13 +548,17 @@ class Outbound extends Controller {
             ->group('outbound_xq_from.id')
             ->where($search)
             ->field('outbound_xq_from.*,warehouse.name as w_name,outbound_from.transport_id as t_id,sum(outbound_xq_from.ck_nums) as count,outbound_from.reachout_name,outbound_from.delivery_time,cabinet.name as c_name,outbound_from.ck_time')
-            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]]);
-        return view('detailed',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]);
+            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+        return view('detailed',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
 
 
     //导出
-    public function outExcel(){
+    public function outExcel2(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data = input();
         array_shift($data);
         $id=$data['id'];
@@ -623,5 +654,77 @@ class Outbound extends Controller {
             exit();
         }
     }
-
+    public function outExcel(){
+        $data=input();
+        array_shift($data);
+        $id=$data['id'];
+        $da=str_replace('"', '', $id);
+        $da=trim($da,'[');
+        $da=trim($da,']');
+        $data=db('system_order')
+            ->where("id in ($da)")
+            ->select();
+        if(!empty($data)){
+            Vendor('PHPExcel.PHPExcel');
+            Vendor('PHPExcel.PHPExcel.IOFactory');
+            $phpExcel = new \PHPExcel();
+            $phpExcel->setActiveSheetIndex(0)
+                ->setCellValue('A1', '发货日期')
+                ->setCellValue('B1', '工厂')
+                ->setCellValue('C1', '工厂名称')
+                ->setCellValue('D1', '装运单号')
+                ->setCellValue('E1', '交货单号')
+                ->setCellValue('F1', '售达方代码')
+                ->setCellValue('G1', '售达方名称')
+                ->setCellValue('H1', '送达方代码')
+                ->setCellValue('I1', '送达方名称')
+                ->setCellValue('J1', '物料')
+                ->setCellValue('K1', '物料名称')
+                ->setCellValue('L1', '交货数量')
+                ->setCellValue('M1', '详细批次');
+            $len = count($data);
+            for($i = 0 ; $i < $len ; $i++){
+                $v = $data[$i];
+                $rownum = $i+2;
+                $phpExcel->getActiveSheet()->setCellValue('A' . $rownum, date('Y-m-d',$v['delivery_time']));
+                $phpExcel->getActiveSheet()->setCellValue('B' . $rownum, $v['factory_id']);
+                $phpExcel->getActiveSheet()->setCellValue('C' . $rownum, $v['factory_name']);
+                $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['transport_id']);
+                $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['Delivery_id']);
+                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, $v['reachout_id']);
+                $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['reachout_name']);
+                $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['reachby_id']);
+                $phpExcel->getActiveSheet()->setCellValue('I' . $rownum, $v['reachby_name']);
+                $phpExcel->getActiveSheet()->setCellValue('J' . $rownum, $v['material_id']);
+                $phpExcel->getActiveSheet()->setCellValue('K' . $rownum, $v['material_name']);
+                $phpExcel->getActiveSheet()->setCellValue('L' . $rownum, $v['Delivery_num']);
+                $phpExcel->getActiveSheet()->setCellValue('M' . $rownum, $v['detailed']);
+            }
+            $phpExcel->setActiveSheetIndex(0);
+            $filename=date('Y-m-d',time()).'.xlsx';
+            $objWriter=\PHPExcel_IOFactory::createWriter($phpExcel,'Excel2007');
+            $filePath =$filename;
+            $objWriter->save($filePath);
+            if(!file_exists($filePath)){
+                $response = array(
+                    'status' => 'false',
+                    'url' => '',
+                    'token'=>''
+                );
+            }else{
+                $response = array(
+                    'status' => true,
+                    'url' => $filename,
+                    'token'=>$this->getDownLoadToken($filename)
+                );
+            }
+        }else{
+            $response = array(
+                'status' => 'false',
+                'url' => '',
+                'token'=>''
+            );
+        }
+        exit(json_encode($response));
+    }
 }

@@ -40,7 +40,7 @@
 					<div class="layui-form-item">
 						<div class="layui-input-inline">
 							<button class="layui-btn save" lay-submit>查询</button>
-							<button class="layui-btn" id="dc">导出</button>
+							<a href="#" class="layui-btn" id="dc">导出</a>
 						</div>
 					</div>
 				</form>
@@ -57,6 +57,7 @@
 						<th>送达方</th>
 						<th>出库日期</th>
 						<th>总数量</th>
+						<th>实际重量</th>
 						<th>操作</th>
 					</tr>
 					</thead>
@@ -69,8 +70,9 @@
 						<td>{$row.w_name}</td>
 						<td>{$row.transport_id}</td>
 						<td>{$row.reachout_name}</td>
-						<td><?php if(!empty($row['delivery_time'])){echo date('Y-m-d',$row['delivery_time']);} ?></td>
+						<td><?php if(!empty($row['ck_time'])){echo date('Y-m-d',$row['ck_time']);} ?></td>
 						<td>{$row.count}</td>
+						<td>{$row.total_zhong}</td>
 						<td>
 							<a href="#" class="edit xq" style="margin-right: 15px;"><i class="ico" title="详情">&#xe619;</i></a>
 							<a href="{:url('Outbound/to_examine_yes',['id'=>$row.id,'transport_id'=>$row.transport_id,'reachout_name'=>$row.reachout_name,'task'=>'销售出库'])}" class="edit ks" title="审核通过"><i class="ico">&#xe602;</i></a>
@@ -184,8 +186,7 @@
 				var data = sessionStorage.session_ck;
 				if(data !=  undefined || data != null){
 					var params = {id: data};
-					$.post("{:url('Outbound/outExcel')}", params, function (res) {
-						console.log(res)
+					$.post("{:url('Outbound/outExcel2')}", params, function (res) {
 						if(res.error==0){
 							alert(res.msg);
 							return false;

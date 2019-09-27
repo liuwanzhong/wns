@@ -59,6 +59,10 @@ class Table extends Controller {
         db('rukuform_xq')->where('id',$data['id'])->update(['sy_count'=>$row['sy_count']-$data['count']]);
         $row=db('rukuform_xq')->where('id',$data['id'])->find();
         $mj['sy']=$row['sy_count'];
+
+        $row=db('rukuform_xq')->where('id',$data['id'])->find();
+        $row['product_time']=date('Y-m-d',$row['product_time']);
+        $mj['row']=$row;
         return $mj;
     }
     public function huifu() {

@@ -184,6 +184,14 @@
 					type:'post',
 					data:{"id":id},
 					success:function (data) {
+						if(data.error==0){
+							layer.alert(data.msg, {
+								icon: 6,
+								yes:function(){
+									location.href='/index/Staffs/pow';
+								}
+							});
+						}
 						$('#id').val(data.id)
 						$('#parent_id').val(data.parent_id)
 						$('#pow_name').val(data.pow_name)

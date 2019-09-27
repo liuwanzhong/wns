@@ -4,11 +4,16 @@ use think\Controller;
 use think\Db;
 use think\Request;
 use think\response\Redirect;
+use think\Session;
 
 class Instor extends Controller
 {
     //货物列表
     public function index(){
+        $zt=Session::get('zt');
+        static $md=[];
+        $time=time();
+        $zq=db('rukuform_xq')->where('is_del',0)->where('state',1)->where("product_time<$time-60*60*24*30")->select();
         $rows=db('rukuform_xq')->where('is_del',0)->select();
         for($i=0;$i<count($rows);$i++){
             if($rows[$i]['rk_nums']<1){
@@ -71,10 +76,26 @@ class Instor extends Controller
 
         //仓库
         $ware=db('warehouse')->where('is_del',1)->select();
-        return view('index2',['orders'=>$orders,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
+        foreach ($orders as $o) {
+            foreach ($zq as $z) {
+                if($o['id']==$z['id']){
+                    $md[]=$o;
+                }
+            }
+        }
+        return view('index2',['orders'=>$orders,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'md'=>$md,'zt'=>$zt]);
+    }
+
+    public function zt() {
+        $zt=input('zt');
+        Session::set('zt',$zt);
     }
     //查看入库产品
     public function show($id){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $time=db('record')->where('huowei',$id)->where('task','结存')->where('is_del',1)->field('time')->order('time desc')->limit(1)->select();
         if(empty($time)){
             $rows=db('record')->where('huowei',$id)->where('is_del',1)->select();
@@ -83,56 +104,6 @@ class Instor extends Controller
             $rows=db('record')->where('huowei',$id)->where("time >= $time")->where('is_del',1)->select();
         }
         return view('show',['rows'=>$rows]);
-    }
-    //添加数据
-    public function insert(Request $request){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
-        $data = $request->param();
-        array_shift($data);
-        $rs = db('goods')->insert($data);
-        if($rs){
-           back_location("添加成功",url('instor/index'));
-        }else{
-            $this->error("添加失败");
-        }
-    }
-    //删除
-    public function delete($id){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
-        $row = db('goods')->where('is_del',1)->where('id',$id)->find();
-        if($row['count'] > 0 ){
-            back_location("该商品还有库存，无法删除",url('instor/index'));
-        }
-        $rs = db('goods')->where('id',$id)->update(['is_del'=>0,'delete_time'=>time()]);
-        if($rs){
-            back_location("删除成功",url('instor/index'));
-        }else{
-            $this->error("删除失败");
-        }
-    }
-
-    /**
-     * 其他入库
-     */
-    public function other_rk()
-    {
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告:越权操作');
-        }
-        //仓库
-        $cks = db('warehouse')->where('is_del',1)->select();
-        //产品名称
-        $goods_name=db('goods_name')->where('is_del',0)->select();
-        //产品属性
-        $kc=db('kc_status')->where('is_del',0)->select();
-        return view('other_rk',['cks'=>$cks,'goods_name'=>$goods_name,'kc'=>$kc]);
     }
     /**
      * 货位选择
@@ -150,6 +121,18 @@ class Instor extends Controller
         }
         $rows=array_values($rows);
         return $rows;
+    }
+    /**
+     * 货位选择(返回产品信息)
+     */
+    public function huowei_w($id) {
+        $r=db('rukuform_xq')->where('is_del',0)->where('state',1)->where('rk_huowei_id',$id)->find();
+        if($r){
+            $r['product_time']=date('Y-m-d',$r['product_time']);
+            return $r;
+        }else{
+            return false;
+        }
     }
     /**
      * 绑定产品名称
@@ -179,15 +162,12 @@ class Instor extends Controller
         $jing=sprintf("%.3f",$jing*$num/1000);
         return ['mao'=>$mao,'jing'=>$jing];
     }
-    // 库存转结
-//    public function show_month() {
-//        $id = db('record')
-//            -> field('huowei')
-//            -> group('huowei')
-//            -> select();
-//    }
     // 结存
     public function jiecun(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $id=input('id');
         $time=time();
         $month =  date('m',time());
@@ -336,7 +316,34 @@ class Instor extends Controller
         }
 
     }
-    //添加其他入库
+
+    /**
+     * 其他入库记录列表
+     */
+    public function other_rk_list() {
+        $rows=db('other_rk')->paginate(100);
+        return view('other_rk_list',['rows'=>$rows]);
+    }
+    /**
+     * 其他入库添加界面
+     */
+    public function other_rk()
+    {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告:越权操作');
+        }
+        //仓库
+        $cks = db('warehouse')->where('is_del',1)->select();
+        //产品名称
+        $goods_name=db('goods_name')->where('is_del',0)->select();
+        //产品属性
+        $kc=db('kc_status')->where('is_del',0)->select();
+        return view('other_rk',['cks'=>$cks,'goods_name'=>$goods_name,'kc'=>$kc]);
+    }
+    /**
+     * 添加其他入库
+     */
     public function tj_rk()
     {
         Db::startTrans();
@@ -367,7 +374,7 @@ class Instor extends Controller
             try {
                 //不存在则添加库存
                 $id = db('rukuform')->insertGetId(['shipmentnum' => $data['shipmentnum'], 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id'], 'userintime' => $userintime, 'intime' => $userintime]);
-                $f = db('rukuform_xq')->insert(['factory' => $data['factory'], 'transfers_id' => $data['odd_number'], 'product_name' => $data['customer'], 'rk_status_id' => $data['rk_status_id'], 'rk_huowei_id' => $data['rk_huowei_id'], 'rk_nums' => $data['rk_nums'], 'product_time' => $userintime, 'netweight' => $data['mao'], 'Grossweight' => $data['jin'], 'state' => 1, 'rukuid' => $id]);
+                $f = db('rukuform_xq')->insert(['factory' => $data['factory'], 'transfers_id' => $data['odd_number'], 'product_name' => $data['customer'], 'rk_status_id' => $data['rk_status_id'], 'rk_huowei_id' => $data['rk_huowei_id'], 'rk_nums' => $data['rk_nums'], 'product_time' => $product_time, 'netweight' => $data['mao'], 'Grossweight' => $data['jin'], 'state' => 1, 'rukuid' => $id]);
                 $p = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'customer' => $data['factory'], 'early_stage' => 0, 'qt_ruku' => $data['rk_nums'], 'balance' => $data['rk_nums'], 'huowei' => $data['rk_huowei_id'], 'count' => $data['content']]);
                 if ($id && $f && $p) {
                     // 提交事务
@@ -378,13 +385,40 @@ class Instor extends Controller
                 // 回滚事务
                 Db::rollback();
             }
+            $rk=db('cabinet')->where('id',$data['rk_huowei_id'])->find();
+            db('other_rk')->insert(['factory'=>$data['factory'],'product_name'=>$data['customer'],'product_time'=>$product_time,'huowei'=>$rk['name'],'count'=>$data['rk_nums'],'rk_time'=>$userintime,'conter'=>$data['content']]);
             return redirect('index');
         }
     }
+    /**
+     * 删除其他入库记录
+     */
+    public function other_del($id) {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $r=db('other_rk')->where('id',$id)->delete();
+        if($r){
+            return redirect('other_rk_list');
+        }else{
+            $this->error('删除失败,请联系管理员');
+        }
+    }
 
-
-    //其他出库
+    /**
+     * 其他入库记录列表
+     */
+    public function other_ck_list() {
+        $rows=db('other_ck')->paginate(100);
+        return view('other_ck_list',['rows'=>$rows]);
+    }
+    //其他出库页面
     public function other_ck() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $f=db('rukuform_xq')->where('state',1)->select();
         for($i=0;$i<count($f);$i++){
             db('rukuform_xq')->where('id',$f[$i]['id'])->update(['sy_count'=>$f[$i]['rk_nums']]);
@@ -394,42 +428,37 @@ class Instor extends Controller
         $goods_name=db('goods_name')->where('is_del',0)->select();
         return view('other_ck',['cks'=>$cks,'goods_name'=>$goods_name]);
     }
-    //提交出库
+    //添加其他出库
     public function tj_ck() {
         Db::startTrans();
         $data=input();
         array_shift($data);
         $delivery_time=strtotime($data['delivery_time']);
-//        dump($data);exit;
         try{
             $id = db('outbound_from')->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>$delivery_time,'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id'],'state'=>1]);
-            for ($i=0;$i<count($data['delivery_num']);$i++){
-                $time=time();
-                $a=db('outbound_xq_from')->insert([
-                    'chukuid'=>$id,
-                    'product_name'=>$data['material_name'][$i],
-                    'ck_huowei_id'=>$data['huowei_name'][$i],
-                    'ck_nums'=>$data['huowei_out'][$i],
-                    'netweight'=>$data['jin'][$i],
-                    'product_time'=>strtotime($data['product_time'][$i]),
-                    'content'=>$data['detailed'][$i],
-                    'create_time'=>$time,
-                    'state'=>0
+            for ($i=0; $i<count($data['delivery_num']); $i++) {
+                $time  = time();
+                $a = db('outbound_xq_from') -> insert([
+                    'chukuid'      => $id,
+                    'product_name' => $data['material_name'][$i],
+                    'ck_huowei_id' => $data['huowei_name'][$i],
+                    'ck_nums'      => $data['huowei_out'][$i],
+                    'netweight'    => $data['jin'][$i],
+                    'product_time' => strtotime($data['product_time'][$i]),
+                    'content'      => $data['detailed'][$i],
+                    'create_time'  => $time,
+                    'state'        => 0
                 ]);
-                $r=db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$data['huowei_name'][$i])->find();
-                $count=(int)$r['rk_nums']-(int)$data['huowei_out'][$i];
-                $q=db('record')->insert(['time'=>$delivery_time,'odd_number'=>$data['transport_id'],'task'=>'其他出库','customer'=>$data['reachout_name'],'early_stage'=>$r['rk_nums'],'qt_chuku'=>$data['huowei_out'][$i],'balance'=>$count,'huowei'=>$data['huowei_name'][$i],'count'=>$data['detailed'][$i]]);
-                $x=db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$data['huowei_name'][$i])->update(['rk_nums'=>$count]);
-                $rows=db('rukuform_xq')->where('is_del',0)->select();
-                for($i=0;$i<count($rows);$i++){
-                    if($rows[$i]['rk_nums']<1){
-                        db('rukuform_xq')->where('id',$rows[$i]['id'])->update(['is_del'=>1]);
-                        db('record')->where('huowei',$rows[$i]['rk_huowei_id'])->update(['is_del'=>0]);
-                    }
-                }
+                $r = db('rukuform_xq') -> where('is_del', 0) -> where('rk_huowei_id', $data['huowei_name'][$i]) -> find();
+                $count = (int)$r['rk_nums'] - (int)$data['huowei_out'][$i];
+                $q = db('record') -> insert(['time' => $delivery_time, 'odd_number' => $data['transport_id'], 'task' => '其他出库', 'customer' => $data['reachout_name'], 'early_stage' => $r['rk_nums'], 'qt_chuku' => $data['huowei_out'][$i], 'balance' => $count, 'huowei' => $data['huowei_name'][$i], 'count' => $data['detailed'][$i]]);
+                $x = db('rukuform_xq') -> where('is_del', 0) -> where('rk_huowei_id', $data['huowei_name'][$i]) -> update(['rk_nums' => $count]);
+                $wa=db('warehouse')->where('id',$data['ck_id'])->find();
+                $huowei=db('cabinet')->where('id',$data['huowei_name'][$i])->find();
+                $p=db('other_ck')->insert(['time'=>$delivery_time,'warehouse'=>$wa['name'],'product_name'=>$data['material_name'][$i],'product_time'=>strtotime($data['product_time'][$i]),'huowei'=>$huowei['name'],'count'=>$data['huowei_out'][$i],'conter'=>$data['detailed'][$i]]);
 
             }
-            if ($id && $a && $q && $x) {
+            if ($id && $a && $q && $x && $p) {
                 // 提交事务
                 Db::commit();
             }
@@ -440,6 +469,21 @@ class Instor extends Controller
         }
         return redirect('index');
     }
+    /**
+     * 删除其他出库记录
+     */
+    public function other_ck_del($id) {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $r=db('other_ck')->where('id',$id)->delete();
+        if($r){
+            return redirect('other_ck_list');
+        }else{
+            $this->error('删除失败,请联系管理员');
+        }
+    }
 
     //调拨列表
     public function db()
@@ -449,6 +493,10 @@ class Instor extends Controller
     }
     //调拨出入库
     public function other_db() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $f=db('rukuform_xq')->where('state',1)->select();
         for($i=0;$i<count($f);$i++){
             db('rukuform_xq')->where('id',$f[$i]['id'])->update(['sy_count'=>$f[$i]['rk_nums']]);
@@ -525,6 +573,21 @@ class Instor extends Controller
             $r=db('cabinet')->where('is_del',1)->where('id',$id)->find();
         }
         return $r;
+    }
+    /**
+     *删除调拨单
+     */
+    public function db_del($id) {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $r=db('db_list')->where('id',$id)->delete();
+        if($r){
+            return redirect('db');
+        }else{
+            $this->error('删除失败,请联系管理员');
+        }
     }
 
     //tj_db
@@ -617,6 +680,10 @@ class Instor extends Controller
      * 生成损耗单界面
      */
     public function wastage_add() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $f=db('rukuform_xq')->where('state',1)->select();
         for($i=0;$i<count($f);$i++){
             db('rukuform_xq')->where('id',$f[$i]['id'])->update(['sy_count'=>$f[$i]['rk_nums']]);
@@ -629,6 +696,7 @@ class Instor extends Controller
      * 添加损耗单
      */
     public function wastage_inset() {
+
         Db ::startTrans();
         $data = input();
         $time = strtotime($data['d_time']);//损耗日期
@@ -656,5 +724,20 @@ class Instor extends Controller
             Db ::rollback();
         }
         return redirect('wastage_list');
+    }
+    /**
+     * 删除损耗单
+     */
+    public function wastage_del($id) {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $r=db('wastage_list')->where('id',$id)->delete();
+        if($r){
+            return redirect('wastage_list');
+        }else{
+            $this->error('删除失败,请联系管理员');
+        }
     }
 }

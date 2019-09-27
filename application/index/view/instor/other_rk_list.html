@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>调拨</title>
+    <title>其他入库</title>
     <link rel="stylesheet" href="/images/index.css">
     <link rel="stylesheet" href="/images/boot.css">
     <link rel="stylesheet" href="/layui/css/layui.css">
@@ -14,33 +14,35 @@
             <span class="layui-breadcrumb">
                 <a href="/public/main.html" target="box">首页</a>
                 <a href="javascript:;">在库管理</a>
-                <a><cite>调拨</cite></a>
+                <a><cite>其他入库</cite></a>
             </span>
     </div>
-    <a href="{:url('Instor/other_db')}" class="layui-btn" style="margin-left: 30px;">调拨</a>
+    <a href="{:url('Instor/other_rk')}" class="layui-btn" style="margin-left: 30px;">添加其他入库</a>
     <main class="bd_content">
         <table class="layui-table" style="width: 96%; margin: 12px auto;">
             <thead>
             <tr>
+                <th>出库工厂</th>
                 <th>产品名称</th>
-                <th>调拨日期</th>
                 <th>产品日期</th>
-                <th>调出货位</th>
-                <th>调入货位</th>
-                <th>调拨数量</th>
+                <th>入库货位</th>
+                <th>入库数量</th>
+                <th>操作时间</th>
+                <th>备注</th>
                 <th>操作</th>
             </tr>
             </thead>
             <tbody>
             {volist name='rows' id='row'}
             <tr>
-                <td>{$row['cp_name']}</td>
-                <td><?php if(!empty($row['db_time'])){echo date('Y-m-d',$row['db_time']);}?></td>
-                <td><?php if(!empty($row['cp_time'])){echo date('Y-m-d',$row['cp_time']);}?></td>
-                <td>{$row['dc_name']}</td>
-                <td>{$row['dr_name']}</td>
-                <td>{$row['db_num']}</td>
-                <td><a href="{:url('Instor/db_del','id='.$row.id    )}" class="layui-btn submit" lay-submit lay-filter="formDemo">删除</a></td>
+                <td>{$row['factory']}</td>
+                <td>{$row['product_name']}</td>
+                <td><?php if(!empty($row['product_time'])){echo date('Y-m-d',$row['product_time']);}?></td>
+                <td>{$row['huowei']}</td>
+                <td>{$row['count']}</td>
+                <td><?php if(!empty($row['rk_time'])){echo date('Y-m-d',$row['rk_time']);}?></td>
+                <td>{$row['conter']}</td>
+                <td><a href="{:url('Instor/other_del','id='.$row.id    )}" class="layui-btn submit" lay-submit lay-filter="formDemo">删除</a></td>
             </tr>
             {/volist}
             </tbody>

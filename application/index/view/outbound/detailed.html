@@ -37,6 +37,12 @@
 						</div>
 					</div>
 					<div class="layui-form-item">
+						<label class="layui-form-label">产品名称</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="s_material_name" name="s_material_name" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_material_name)){echo $s_material_name;}?>">
+						</div>
+					</div>
+					<div class="layui-form-item">
 						<div class="layui-input-inline">
 							<button class="layui-btn save" lay-submit>查询</button>
 						</div>
@@ -49,7 +55,7 @@
 					<tr>
 						<th>ID</th>
 						<th>出库仓库</th>
-						<th>出库货物</th>
+						<th>产品名称</th>
 						<th>出库货位</th>
 						<th>送达方</th>
 						<th>发货日期</th>

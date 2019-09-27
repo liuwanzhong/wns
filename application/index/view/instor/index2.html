@@ -15,6 +15,43 @@
     </style>
 </head>
 <body>
+<?php if(!empty($md) && $zt==0): ?>
+<div class="model" style="display: block;width:70%">
+    <div class="head">
+        <span>库存预警</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content">
+        <table class="layui-table">
+            <thead>
+                <tr>
+                    <th>仓库名称</th>
+                    <th>货位</th>
+                    <th>产品名称</th>
+                    <th>生产日期</th>
+                    <th>实时数量</th>
+                    <th>备注</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+            {volist name='md' id='m'}
+            <tr>
+                <td>{$m.ckname}</td>
+                <td>{$m.name}</td>
+                <td>{$m.product_name}</td>
+                <td><?php if(!empty($m['product_time'])){echo date('Y-m-d',$m['product_time']);} ?></td>
+                <td>{$m.rk_nums}</td>
+                <td>{$m.content}</td>
+                <td><?php if($m['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
+            </tr>
+            {/volist}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+<?php endif; ?>
 <div class="note">
     <div class="nav">
         <span class="layui-breadcrumb">
@@ -51,8 +88,6 @@
             <div class="layui-form-item">
                 <div class="layui-input-inline" style="width: auto;">
                     <button class="layui-btn save" lay-submit>查询</button>
-                    <a href="{:url('Instor/other_rk')}" class="layui-btn ">其他入库</a>
-                    <a href="{:url('Instor/other_ck')}" class="layui-btn ">其他出库</a>
 
                 </div>
             </div>
@@ -91,7 +126,6 @@
                     <?php else: ?>
                     <a href="{:url('Instor/frozen_j','id='.$v.id)}" class="layui-btn layui-btn-sm">解除冻结</a>
                     <?php endif; ?>
-                    <a href="{:url('instor/delete','id='.$v['id'])}" class="layui-btn layui-btn-sm layui-btn-danger">删除</a>
                 </td>
             </tr>
             {/volist}
@@ -117,6 +151,14 @@
                 $('#s_delivery_time').val(value)
             }
         });
+    })
+    $('.close').on('click', function(){
+        $.ajax({
+            url:'/index/Instor/zt',
+            type:'get',
+            data:{'zt':1}
+        })
+        $('.model').hide();
     })
 </script>
 </body>

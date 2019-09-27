@@ -173,7 +173,6 @@
                 <input type="hidden" name="all_weight" value="">
                 <p>合计数量：<span class="all_count">0</span></p>
                 <p>合计重量：<span class="all_weight">0</span></p>
-                <p>派车人签字：</p>
             </div>
             <div class="sign">
                 <span>保管签字：</span>
@@ -209,6 +208,7 @@
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
+
     layui.use(['element', 'form','laydate','layer'], function () {
         let element = layui.element;
         let form = layui.form;
@@ -239,15 +239,15 @@
                 <botton class="layui-btn layui-btn-sm dia">点击</botton>
             </td>
             <td class="count">
-                <input type="hidden" value="huowei_out" name="huowei_out[]" readonly>
+                <input type="hidden" value="0" name="huowei_out[]" readonly>
                 <span>0</span>
             </td>
             <td class="jin">
-                <input type="hidden" value="jin" name="jin[]" readonly>
+                <input type="hidden" value="0" name="jin[]" readonly>
                 <span>0</span>
             </td>
             <td class="sy_count">
-                <input type="hidden" value="" name="sy_count[]" readonly>
+                <input type="hidden" value="0" name="sy_count[]" readonly>
                 <span>0</span>
             </td>
              <td class="indate">
@@ -346,6 +346,7 @@
             let num = tr.find('input[type=text]').val();
             let allcount = $('.all_count').text();
             let allweight = $('.all_weight').text();
+
             let time = tr.find('td:eq(2)').text();
             $.ajax({
                 url:'/index/Table/houwei_cd',
@@ -401,6 +402,17 @@
         let p = $(this).parents('tr');
         let id=p.find('.rukuform_xq_id').val();
         let num=p.find('.count').find('input').val();
+        let jin = p.find('.jin input').val();
+        let allcount = $('.all_count').text();
+        let allweight = $('.all_weight').text();
+        if(jin != 0 || num != 0){
+            let weight = [(Number(allweight) - Number(jin))*1000]/1000;
+            let we=Math.round(weight*1000)/1000;
+            $('.all_count').text(Number(allcount) - Number(num));
+            $('.all_weight').text(we);
+            $('input[name=all_count]').val(Number(allcount) - Number(num));
+            $('input[name=all_weight]').val(we);
+        }
         $.ajax({
             url:'/index/Table/huifu',
             data:{id,num}
