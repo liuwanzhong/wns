@@ -75,12 +75,16 @@ class Instor extends Controller
     }
     //查看入库产品
     public function show($id){
-        $time=db('record')->where('huowei',$id)->where('task','结存')->where('is_del',1)->field('time')->order('time desc')->limit(1)->select();
-        if(empty($time)){
+        $state_time=db('record')->where('huowei',$id)->where('task','结存')->where('is_del',1)->field('state_time')->order('state_time desc')->limit(1)->select();
+        // echo db('record')->getlastSql();
+        // dump($state_time);exit;
+        if(empty($state_time)){
             $rows=db('record')->where('huowei',$id)->where('is_del',1)->select();
         }else{
-            $time=$time[0]['time'];
-            $rows=db('record')->where('huowei',$id)->where("time >= $time")->where('is_del',1)->select();
+            $state_time=$state_time[0]['state_time'];
+            $rows=db('record')->where('huowei',$id)->where("state_time >= '$state_time'")->where('is_del',1)->select();
+            echo db('record')->getlastSql();
+            // dump($rows);exit;
         }
         return view('show',['rows'=>$rows]);
     }
@@ -179,13 +183,7 @@ class Instor extends Controller
         $jing=sprintf("%.3f",$jing*$num/1000);
         return ['mao'=>$mao,'jing'=>$jing];
     }
-    // 库存转结
-//    public function show_month() {
-//        $id = db('record')
-//            -> field('huowei')
-//            -> group('huowei')
-//            -> select();
-//    }
+
     // 结存
     public function jiecun(){
         $id=input('id');
@@ -197,28 +195,34 @@ class Instor extends Controller
         $cq= db('record')
         ->where('huowei',$id)
         ->where('is_del',1)
-        ->where("time <= $time")
+        ->where("state_time <= now()")
         ->where('task','结存')
         ->order('state_time desc')
         ->limit(1)
         ->select();
+        // dump($cq);exit;
         if($cq){
             $chuqi=$cq[0]['balance'];
+            db('record')
+            ->where('task','结存')
+            ->where('huowei',$id)
+            -> update(['is_del' => 2]);
         }else{
             $res=db('record')
             ->where('huowei',$id)
             ->where('is_del',1)
-            ->where("time <= $time")
-            ->field('early_stage')
-            ->order('state_time asc')
+            ->where("state_time <= now()")
+            ->field('balance')
+            ->order('state_time desc')
             ->limit(1)
             ->select();
-            $chuqi=$res[0]['early_stage'];
+            $chuqi=$res[0]['balance'];
         }
+        // dump($chuqi);exit;
         $jiecun=db('record')
         ->where('huowei',$id)
         ->where('is_del',1)
-        ->where("time <= $time")
+        ->where("state_time <= now()")
         ->field('balance')
         ->order('state_time desc')
         ->limit(1)
@@ -251,8 +255,8 @@ class Instor extends Controller
             $m=$times[1];
             $rows=db('record')
             ->where('record.is_del',1)
-            ->where("date_format(from_unixtime(time),'%m')=$m")
-            ->where("date_format(from_unixtime(time),'%Y')=$y")
+            ->where("date_format(record.state_time,'%m')=$m")
+            ->where("date_format(record.state_time,'%Y')=$y")
             ->join('rukuform_xq','rukuform_xq.rk_huowei_id=record.huowei','left')
             ->join('cabinet','cabinet.id=record.huowei','left')
             ->join('warehouse','warehouse.id=cabinet.warehouse_id','left')
@@ -273,11 +277,10 @@ class Instor extends Controller
         $m=$times[1];
         $rows=db('record')
         ->where('record.is_del',1)
-        ->where("date_format(from_unixtime(time),'%m')=$m")
-        ->where("date_format(from_unixtime(time),'%Y')=$y")
+        ->where("date_format(state_time,'%m')=$m")
+        ->where("date_format(state_time,'%Y')=$y")
         ->where('huowei',$huowei)
-        ->where("task != '结存'")
-        ->order('time asc')
+        ->order('state_time asc')
         ->select();
         return view('show_month_xx',['rows'=>$rows,'time'=>$time]);
     }

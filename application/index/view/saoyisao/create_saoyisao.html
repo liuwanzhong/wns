@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" href="/images/index.css" />
+    <link rel="stylesheet" href="/layui/css/layui.css" />
+    
+    <style>
+        .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
+        .submit{margin-left: 30px;margin-top: 30px;}
+        .container{display: block;overflow-x: hidden;height: 580px;}
+        .container::-webkit-scrollbar{width: 0;}
+        .layui-form-radio{margin: 0;padding: 0;}
+        video {
+            display: block;
+            margin: 0 auto;
+            width: 240px;
+            height: 240px;
+            background: #000;
+            border-radius: 5px;
+        }
+    </style>
+    </style>
+</head>
+<body>
+<div class="note">
+    <form method="post" class="layui-form" action="{:url('Saoyisao/create_saoyisao')}">
+        <div class="form_box">
+            <div class="layui-form-item">
+                <label class="layui-form-label">出货仓库:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="transport_id" autocomplete="off" class="layui-input" value="{$name}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">售达方:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="delivery" autocomplete="off" class="layui-input" value="{$delivery}" >
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">客户名:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="delivery_name" autocomplete="off" class="layui-input" value="{$delivery_name}">
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <table class="layui-table" style="width: 96%; margin: 12px auto;">
+                <thead>
+                    <tr>
+                        <th>产品名称</th>
+                        <th>总数量</th>
+                        <th>产品日期</th>
+                        <th>批次</th>
+                        <th>操作</th>
+                </thead>
+                <tbody class="tbd">
+                        {if condition="!empty($xx)"}
+                        {volist name='xx' id='x'}
+                            <tr>
+                                <th>{$x.goods_name}</th>
+                                <th>{$x.num}</th>
+                                <th>{$x.goods_time}</th>
+                                <th>查看</th>
+                                <th>删除</th>
+                            </tr>
+                        {/volist}
+                        {/if}
+                </tbody>
+            </table>
+            <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
+        </div>
+    </form>
+</div>
+<div id="video"></div>
+    <div>
+        <button class="layui-btn open" id="open">扫码</button>
+    </div>
+    <div id="result"></div>
+<script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/layui/layui.js"></script>
+<script src="/static/js/qrscan.js"></script>
+<script type="text/javascript">
+    layui.use(['element', 'form','laydate','layer'], function () {
+        let element = layui.element;
+        let form = layui.form;
+        let laydate = layui.laydate;
+        let layer = layui.layer;
+        laydate.render({
+            elem: '#time',
+            type: 'date'
+        })
+    });
+    /*
+    *扫码
+    */
+    var ds = null;
+    var xx = null;
+    var scan = new QRScan('video');
+
+    document.getElementById('open').onclick = function () {
+        scan.openScan();
+        ds = window.setInterval(function () {
+            startScan();
+        }, 1500);
+    };
+    document.getElementById('close').onclick = function () {
+        scan.closeScan();
+        window.clearInterval(ds);
+    };
+
+    var re_div = document.getElementById('result');
+    function startScan() {
+        scan.getImgDecode(function (data) {
+            console.log(data);
+            var p = document.createElement('p');
+            if (data.success) {
+                // alert(data.payload);
+                // location.href=data.payload
+                window.location.href=data.payload;
+            } else {
+                p.innerHTML = 'ERROR: ' + data.msg;
+            }
+            re_div.appendChild(p);
+        });
+    };
+
+</script>
+</body>
+</html>

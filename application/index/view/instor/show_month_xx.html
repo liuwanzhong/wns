@@ -50,7 +50,7 @@
                 <tbody>
                     {volist name='rows' id='row'}
                     <tr>
-                        <td><?php if(!empty($row['time'])){echo date('Y-m-d',$row['time']);} ?></td>
+                        <td>{$row.state_time}</td>
                         <td>{$row.odd_number}</td>
                         <td>{$row.task}</td>
                         <td>{$row.customer}</td>

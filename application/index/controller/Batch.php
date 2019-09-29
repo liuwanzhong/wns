@@ -131,9 +131,9 @@ class Batch extends Controller {
         ->where('tray.is_del',0)
         ->select();
         $batch=explode(',',$res[0]['batch']);
-        return view('chuku',['res'=>$res,'tp_num'=>$tp_num,'batch'=>$batch]);
+        return redirect('Saoyisao/create_saoyisao',['tp_num'=>$tp_num]);
     }
-    /**
+    /** 
      * 出库执行
      */
     public function tray_ck_insert(){
@@ -215,5 +215,6 @@ class Batch extends Controller {
         $data=explode(',',$res[0]['batch']);
         return $data;
     }
+    
 }
 // ,'tp_num'=>$tp_num,'batch'=>$batch]
