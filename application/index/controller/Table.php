@@ -23,6 +23,7 @@ class Table extends Controller {
     public function houwei_ck() {
         $sy=isset($_POST['sy']) ? $_POST['sy'] : 0;
         $id=input('id');
+        $ne=input('ne');
         static $md=[];
         $ck=db('cabinet')
         ->where('warehouse_id',$id)
@@ -33,6 +34,7 @@ class Table extends Controller {
                 ->where('rukuform_xq.state',1)
                 ->where('rukuform_xq.is_del',0)
                 ->where('rukuform_xq.sy_count>=1')
+                ->where('rukuform_xq.product_name',$ne)
                 ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id')
                 ->field('rukuform_xq.*,cabinet.name,cabinet.id as c_id')
                 ->select();

@@ -275,6 +275,7 @@
         let par = '';
         $('.tbd').on('click', '.dia', function () {
             let id = $('#table').val();
+            let ne = $(this).parents('tr').find('.status input').val();
             if(id == 0){
                 layer.alert('请选择仓库',{icon:5});
                 return false;
@@ -285,7 +286,7 @@
                 $('.model_table').show();
                 $.ajax({
                     url:'/index/Table/houwei_ck',
-                    data: {id},
+                    data: {id,ne},
                     success:function (data) {
                         let html = '';
                         for (let i =0; i<data.length; i++){

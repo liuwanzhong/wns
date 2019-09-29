@@ -110,6 +110,7 @@ class Outbound extends Controller {
     }
     // 生成出库单
     public function make_outbound_order(){
+        $num=0;
         $ms=$this->qx();
         if($ms==0){
             $this->error('警告：越权操作');
@@ -161,7 +162,10 @@ class Outbound extends Controller {
                 ->group('material_name')
                 ->select();
             $cks = db('warehouse')->where('is_del',1)->select();
-            return view('make_outbound_order',['rows'=>$rows,'fh'=>$fh,'zy'=>$zy,'sd'=>$sd,'cks'=>$cks,'id'=>$cd]);
+            foreach ($rows as $row) {
+                $num+=$row['num'];
+            }
+            return view('make_outbound_order',['rows'=>$rows,'fh'=>$fh,'zy'=>$zy,'sd'=>$sd,'cks'=>$cks,'id'=>$cd,'num'=>$num]);
         }else{
             $this -> error('请选择至少一条数据');
         }
@@ -269,6 +273,7 @@ class Outbound extends Controller {
     }
     // 出库订单详情
     public function to_examine_show($id) {
+        $num=0;
         $ms=$this->qx();
         if($ms==0){
             $this->error('警告：越权操作');
@@ -300,7 +305,10 @@ class Outbound extends Controller {
                 $cats[$k]['j']=0;
             }
         }
-        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet]);
+        foreach ($cats as $row) {
+            $num+=$row['count'];
+        }
+        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num]);
     }
     //出库修改订单
     public function to_examine_up() {
@@ -461,6 +469,8 @@ class Outbound extends Controller {
     }
     //订单详情
     public function warehousing_show($id) {
+        $num=0;
+        $z=0;
         $rows=db('outbound_from')
             ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
             ->where('outbound_from.is_del',0)
@@ -484,7 +494,11 @@ class Outbound extends Controller {
                 $cats[$k]['j']=0;
             }
         }
-        return view('warehousing_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet]);
+        foreach ($cats as $cat) {
+            $num+=$cat['ck_nums'];
+            $z+=$cat['netweight'];
+        }
+        return view('warehousing_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num,'z'=>$z]);
     }
     //删除
     public function warehousing_del() {

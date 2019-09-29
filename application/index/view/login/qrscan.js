@@ -61,7 +61,7 @@
                 }).catch(function (err) {
                     var p = doc.createElement('p');
                     p.innerHTML = 'ERROR: ' + err.name +
-                                  '<br>该浏览器不支持调用摄像头，请使用夸克浏览器';
+                                  '<br>该浏览器不支持调用摄像头，请使用UC浏览器';
                     self.div_can.appendChild(p);
                 });
                 vd.play();

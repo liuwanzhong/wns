@@ -171,7 +171,8 @@
             <div class="total">
                 <input type="hidden" name="all_count" value="">
                 <input type="hidden" name="all_weight" value="">
-                <p>合计数量：<span class="all_count">0</span></p>
+                <p>总数量：<span class="allNum">{$num}</span></p>
+                <p>实发数量：<span class="all_count">0</span></p>
                 <p>合计重量：<span class="all_weight">0</span></p>
             </div>
             <div class="sign">
@@ -298,6 +299,7 @@
         let par = '';
         $('.tbd').on('click', '.dia', function () {
             let id = $('#table').val();
+            let ne = $(this).parents('tr').find('.status input').val()
             if(id == 0){
                 layer.alert('请选择仓库',{icon:5});
                 return false;
@@ -308,7 +310,7 @@
                 $('.model_table').show();
                 $.ajax({
                     url:'/index/Table/houwei_ck',
-                    data: {id},
+                    data: {id,ne},
                     success:function (data) {
                         let html = '';
                         for (let i =0; i<data.length; i++){
@@ -317,13 +319,12 @@
                             <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
                             <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
                             <input type="hidden" id="c_id" class="layui-input" value="${data[i].c_id}">
-
                             <td><input type="radio" name="sex" value="nan" title=""></td>
                             <td>${data[i].product_name}</td>
                             <td>${data[i].product_time}</td>
                             <td class="hw">${data[i].name}</td>
                             <td>${data[i].sy_count}</td>
-                            <td><input type="text" class="layui-input" style="width: 80px;"></td>
+                            <td><input type="text" class="layui-input" style="width:80px;"></td>
                         </tr>`;
                         }
                         $('.kc_list').append(html)
@@ -335,7 +336,6 @@
 
 
         $('.sure').on('click', function () {
-            $('.model_table').hide();
             let che = $('.kc_list').find('input:radio:checked')[0];
             let tr = $(che).parents('tr');
             let id = tr.find('#id').val();
@@ -346,8 +346,13 @@
             let num = tr.find('input[type=text]').val();
             let allcount = $('.all_count').text();
             let allweight = $('.all_weight').text();
-
             let time = tr.find('td:eq(2)').text();
+            let allnum = $('.allNum').text();
+            if(Number(allnum) < (Number(allcount) + Number(num))){
+                layer.alert('实发数量不得超过总数量',{icon:5})
+                return false;
+            }
+            $('.model_table').hide();
             $.ajax({
                 url:'/index/Table/houwei_cd',
                 data:{id, m, j, count:num},

@@ -40,7 +40,7 @@
                 <td>{$m.ckname}</td>
                 <td>{$m.name}</td>
                 <td>{$m.product_name}</td>
-                <td><?php if(!empty($m['product_time'])){echo date('Y-m-d',$m['product_time']);} ?></td>
+                <td><span style="color:red"><?php if(!empty($m['product_time'])){echo date('Y-m-d',$m['product_time']);} ?></span></td>
                 <td>{$m.rk_nums}</td>
                 <td>{$m.content}</td>
                 <td><?php if($m['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
@@ -66,7 +66,7 @@
                 <label class="layui-form-label">仓库名称</label>
                 <div class="layui-input-inline">
                     <select name="s_transfers_id" id="">
-                        <option value="0">---请选择库房---</option>
+                        <option value="0">全部</option>
                         {volist name='ware' id='w'}
                         <option value="{$w.id}" <?php if($s_transfers_id==$w['id']){echo 'selected';} ?>>{$w.name}</option>
                         {/volist}
@@ -86,11 +86,16 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <div class="layui-input-inline" style="width: auto;">
-                    <button class="layui-btn save" lay-submit>查询</button>
-
+                <label class="layui-form-label">全部</label>
+                <div class="layui-input-inline">
+                    <select name="s_material_zt" id="">
+                        <option value="0">---请选择状态---</option>
+                        <option value="1" <?php if(!empty($s_material_zt)){if($s_material_zt==1){echo 'selected';};} ?>>正常</option>
+                        <option value="2" <?php if(!empty($s_material_zt)){if($s_material_zt==2){echo 'selected';};} ?>>冻结</option>
+                    </select>
                 </div>
             </div>
+            <button class="layui-btn save" lay-submit>查询</button>
         </form>
     </div>
 
@@ -119,12 +124,12 @@
                 <td>{$v.content}</td>
                 <td><?php if($v['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
                 <td>
-                    <a href="{:url('instor/show','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">查看</a>
-                    <a href="{:url('instor/jiecun','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">结存</a>
+                    <a href="{:url('instor/show',['id'=>$v.rk_huowei_id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">查看</a>
+                    <a href="{:url('instor/jiecun',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">结存</a>
                     <?php if($v['state']==1): ?>
-                    <a href="{:url('Instor/frozen','id='.$v.id)}" class="layui-btn layui-btn-sm">冻结</a>
+                    <a href="{:url('Instor/frozen',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm">冻结</a>
                     <?php else: ?>
-                    <a href="{:url('Instor/frozen_j','id='.$v.id)}" class="layui-btn layui-btn-sm">解除冻结</a>
+                    <a href="{:url('Instor/frozen_j',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm">解除冻结</a>
                     <?php endif; ?>
                 </td>
             </tr>

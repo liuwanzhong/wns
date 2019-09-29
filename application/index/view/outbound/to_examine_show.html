@@ -122,7 +122,7 @@
                         <input type="hidden" name="cd[]" value="{$v.id}">
                         <input type="hidden" name="gross_min" value="{$v.j}">
                         <input type="hidden" name="delivery_id[]" value="{$v.delivery_id}">
-                        <td>
+                        <td class="status">
                             <input type="hidden" value="{$v.product_name}" name="material_name[]" readonly>
                             {$v.product_name}
                         </td>
@@ -201,7 +201,8 @@
             <div class="total">
                 <input type="hidden" name="all_count" value="">
                 <input type="hidden" name="all_weight" value="">
-                <p>合计数量：<span class="all_count">0</span></p>
+                <p>总数量：<span class="allNum">{$num}</span></p>
+                <p>实发数量：<span class="all_count">0</span></p>
                 <p>合计重量：<span class="all_weight">0</span></p>
                 <p>派车人签字：</p>
             </div>
@@ -212,7 +213,7 @@
         </div>
     </form>
 </div>
-<div class="model_table" style="display: none; top: 45%; overflow: hidden;">
+<div class="model_table" style="display: none; top: 45%; overflow: hidden;right:-30%">
     <div class="head">
         <span>修改商品</span>
         <a href="javascript:" class="close">×</a>
@@ -260,7 +261,7 @@
                         <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
                         <input type="hidden" name="gross_min" value="{$v.j}">
                         <input type="hidden" name="delivery_id[]" value="{$v.delivery_id}">
-                        <td>
+                        <td class="status">
                             <input type="hidden" value="${child[3].innerText}" name="material_name[]" readonly>
                             ${child[3].innerText}
                         </td>
@@ -331,6 +332,7 @@
         let par = '';
         $('.tbd').on('click', '.dia', function () {
             let id = $('#table').val();
+            let ne = $(this).parents('tr').find('.status input').val();
             if(id == 0){
                 layer.alert('请选择仓库',{icon:5});
                 return false;
@@ -341,7 +343,7 @@
                 $('.model_table').show();
                 $.ajax({
                     url:'/index/Table/houwei_ck',
-                    data: {id},
+                    data: {id,ne},
                     success:function (data) {
                         let html = '';
                         for (let i =0; i<data.length; i++){
@@ -368,7 +370,6 @@
 
 
         $('.sure').on('click', function () {
-            $('.model_table').hide();
             let che = $('.kc_list').find('input:radio:checked')[0];
             let tr = $(che).parents('tr');
             let id = tr.find('#id').val();
@@ -380,6 +381,12 @@
             let allcount = $('.all_count').text();
             let allweight = $('.all_weight').text();
             let time = tr.find('td:eq(2)').text();
+            let allnum = $('.allNum').text();
+            if(Number(allnum) < (Number(allcount) + Number(num))){
+                layer.alert('实发数量不得超过总数量',{icon:5})
+                return false;
+            }
+            $('.model_table').hide();
             par.find('.indate').find('input').val(time);
             par.find('.indate').find('span').text(time);
             $.ajax({

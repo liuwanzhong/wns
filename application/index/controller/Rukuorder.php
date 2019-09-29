@@ -9,6 +9,8 @@ use think\Db;
 class Rukuorder extends Controller {
     //添加入库订单列表
     public function index(){
+        $num=0;
+        $z=0;
         $ms=$this->qx();
         if($ms==0){
             $this->error('警告:越权操作');
@@ -35,7 +37,11 @@ class Rukuorder extends Controller {
                 $rows[$k]['j']=$row['netweight'];
             }
         }
-        return view('index',['rows'=>$rows,'status'=>$status,'cks'=>$cks,'id'=>$cd]);
+        foreach ($rows as $row) {
+            $num+=$row['countnum'];
+            $z+=$row['netweight'];
+        }
+        return view('index',['rows'=>$rows,'status'=>$status,'cks'=>$cks,'id'=>$cd,'num'=>$num,'z'=>$z]);
     }
     //货位
     public function show($id){
@@ -146,6 +152,8 @@ class Rukuorder extends Controller {
     }
     //订单详情
     public function to_examine_show($id) {
+        $num=0;
+        $z=0;
         $ms=$this->qx();
         if($ms==0){
             $this->error('警告:越权操作');
@@ -172,7 +180,11 @@ class Rukuorder extends Controller {
             $cats[$k]['m']=$row['Grossweight']/$row['rk_nums'];
             $cats[$k]['j']=$row['netweight']/$row['rk_nums'];
         }
-        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'status'=>$status,'cks'=>$cks,'cabinet'=>$cabinet]);
+        foreach ($cats as $row) {
+            $num+=$row['rk_nums'];
+            $z+=$row['netweight'];
+        }
+        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'status'=>$status,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num,'z'=>$z]);
     }
     //修改订单
     public function to_examine_up() {
@@ -224,6 +236,14 @@ class Rukuorder extends Controller {
         array_shift($data);
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
+        }
+        $s=db('rukuform_xq')
+            ->where('rukuid',$id)
+            ->select();
+        foreach ($s as $v) {
+            if($v['rk_huowei_id']==0 || $v['product_time']==''){
+                $this->error('请完善信息');
+            }
         }
         try{
             $s=db('rukuform_xq')
@@ -303,16 +323,18 @@ class Rukuorder extends Controller {
             ->join('rukuform_xq','rukuform.id=rukuform_xq.rukuid','left')
             ->where('rukuform.is_del',0)
             ->where('rukuform.state',1)
-            ->group('rukuform_xq.factory,rukuform_xq.rukuid')
+            ->group('rukuform_xq.rukuid')
             ->where($search)
             ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
             ->where('rukuform_xq.rk_nums>0')
             ->paginate(20,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
-        // var_dump($rows);exit;
         return view('warehousing',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     //订单详情
     public function warehousing_show($id) {
+        $num=0;
+        $mao=0;
+        $jing=0;
         $rows=db('rukuform')
             ->join('warehouse','rukuform.ck_id=warehouse.id')
             ->where('rukuform.is_del',0)
@@ -325,7 +347,12 @@ class Rukuorder extends Controller {
             ->join('kc_status','kc_status.id=rukuform_xq.rk_status_id')
             ->field('rukuform_xq.*,kc_status.title as w_name,cabinet.name as c_name')
             ->select();
-        return view('warehousing_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id]);
+        foreach ($cats as $cat) {
+            $num+=$cat['rk_nums'];
+            $mao+=$cat['Grossweight'];
+            $jing+=$cat['netweight'];
+        }
+        return view('warehousing_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'num'=>$num,'mao'=>$mao,'jing'=>$jing]);
     }
     //删除
     public function warehousing_del() {
