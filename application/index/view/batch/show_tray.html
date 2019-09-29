@@ -131,7 +131,7 @@
 					type:'post',
 					data:{"id":id},
 					success:function (data) {
-                        console.log(data);
+						$('.kc_list').empty();
 						let html = '';
                         for (let i =0; i<data.length; i++){
                             html += ` <tr>
