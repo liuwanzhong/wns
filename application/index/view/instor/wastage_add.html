@@ -45,6 +45,7 @@
                         <th>产品名称</th>
                         <th>损耗日期</th>
                         <th>货位</th>
+                        <th>产品日期</th>
                         <th>产品数量</th>
                         <th>损耗数量</th>
                         <th>备注</th>
@@ -64,6 +65,10 @@
                         </td>
                         <td class="huowei">
                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
+                        </td>
+                        <td class="c_time">
+                            <input type="hidden" value="" name="c_time" class="layui-input">
+                            <span>0</span>
                         </td>
                         <td class="count">
                             <input type="hidden" value="huowei_out" name="huowei_out" class="layui-input">
@@ -106,28 +111,6 @@
 
 </div>
 
-<div class="model_table_ss" style="display: none; top: 45%; overflow: hidden;">
-    <div class="head">
-        <span>调拨入库</span>
-        <a href="javascript:" class="close2">×</a>
-    </div>
-    <div class="content" style="height: 100%;overflow-x: hidden;">
-        <table class="layui-table layui-form">
-            <thead>
-            <tr>
-                <th></th>
-                <th>产品名称</th>
-                <th>产品日期</th>
-                <th>货位名称</th>
-                <th>库存数量</th>
-                </tr>
-            </thead>
-            <tbody class="kc_list2"></tbody>
-        </table>
-        <button class="layui-btn sure2" style="margin:20px auto 100px;">确定</button>
-    </div>
-
-</div>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
@@ -139,29 +122,6 @@
         laydate.render({
             elem: '#time',
             type: 'date'
-        })
-
-
-        form.on('select(ck_id)', function(data){
-            let id = data.elem.value;
-            if(id != 0){
-                $('.showhuowei').empty();
-                $.ajax({
-                    type: "get",//请求方式有post，get请求方式，这里是post请求
-                    url: '/index/Outbound/huowei/id/' + id,//请求的方法的路径
-                    dataType: 'json',//请求参数的格式为json.另外还有text等
-                    success: function(data){
-                        var data = JSON.parse(data);
-                        $('.showhuowei').append("<option value=''>请选择货位</option>");
-                        for (var i=0;i<data.length;i++)
-                        {
-                            $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
-                        }
-                        form.render();
-                    }
-                })
-            }
-
         })
 
         let par = '';
@@ -210,73 +170,19 @@
             let che = $('.kc_list').find('input:radio:checked')[0];
             let tr = $(che).parents('tr');
             let id = tr.find('#id').val();
+            let time = tr.find('td:eq(2)').text();
             $.ajax({
                 url:'/index/Instor/houwei_cd',
                 data:{id},
                 success:function (d) {
                     // let coun = d.rk_nums;
+                    par.find('.c_time').find('input').val(time);
+                    par.find('.c_time').find('span').text(time);
                     par.find('.count').find('span').text(d.rk_nums);
                     par.find('.count').find('input').val(d.rk_nums);
                     // // par.find('.rukuform_xq_id').val(id);
                     par.find('.huowei').html(`<input type="hidden" value="${d.id}" name="rk_id" readonly><span>${d.name}</span>`);
                     $('#r_id').val(d.id)
-                }
-            })
-        })
-
-
-
-        let par2 = '';
-        $('.tbd').on('click', '.dia_r', function () {
-            par2 = $(this).parents('tr');
-            let id = $('#table').val();
-            if(id == 0){
-                layer.alert('请选择仓库',{icon:5});
-                return false;
-            }else {
-                $('.kc_list2').empty();
-                $('.model_table_ss').show();
-                $.ajax({
-                    url:'/index/Instor/huowei_ck_r',
-                    data: {id},
-                    success:function (data) {
-                        console.log(data)
-                        let html = '';
-                        for (let i =0; i<data.length; i++){
-                            html += ` <tr>
-                            <input type="hidden" id="id" class="layui-input" value="${data[i].id}">
-                            <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
-                            <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
-                            <input type="hidden" id="c_id" class="layui-input" value="${data[i].c_id}">
-                            <td><input type="radio" name="redio" value="nan" title=""></td>
-                            <td>${data[i].product_name}</td>
-                            <td>${data[i].product_time}</td>
-                            <td class="hw">${data[i].name}</td>
-                            <td>${data[i].sy_count}</td>
-                        </tr>`;
-                        }
-                        $('.kc_list2').append(html)
-                        form.render()
-                    }
-                })
-            }
-        })
-
-
-        $('.sure2').on('click', function () {
-            $('.model_table_ss').hide();
-            let che = $('.kc_list2').find('input:radio:checked')[0];
-            let tr = $(che).parents('tr');
-            let id = tr.find('#id').val();
-            $.ajax({
-                url:'/index/Instor/houwei_cd',
-                data:{id},
-                success:function (d) {
-                    let count = d.rk_nums == undefined ? 0 : d.rk_nums;
-                    par2.find('.count_ss').find('span').text(count);
-                    par2.find('.count_ss').find('input').val(count);
-                    par2.find('.huowei_r').html(`<input type="hidden" value="${d.id}" name="huowei_name" readonly><span>${d.name}</span>`);
-
                 }
             })
         })
@@ -306,24 +212,8 @@
         sessionStorage.removeItem('session')
     })
 
-    $('.tbd').on('click','.remove', function(){
-        let p = $(this).parents('tr');
-        let id=p.find('.rukuform_xq_id').val();
-        let num=p.find('.count').find('input').val();
-        $.ajax({
-            url:'/index/Table/huifu',
-            data:{id,num}
-        })
-        p.remove();
-    })
-
     $('.close').on('click', function(){
         $('.model_table').hide();
-
-    })
-
-    $('.close2').on('click', function(){
-        $('.model_table_ss').hide();
 
     })
 </script>

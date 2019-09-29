@@ -15,6 +15,43 @@
     </style>
 </head>
 <body>
+<?php if(!empty($md) && $zt==0): ?>
+<div class="model" style="display: block;width:70%">
+    <div class="head">
+        <span>库存预警</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content">
+        <table class="layui-table">
+            <thead>
+                <tr>
+                    <th>仓库名称</th>
+                    <th>货位</th>
+                    <th>产品名称</th>
+                    <th>生产日期</th>
+                    <th>实时数量</th>
+                    <th>备注</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+            <tbody>
+            {volist name='md' id='m'}
+            <tr>
+                <td>{$m.ckname}</td>
+                <td>{$m.name}</td>
+                <td>{$m.product_name}</td>
+                <td><span style="color:red"><?php if(!empty($m['product_time'])){echo date('Y-m-d',$m['product_time']);} ?></span></td>
+                <td>{$m.rk_nums}</td>
+                <td>{$m.content}</td>
+                <td><?php if($m['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
+            </tr>
+            {/volist}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+<?php endif; ?>
 <div class="note">
     <div class="nav">
         <span class="layui-breadcrumb">
@@ -29,7 +66,7 @@
                 <label class="layui-form-label">仓库名称</label>
                 <div class="layui-input-inline">
                     <select name="s_transfers_id" id="">
-                        <option value="0">---请选择库房---</option>
+                        <option value="0">全部</option>
                         {volist name='ware' id='w'}
                         <option value="{$w.id}" <?php if($s_transfers_id==$w['id']){echo 'selected';} ?>>{$w.name}</option>
                         {/volist}
@@ -49,13 +86,16 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <div class="layui-input-inline" style="width: auto;">
-                    <button class="layui-btn save" lay-submit>查询</button>
-                    <a href="{:url('Instor/other_rk')}" class="layui-btn ">其他入库</a>
-                    <a href="{:url('Instor/other_ck')}" class="layui-btn ">其他出库</a>
-
+                <label class="layui-form-label">全部</label>
+                <div class="layui-input-inline">
+                    <select name="s_material_zt" id="">
+                        <option value="0">---请选择状态---</option>
+                        <option value="1" <?php if(!empty($s_material_zt)){if($s_material_zt==1){echo 'selected';};} ?>>正常</option>
+                        <option value="2" <?php if(!empty($s_material_zt)){if($s_material_zt==2){echo 'selected';};} ?>>冻结</option>
+                    </select>
                 </div>
             </div>
+            <button class="layui-btn save" lay-submit>查询</button>
         </form>
     </div>
 
@@ -84,14 +124,13 @@
                 <td>{$v.content}</td>
                 <td><?php if($v['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
                 <td>
-                    <a href="{:url('instor/show','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">查看</a>
-                    <a href="{:url('instor/jiecun','id='.$v['rk_huowei_id'])}" class="layui-btn layui-btn-sm shows">结存</a>
+                    <a href="{:url('instor/show',['id'=>$v.rk_huowei_id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">查看</a>
+                    <a href="{:url('instor/jiecun',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">结存</a>
                     <?php if($v['state']==1): ?>
-                    <a href="{:url('Instor/frozen','id='.$v.id)}" class="layui-btn layui-btn-sm">冻结</a>
+                    <a href="{:url('Instor/frozen',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm">冻结</a>
                     <?php else: ?>
-                    <a href="{:url('Instor/frozen_j','id='.$v.id)}" class="layui-btn layui-btn-sm">解除冻结</a>
+                    <a href="{:url('Instor/frozen_j',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm">解除冻结</a>
                     <?php endif; ?>
-                    <a href="{:url('instor/delete','id='.$v['id'])}" class="layui-btn layui-btn-sm layui-btn-danger">删除</a>
                 </td>
             </tr>
             {/volist}
@@ -117,6 +156,14 @@
                 $('#s_delivery_time').val(value)
             }
         });
+    })
+    $('.close').on('click', function(){
+        $.ajax({
+            url:'/index/Instor/zt',
+            type:'get',
+            data:{'zt':1}
+        })
+        $('.model').hide();
     })
 </script>
 </body>

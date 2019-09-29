@@ -108,7 +108,7 @@
                             </select>
                         </td>
                         <td class="huowei">
-                            <select name='rk_huowei_id' class='showhuowei' lay-search>
+                            <select name='rk_huowei_id' class='showhuowei' lay-search lay-filter="hh_w">
                                 <option value=''>请选择货位</option>
                             </select>
                         </td>
@@ -176,8 +176,31 @@
                     }
                 })
             }
-
         })
+
+        //入库货位时间
+        form.on('select(hh_w)', function(data){
+            let id = data.elem.value;
+            let pp = $(data.elem).parents('tr');
+            if(id != 0){
+                $.ajax({
+                    type: "get",//请求方式有post，get请求方式，这里是post请求
+                    url: '/index/Instor/huowei_w/id/' + id,//请求的方法的路径
+                    dataType: 'json',//请求参数的格式为json.另外还有text等
+                    success: function(data){
+                        if(data!=false){
+                            pp.find('input[name=product_time]').val(data.product_time)
+                            pp.find('input[name=product_time]').prop('readonly',true)
+                        }else{
+                            pp.find('input[name=product_time]').val(' ')
+                            pp.find('input[name=product_time]').prop('readonly',false)
+                        }
+                    }
+                })
+            }
+        })
+
+
 
         form.on('select(product_name)', function(data){
             let par = $(data.elem).parents('tr');

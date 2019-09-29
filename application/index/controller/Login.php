@@ -127,6 +127,12 @@ class Login extends Controller
     //退出登录
     public function out() {
         Session::delete('users');
+        Session::delete('zt');
         return redirect('login');
+    }
+
+
+    public function cm() {
+        return view('em');
     }
 }

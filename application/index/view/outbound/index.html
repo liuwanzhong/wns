@@ -33,6 +33,7 @@
             <div class="handle">
                 <button type="button" class="layui-btn" id="dialog">导入excel表</button>
                 <button type="button" class="layui-btn" id="outorder">生成出库单</button>
+                <a href="#" class="layui-btn" id="dc">导出</a>
             </div>
             <main class="bd_content">
                 <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
@@ -163,9 +164,9 @@
         <script src="/layui/layui.js"></script>
         <script type="text/javascript">
             layui.use('element', function () {
-                
+
             })
-            
+
             //导入excel表
 			$('#dialog').on('click', function(){
 				$('.model').show();
@@ -228,8 +229,6 @@
                 location.href = "/index/Outbound/make_outbound_order/id/"+orders;
             })
 
-
-
             let out_session=[];
             $('.tbd').on('click','input[type=checkbox]',function () {
                 let ses=JSON.parse(sessionStorage.getItem('out_session'));
@@ -276,6 +275,31 @@
                 }
             },'json')
         })
+            $('#dc').on('click', function() {
+                var data = sessionStorage.out_session;
+                console.log(data)
+                if(data !=  undefined || data != null){
+                    var params = {id: data};
+                    $.post("{:url('Outbound/outExcel')}", params, function (res) {
+                        console.log(res)
+                        if(res.error==0){
+                            alert(res.msg);
+                            return false;
+                        }
+                        if (res.status) {
+                            window.location.href = ("{:Url('index/Outbound/download')}?file=" + res.url);
+                        } else {
+                            layer.msg('系统错误，操作失败');
+                        }
+                    }, 'json')
+                }
+                else {
+                    layer.alert('请选择需要导出的数据',{icon:5})
+                    return false;
+                }
+            })
+
+
         </script>
 	</body>
 </html>

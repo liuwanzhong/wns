@@ -291,11 +291,6 @@ class Run extends Controller {
             $this->error("删除失败");
         }
     }
-
-    
-
-
-
     //导入
     public function upload_excel() {
         $ms = $this -> qx();
@@ -340,7 +335,12 @@ class Run extends Controller {
             $this -> error('添加失败');
         }
     }
-    /** 
+
+
+
+
+
+    /**
      * 托盘管理
      */
     public function tray(){
@@ -378,7 +378,7 @@ class Run extends Controller {
         $id=$_POST['id'];
         $row=db('tray')
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
-        ->where('tray.warehouse_id = warehouse.id')  
+        ->where('tray.warehouse_id = warehouse.id')
         ->where('tray.id',$id)
         ->where('tray.is_del',0)
         ->field('tray.*,warehouse.name')
@@ -407,6 +407,7 @@ class Run extends Controller {
      */
     public function tray_add(){
         $data=input();
+
         if(!empty($data['tp_num'])&&!empty($data['warehouse_id'])){
             $res=db('tray')
             ->where('tp_num',$data['tp_num'])
@@ -425,7 +426,7 @@ class Run extends Controller {
             Vendor('phpqrcode.phpqrcode');
             //生成二维码图片
             $object = new \QRcode();
-            $object->png($text, $outfile, $level, $size,$margin, $saveandprint); 
+            $object->png($text, $outfile, $level, $size,$margin, $saveandprint);
             $path='../../trayimg\\'.$data['tp_num'].'.png';
             $res=db('tray')
             ->insert([

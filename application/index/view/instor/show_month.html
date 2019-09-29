@@ -28,32 +28,40 @@
             </div>
             <button class="layui-btn pandian" lay-submit>查询</button>
         </div>
-        
+
     </div>
     <main class="bd_content">
-            <table class="layui-table" style="width: 96%; margin: 12px auto;">
+            <table class="layui-table" style="width: 96%; margin: 12px auto 120px;">
                 <thead>
                     <tr>
-                        <th rowspan="2">仓库</th>
-                        <th rowspan="2">货位</th>
-                        <th rowspan="2">产品名</th>
-                        <th colspan="3">操作</th>
+                        <th>结存时间</th>
+                        <th>仓库名称</th>
+                        <th>货位</th>
+                        <th>产品名称</th>
+                        <th>生产日期</th>
+                        <th>结存剩余数量</th>
+                        <th>备注</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
                     {volist name='rows' id='row'}
                     <tr>
-                        <td>{$row.w_name}</td>
-                        <td>{$row.c_name}</td>
-                        <td>{$row.rk_name}</td>
-                        <td><a href="{:url('Instor/show_month_xx',['huowei'=>$row.huowei,'time'=>$time])}">详细</a></td>
+                        <td>{$row.state_time}</td>
+                        <td>{$row.warehouse_name}</td>
+                        <td>{$row.huowei_name}</td>
+                        <td>{$row.product_name}</td>
+                        <td>{$row.product_time}</td>
+                        <td>{$row.num}</td>
+                        <td>{$row.ctenter}</td>
+                        <td><a href="{:url('Instor/show_month_xx',['id'=>$row.id,'time'=>$time])}" class="layui-btn">查看流水</a></td>
                     </tr>
                     {/volist}
                 </tbody>
             </table>
         </main>
 </div>
-    
+
 <script src="/static/js/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script>

@@ -25,7 +25,7 @@
     </div>
 
     <form method="post" class="layui-form" action="{:url('Instor/pandian')}">
-        
+
         <div class="container">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
@@ -42,38 +42,26 @@
                 <tbody class="tbd">
                 {volist name='list' id='l'}
                 <tr>
-                    <th>
-                        <input type="text" class="text" readonly value="{$l['w_name']}" name="w_name">
-                    </th>
-                    <th>
-                        <input type="text" class="text" readonly value="{$l['c_name']}" name="c_name">
-                    </th>
-                    <th>
-                        <input type="text" class="text" readonly value="{$l['product_name']}" name="product_name">
-                    </th>
-                    <th>
-                        <input type="text" class="text" readonly value="<?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?>" name="product_time">
-                    </th>
-                    <th>
-                        <input type="text" class="text"  readonly value="{$l['pd_num']}" name="pd_num">
-                    </th>
-                    <th>
-                        <input type="text" class="text" readonly value="{$l['rk_nums']}" name="rk_nums">
-                    </th>
-                    <th>
-                        <input type="text" class="text" readonly value="{$l['chayi']}" name="chayi">
-                    </th>
+                    <td>{$l['w_name']}</td>
+                    <td>{$l['c_name']}</td>
+                    <td>{$l['product_name']}</td>
+                    <td><input type="text" class="text" readonly value="<?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?>" name="product_time"></td>
+                    <td>{$l['pd_num']}</td>
+                    <td>{$l['rk_nums']}</td>
+                    <td>{$l['chayi']}</td>
+
                 </tr>
                 {/volist}
                 </tbody>
-                <button class="layui-btn submit" lay-submit lay-filter="formDemo">返回</button>
+
             </table>
     </form>
+    <button class="layui-btn submit" lay-submit lay-filter="formDemo">返回</button>
 </div>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
-    
+
 
 </script>
 </body>

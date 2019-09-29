@@ -9,7 +9,7 @@
     <style>
         .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
         .submit{margin-left: 30px;margin-top: 30px;}
-        .container{display: block;overflow-x: hidden;height: 580px;}
+        /*.container{display: block;overflow-x: hidden;height: 580px;}*/
         .container::-webkit-scrollbar{width: 0;}
         .layui-form-radio{margin: 0;padding: 0;}
     </style>
@@ -24,7 +24,7 @@
         </span>
     </div>
     <form method="post" class="layui-form" action="{:url('Instor/do_add')}">
-        <div class="container">
+        <div class="container" >
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
                     <tr>
@@ -39,33 +39,36 @@
                 <tbody class="tbd">
                 {volist name='list' id='l'}
                 <tr>
-                    <th>
-                        <input type="text" class="text" readonly value="{$l['w_name']}" name="w_name[]">
-                    </th>
-                    <th>
-                        <input type="text" class="text" readonly value="{$l['c_name']}" name="c_name[]">
-                    </th>
-                    <th>
-                        <input type="text" class="text" readonly value="{$l['product_name']}" name="product_name[]">
-                    </th>
-                    <th>
-                        <input type="text" class="text" readonly value="<?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?>" name="product_time[]">
-                    </th>
-                    <th>
-                        <input type="text" class="text"  value="" name="pd_num[]">
-                    </th>
-                    <th>
-                        <input type="text" class="text" readonly value="{$l['rk_nums']}" name="rk_nums[]">
-                    </th>
+                    <td>
+                        <input type="hidden" value="{$l['w_name']}" name="w_name[]">
+                        {$l['w_name']}
+                    </td>
+                    <td>
+                        <input type="hidden" value="{$l['c_name']}" name="c_name[]">
+                        {$l['c_name']}
+                    </td>
+                    <td>
+                        <input type="hidden" value="{$l['product_name']}" name="product_name[]">
+                        {$l['product_name']}
+                    </td>
+                    <td><input type="text" class="text" readonly value="<?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?>" name="product_time[]"></td>
+                    <td><input type="text" class="text"  value="" name="pd_num[]"></td>
+                    <td>
+                        <input type="hidden" value="{$l['rk_nums']}" name="rk_nums[]">
+                        {$l['rk_nums']}
+                    </td>
                 </tr>
                 {/volist}
                 </tbody>
-                <span>
-                    备注<input type="text" class="text"name="count"value="">
-                </span>
-                <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
-                <button class="layui-btn fanhui" lay-submit>返回</button>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" id="count" name="count" autocomplete="off">
+                    </div>
+                </div>
             </table>
+        </div>
+            <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
     </form>
 </div>
 <script src="/static/jquery-1.9.1.min.js"></script>

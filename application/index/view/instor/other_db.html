@@ -43,9 +43,9 @@
                 <thead>
                     <tr>
                         <th>产品名称</th>
-                        <th>产品日期</th>
                         <th>调拨日期</th>
                         <th>调出货位</th>
+                        <th>产品日期</th>
                         <th>调出货位产品数量</th>
                         <th>调拨数量</th>
                         <th>调入货位</th>
@@ -62,16 +62,17 @@
                             </select>
                         </td>
                         <td class="jin">
-                            <input type="date" value="" name="c_time" class="layui-input">
-                        </td>
-                        <td class="jin">
                             <input type="date" value="" name="d_time" class="layui-input">
                         </td>
                         <td class="huowei">
                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
                         </td>
+                        <td class="c_time">
+                            <input type="hidden" value="" name="c_time" class="layui-input">
+                            <span></span>
+                        </td>
                         <td class="count">
-                            <input type="hidden" value="huowei_out" name="huowei_out" readonly>
+                            <input type="hidden" value="" name="huowei_out" readonly>
                             <span>0</span>
                         </td>
                         <td class="jin">
@@ -81,7 +82,7 @@
                             <botton class="layui-btn layui-btn-sm dia_r">点击</botton>
                         </td>
                         <td class="count_ss">
-                            <input type="hidden" value="huowei_out_ss" name="huowei_out_ss" readonly>
+                            <input type="hidden" value="" name="huowei_out_ss" readonly>
                             <span>0</span>
                         </td>
                 </tr>
@@ -194,6 +195,7 @@
                     url:'/index/Instor/houwei_ck',
                     data: {id,name},
                     success:function (data) {
+                        console.log(data)
                         let html = '';
                         for (let i =0; i<data.length; i++){
                             html += ` <tr>
@@ -218,6 +220,7 @@
             let che = $('.kc_list').find('input:radio:checked')[0];
             let tr = $(che).parents('tr');
             let id = tr.find('#id').val();
+            let time = tr.find('td:eq(2)').text();
             $.ajax({
                 url:'/index/Instor/houwei_cd',
                 data:{id},
@@ -225,7 +228,8 @@
                     // let coun = d.rk_nums;
                     par.find('.count').find('span').text(d.rk_nums);
                     par.find('.count').find('input').val(d.rk_nums);
-                    // // par.find('.rukuform_xq_id').val(id);
+                    par.find('.c_time').find('input').val(time);
+                    par.find('.c_time').find('span').text(time);
                     par.find('.huowei').html(`<input type="hidden" value="${d.id}" name="rk_id" readonly><span>${d.name}</span>`);
                     $('#r_id').val(d.id)
                 }

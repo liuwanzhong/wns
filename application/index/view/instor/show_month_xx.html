@@ -19,10 +19,6 @@
             </span>
     </div>
     <div class="layui-form">
-        <div class="layui-form-item">
-            <a href="{:url('Instor/show_month',['time'=>$time])}" class="layui-btn pandian" lay-submit>返回</a>
-        </div>
-        
     </div>
     <main class="bd_content">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
@@ -50,26 +46,29 @@
                 <tbody>
                     {volist name='rows' id='row'}
                     <tr>
-                        <td>{$row.state_time}</td>
-                        <td>{$row.odd_number}</td>
-                        <td>{$row.task}</td>
-                        <td>{$row.customer}</td>
-                        <td>{$row.early_stage}</td>
-                        <td>{$row.dh_ruku}</td>
-                        <td>{$row.db_ruku}</td>
-                        <td>{$row.qt_ruku}</td>
-                        <td>{$row.xx_chuku}</td>
-                        <td>{$row.db_chuku}</td>
-                        <td>{$row.qt_chuku}</td>
-                        <td>{$row.balance}</td>
-                        <td>{$row.count}</td>
+                        <td>{$row['time']}</td>
+                        <td>{$row['odd_number']}</td>
+                        <td>{$row['task']}</td>
+                        <td>{$row['customer']}</td>
+                        <td>{$row['early_stage']}</td>
+                        <td>{$row['dh_ruku']}</td>
+                        <td>{$row['db_ruku']}</td>
+                        <td>{$row['qt_ruku']}</td>
+                        <td>{$row['xx_chuku']}</td>
+                        <td>{$row['db_chuku']}</td>
+                        <td>{$row['qt_chuku']}</td>
+                        <td>{$row['balance']}</td>
+                        <td>{$row['count']}</td>
                     </tr>
                     {/volist}
                 </tbody>
             </table>
+        <div class="layui-form-item">
+            <a href="{:url('Instor/show_month','time='.$time)}" class="layui-btn pandian" style="margin-left:35px">返回</a>
+        </div>
         </main>
 </div>
-    
+
 <script src="/static/js/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script>
