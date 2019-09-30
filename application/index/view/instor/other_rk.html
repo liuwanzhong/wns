@@ -233,7 +233,7 @@
                     data:{'mao': mao, 'jing':jin, 'num':val},
                     dataType: 'json',//请求参数的格式为json.另外还有text等
                     success: function(data){
-                        console.log(data)
+                        console.log(mao,jin,val)
                         par.find(".mao input").val(data.mao);
                         par.find(".mao span").text(data.mao);
                         par.find(".jin input").val(data.jing);

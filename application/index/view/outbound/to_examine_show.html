@@ -168,10 +168,17 @@
                             </td>
                         <?php endif; ?>
 
+                        <?php if($v['sy_count']==''): ?>
                         <td class="sy_count">
-                            <input type="hidden" value="sy_count" name="sy_count[]" readonly>
+                            <input type="hidden" value="" name="sy_count[]" readonly>
                             <span>0</span>
                         </td>
+                        <?php else:?>
+                        <td>
+                            <input type="text" name="netweight[]" value="{$v['sy_count']}" readonly style="border:0">
+                        </td>
+                        <?php endif; ?>
+
 
                         <?php if($v['product_time']==''): ?>
                         <td class="indate">

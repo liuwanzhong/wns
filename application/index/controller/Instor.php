@@ -26,6 +26,7 @@ class Instor extends Controller
         $s_delivery_time=input('s_delivery_time');//生产日期
         $s_material_name=input('s_material_name');//产品名称
         $s_material_zt=input('s_material_zt');//状态
+        $status_id=input('status');//产品属性
         $search = '';
         if (!empty($s_transfers_id)) {
             $search = "warehouse.id=$s_transfers_id";
@@ -64,6 +65,16 @@ class Instor extends Controller
             }
             $search .= $material_zt;
         }
+        //产品属性
+        if ($status_id!=0) {
+            $stat = $status_id;
+            if (!empty($search)) {
+                $material_zt = " and rukuform_xq.rk_status_id = $stat";
+            } else {
+                $material_zt = " rukuform_xq.rk_status_id = $stat";
+            }
+            $search .= $material_zt;
+        }
         $order = db('rukuform_xq')
             ->where('rukuform_xq.state!=0')
             ->where('rukuform_xq.is_del',0)
@@ -73,7 +84,7 @@ class Instor extends Controller
             ->where("$search")
             ->order('rukuform_xq.create_time desc')
             ->field('rukuform_xq.*,kc_status.title,cabinet.name,kc_status.title')
-            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt]]);
+            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt,'status'=>$status_id]]);
         $orders=$order->all();
         foreach($orders as &$v) {
             $v['ckname'] = db('rukuform') -> field('a.id,a.ck_id,b.name')
@@ -95,7 +106,9 @@ class Instor extends Controller
                 }
             }
         }
-        return view('index2',['orders'=>$orders,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'md'=>$md,'zt'=>$zt,'s_material_zt'=>$s_material_zt]);
+        //产品属性
+        $status=db('kc_status')->where('is_del',0)->select();
+        return view('index2',['orders'=>$orders,'status'=>$status,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'md'=>$md,'zt'=>$zt,'s_material_zt'=>$s_material_zt,'status_id'=>$status_id]);
     }
 
     public function zt() {

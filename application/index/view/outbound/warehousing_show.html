@@ -104,6 +104,7 @@
                     <th>产品名称</th>
                     <th>出库货位</th>
                     <th>实发数量</th>
+                    <th>货位剩余数量</th>
                     <th>产品日期</th>
                     <th>产品批次</th>
                     <th>备注</th>
@@ -127,6 +128,9 @@
                     </td>
                     <td>
                             {$v.ck_nums}
+                    </td>
+                    <td>
+                        {$v.sy_count}
                     </td>
                     <td><?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);}?></td>
                     <td>{$v.product_batch}</td>

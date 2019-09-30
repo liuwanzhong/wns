@@ -201,7 +201,8 @@ class Outbound extends Controller {
                             'product_batch'=>$data['product_batch'][$i],
                             'create_time'=>$time,
                             'count'=>$data['delivery_num'][$i],
-                            'state'=>0
+                            'state'=>0,
+                            'sy_count'=>$data['sy_count'][$i]
                         ]);
                 }
 
@@ -327,7 +328,7 @@ class Outbound extends Controller {
                 'transport_unit' => $data['transport_unit'],
                 'update_time' => time(),
                 'ck_id' => $data['ck_id'],
-                'ck_time'=>strtotime($data['userintime']),'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight']
+                'ck_time'=>strtotime($data['userintime']),'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight'],
                 ]);
         for($i=0;$i<count($data['material_name']);$i++){
             if(empty($data['cd'][$i])){
@@ -343,6 +344,7 @@ class Outbound extends Controller {
                     'content'       => $data['content'][$i],
                     'netweight'     => $data['netweight'][$i],
                     'update_time'   => time(),
+                    'sy_count'=>$data['sy_count'][$i]
                 ]);
             }else{
                 $fs=db('outbound_xq_from')
@@ -357,6 +359,7 @@ class Outbound extends Controller {
                         'content'       => $data['content'][$i],
                         'netweight'     => $data['netweight'][$i],
                         'update_time'   => time(),
+                        'sy_count'=>$data['sy_count'][$i]
                     ]);
             }
         }

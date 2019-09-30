@@ -30,19 +30,19 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">出货仓库:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="transport_id" autocomplete="off" class="layui-input" value="{$res[0]['transport_id']}">
+                    <input type="text" name="transport_id" autocomplete="off" class="layui-input" readonly value="{$res[0]['transport_id']}">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">售达方:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="delivery" autocomplete="off" class="layui-input" value="{$res[0]['delivery']}" >
+                    <input type="text" name="delivery" autocomplete="off" class="layui-input" readonly value="{$res[0]['delivery']}" >
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">客户名:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="delivery_name" autocomplete="off" class="layui-input" value="{$res[0]['delivery_name']}">
+                    <input type="text" name="delivery_name" autocomplete="off" class="layui-input" readonly value="{$res[0]['delivery_name']}">
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
         </div>
         <div class="layui-form-item">
             <div class="layui-input-inline">
-                <button class="layui-btn save" lay-submit>查询</button>
+                <button class="layui-btn save" id="save" lay-submit>返回</button>
             </div>
         </div>
 </div>
@@ -96,6 +96,10 @@
             type: 'date'
         })
     });
+    document.getElementById('save').onclick = function () {
+        window.location.href='out_log'
+    };
+
 </script>
 </body>
 </html>
