@@ -86,10 +86,10 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">全部</label>
+                <label class="layui-form-label">状态</label>
                 <div class="layui-input-inline">
                     <select name="s_material_zt" id="">
-                        <option value="0">---请选择状态---</option>
+                        <option value="0">全部</option>
                         <option value="1" <?php if(!empty($s_material_zt)){if($s_material_zt==1){echo 'selected';};} ?>>正常</option>
                         <option value="2" <?php if(!empty($s_material_zt)){if($s_material_zt==2){echo 'selected';};} ?>>冻结</option>
                     </select>
@@ -105,6 +105,7 @@
             <tr>
                 <th>仓库名称</th>
                 <th>货位</th>
+                <th>产品属性</th>
                 <th>产品名称</th>
                 <th>生产日期</th>
                 <th>实时数量</th>
@@ -118,6 +119,7 @@
             <tr>
                 <td>{$v.ckname}</td>
                 <td>{$v.name}</td>
+                <td>{$v.title}</td>
                 <td>{$v.product_name}</td>
                 <td><?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);} ?></td>
                 <td>{$v.rk_nums}</td>

@@ -22,7 +22,6 @@
         <table class="layui-table" style="width: 96%; margin: 12px auto;">
             <thead>
             <tr>
-                <th>出库工厂</th>
                 <th>产品名称</th>
                 <th>产品日期</th>
                 <th>入库货位</th>
@@ -35,7 +34,6 @@
             <tbody>
             {volist name='rows' id='row'}
             <tr>
-                <td>{$row['factory']}</td>
                 <td>{$row['product_name']}</td>
                 <td><?php if(!empty($row['product_time'])){echo date('Y-m-d',$row['product_time']);}?></td>
                 <td>{$row['huowei']}</td>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/images/index.css" />
+    <link rel="stylesheet" href="/layui/css/layui.css" />
+    <style>
+        .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
+        .submit{margin-left: 30px;margin-top: 30px;}
+        .container{display: block;overflow-x: hidden;height: 580px;}
+        .container::-webkit-scrollbar{width: 0;}
+        input[type="date"]::-webkit-inner-spin-button {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="note">
+    <div class="nav">
+        <span class="layui-breadcrumb">
+            <a href="/public/main.html" target="box">首页</a>
+            <a href="javascript:;">超级权限</a>
+            <a><cite>数据管理</cite></a>
+        </span>
+    </div>
+    <div>
+        <h1>入库管理</h1>
+        <a href="{:url('Chaoji/a1')}" class="layui-btn">清除在库台账</a>
+        <a href="{:url('Chaoji/a2')}" class="layui-btn">清除入库计划和入库台账</a>
+        <a href="{:url('Chaoji/a4')}" class="layui-btn">清除入库明细</a>
+    </div>
+
+    <div>
+        <h1>在库管理</h1>
+        <a href="{:url('Chaoji/a5')}" class="layui-btn">清除货物列表</a>
+        <a href="{:url('Chaoji/a6')}" class="layui-btn">清除流水详细</a>
+        <a href="{:url('Chaoji/a7')}" class="layui-btn">清除库存盘点</a>
+        <a href="{:url('Chaoji/a8')}" class="layui-btn">清除调拨列表</a>
+        <a href="{:url('Chaoji/a9')}" class="layui-btn">清除损耗单</a>
+        <a href="{:url('Chaoji/a10')}" class="layui-btn">清除其他入库</a>
+        <a href="{:url('Chaoji/a11')}" class="layui-btn">清除其他出库</a>
+    </div>
+
+    <div>
+        <h1>出库管理</h1>
+        <a href="{:url('Chaoji/a13')}" class="layui-btn">清除系统订单</a>
+        <a href="{:url('Chaoji/a14')}" class="layui-btn">清除出库计划和出库台账</a>
+        <a href="{:url('Chaoji/a16')}" class="layui-btn">清除出库明细</a>
+    </div>
+</div>
+
+
+</body>
+</html>

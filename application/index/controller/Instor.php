@@ -72,7 +72,7 @@ class Instor extends Controller
             ->join('warehouse','cabinet.warehouse_id=warehouse.id','left')
             ->where("$search")
             ->order('rukuform_xq.create_time desc')
-            ->field('rukuform_xq.*,kc_status.title,cabinet.name')
+            ->field('rukuform_xq.*,kc_status.title,cabinet.name,kc_status.title')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt]]);
         $orders=$order->all();
         foreach($orders as &$v) {
@@ -189,6 +189,11 @@ class Instor extends Controller
             $this->error('警告：越权操作');
         }
         $id=input('id');
+        $row=db('rukuform_xq')->where('id',$id)->find();
+        $r=db('record')->where('is_del',1)->where('huowei',$row['rk_huowei_id'])->where('task','结存')->count();
+        if($r==1){
+            $this->error('该货位暂无可结存产品');
+        }
         $time=time();
         try{
         //获取货位产品详细信息
@@ -238,7 +243,10 @@ class Instor extends Controller
         $id=input('id');
         $rows=db('record')->where('is_del',0)->where('cj_id',$id)->select();
         foreach ($rows as $k=>$row) {
-            $rows[$k]['time']=date('Y-m-d',$row['time']);
+//            $rows[$k]['time']=date('Y-m-d',$row['time']);
+            if(!empty($row['time'])){
+                $rows[$k]['time']=date('Y-m-d',$row['time']);
+            }
         }
         return view('show_month_xx',['rows'=>$rows,'time'=>$time]);
     }
@@ -349,6 +357,9 @@ class Instor extends Controller
         $product_time = strtotime($data['product_time']);//产品日期
         $userintime = strtotime($data['userintime']);//入库日期
         array_shift($data);
+        if($data['customer']=='' || $data['rk_status_id']==0 || $data['rk_huowei_id']=='' || $data['rk_nums']=='' || $data['product_time']==''){
+            $this->error('请完善其他入库订单');
+        }
         $r = db('record')->where('is_del', 1)->where('huowei', $data['rk_huowei_id'])->count();
         if ($r) {
             try {
@@ -358,34 +369,36 @@ class Instor extends Controller
                 $s = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'customer' => $data['customer'], 'early_stage' => $c['rk_nums'], 'qt_ruku' => $data['rk_nums'], 'balance' => $num, 'huowei' => $data['rk_huowei_id'], 'count' => $data['content']]);
                 //修改实时数量
                 $a = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $data['rk_huowei_id'])->update(['rk_nums' => $num]);
-                if ($s && $a) {
+                $rk=db('cabinet')->where('id',$data['rk_huowei_id'])->find();
+                $f=db('other_rk')->insert(['product_name'=>$data['customer'],'product_time'=>$product_time,'huowei'=>$rk['name'],'count'=>$data['rk_nums'],'rk_time'=>$userintime,'conter'=>$data['content']]);
+                if ($s && $a && $f) {
                     // 提交事务
                     Db::commit();
                 }
             } catch (\Exception $e) {
-                $this->error('其他入库失败，请联系管理员1');
+                $this->error('其他入库失败，请联系管理员');
                 // 回滚事务
                 Db::rollback();
             }
-            return redirect('index');
+            return redirect('other_rk_list');
         } else {
             try {
                 //不存在则添加库存
                 $id = db('rukuform')->insertGetId(['shipmentnum' => $data['shipmentnum'], 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id'], 'userintime' => $userintime, 'intime' => $userintime]);
-                $f = db('rukuform_xq')->insert(['factory' => $data['factory'], 'transfers_id' => $data['odd_number'], 'product_name' => $data['customer'], 'rk_status_id' => $data['rk_status_id'], 'rk_huowei_id' => $data['rk_huowei_id'], 'rk_nums' => $data['rk_nums'], 'product_time' => $product_time, 'netweight' => $data['mao'], 'Grossweight' => $data['jin'], 'state' => 1, 'rukuid' => $id]);
-                $p = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'customer' => $data['factory'], 'early_stage' => 0, 'qt_ruku' => $data['rk_nums'], 'balance' => $data['rk_nums'], 'huowei' => $data['rk_huowei_id'], 'count' => $data['content']]);
-                if ($id && $f && $p) {
+                $f = db('rukuform_xq')->insert( ['transfers_id' => $data['odd_number'], 'product_name' => $data['customer'], 'rk_status_id' => $data['rk_status_id'], 'rk_huowei_id' => $data['rk_huowei_id'], 'rk_nums' => $data['rk_nums'], 'product_time' => $product_time, 'netweight' => $data['mao'], 'Grossweight' => $data['jin'], 'state' => 1, 'rukuid' => $id]);
+                $p = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'early_stage' => 0, 'qt_ruku' => $data['rk_nums'], 'balance' => $data['rk_nums'], 'huowei' => $data['rk_huowei_id'], 'count' => $data['content']]);
+                $rk=db('cabinet')->where('id',$data['rk_huowei_id'])->find();
+                $s=db('other_rk')->insert(['product_name'=>$data['customer'],'product_time'=>$product_time,'huowei'=>$rk['name'],'count'=>$data['rk_nums'],'rk_time'=>$userintime,'conter'=>$data['content']]);
+                if ($id && $f && $p && $s) {
                     // 提交事务
                     Db::commit();
                 }
             } catch (\Exception $e) {
-                $this->error('其他入库失败，请联系管理员2');
+                $this->error('其他入库失败，请联系管理员');
                 // 回滚事务
                 Db::rollback();
             }
-            $rk=db('cabinet')->where('id',$data['rk_huowei_id'])->find();
-            db('other_rk')->insert(['factory'=>$data['factory'],'product_name'=>$data['customer'],'product_time'=>$product_time,'huowei'=>$rk['name'],'count'=>$data['rk_nums'],'rk_time'=>$userintime,'conter'=>$data['content']]);
-            return redirect('index');
+            return redirect('other_rk_list');
         }
     }
     /**
@@ -461,7 +474,7 @@ class Instor extends Controller
                 Db::commit();
             }
         } catch (\Exception $e) {
-            $this->error('其他入库失败，请联系管理员2');
+            $this->error('其他出库失败，请联系管理员');
             // 回滚事务
             Db::rollback();
         }

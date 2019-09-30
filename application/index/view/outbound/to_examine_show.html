@@ -345,6 +345,7 @@
                     url:'/index/Table/houwei_ck',
                     data: {id,ne},
                     success:function (data) {
+                        console.log(data)
                         let html = '';
                         for (let i =0; i<data.length; i++){
                             html += ` <tr>

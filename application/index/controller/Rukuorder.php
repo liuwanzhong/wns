@@ -144,12 +144,13 @@ class Rukuorder extends Controller {
             ->join('rukuform_xq','rukuform.id=rukuform_xq.rukuid','left')
             ->where('rukuform.is_del',0)
             ->where('rukuform.state',0)
-            ->group('rukuform_xq.factory,rukuform_xq.rukuid')
+            ->group('rukuform_xq.rukuid')
             ->where($search)
             ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
             ->paginate(20,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         return view('to_examine',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
+    //rukuform_xq.factory,
     //订单详情
     public function to_examine_show($id) {
         $num=0;
