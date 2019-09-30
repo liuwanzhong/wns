@@ -105,7 +105,6 @@ class Login extends Controller
     //修改密码
     public function users_edit($id) {
         $pwd1=md5(md5(input('pwd1')));
-        dump($id);
         $pwd2=input('pwd2');
         $pwd3=input('pwd3');
         $count=db('staffs')->where('id',$id)->where('password',$pwd1)->count();

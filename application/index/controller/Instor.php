@@ -119,7 +119,6 @@ class Instor extends Controller
             $state_time=$state_time[0]['state_time'];
             $rows=db('record')->where('huowei',$id)->where("state_time >= '$state_time'")->where('is_del',1)->select();
             echo db('record')->getlastSql();
-            // dump($rows);exit;
         }
         return view('show',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt]);
     }
@@ -237,6 +236,7 @@ class Instor extends Controller
      */
     public function show_month_xx(){
         $id=input('id');
+        $time=input('time');
         $rows=db('record')->where('is_del',0)->where('cj_id',$id)->select();
         foreach ($rows as $k=>$row) {
             $rows[$k]['time']=date('Y-m-d',$row['time']);

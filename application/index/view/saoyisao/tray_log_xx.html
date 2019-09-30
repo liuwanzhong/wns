@@ -26,24 +26,23 @@
 </head>
 <body>
 <div class="note">
-    <form method="post" class="layui-form" action="{:url('Saoyisao/create_order')}">
         <div class="form_box">
             <div class="layui-form-item">
                 <label class="layui-form-label">出货仓库:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="transport_id" autocomplete="off" class="layui-input" value="{$name}">
+                    <input type="text" name="transport_id" autocomplete="off" class="layui-input" value="{$res[0]['transport_id']}">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">售达方:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="delivery" autocomplete="off" class="layui-input" value="{$delivery}" >
+                    <input type="text" name="delivery" autocomplete="off" class="layui-input" value="{$res[0]['delivery']}" >
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">客户名:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="delivery_name" autocomplete="off" class="layui-input" value="{$delivery_name}">
+                    <input type="text" name="delivery_name" autocomplete="off" class="layui-input" value="{$res[0]['delivery_name']}">
                 </div>
             </div>
         </div>
@@ -55,40 +54,34 @@
                         <th>总数量</th>
                         <th>产品日期</th>
                         <th>批次</th>
-                        <th>操作</th>
                 </thead>
                 <tbody class="tbd">
-                        {if condition="!empty($xx)"}
-                        {volist name='xx' id='x'}
+                        {volist name='row' id='r'}
                             <tr>
-                                <input type="hidden" name="tp_num[]" id="" value="{$x.0.tp_num}">
+                                <input type="hidden" name="tp_num[]" id="" value="{$r.0.tp_num}">
                                 <th>
-                                    {$x.0.goods_name}
+                                    {$r.0.goods_name}
                                 </th>
                                 <th>
-                                    {$x.0.num}
+                                    {$r.0.num}
                                 </th>
                                 <th>
-                                    {$x.0.goods_time}
+                                        
                                 </th>
                                 <th>
-                                    {$x.0.batch}
+                                    {$r.0.batch}
                                 </th>
-                                <th><a href="#" class="del" title="">删除</a></th>
                             </tr>
                         {/volist}
-                        {/if}
                 </tbody>
             </table>
-            <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
         </div>
-    </form>
+        <div class="layui-form-item">
+            <div class="layui-input-inline">
+                <button class="layui-btn save" lay-submit>查询</button>
+            </div>
+        </div>
 </div>
-<div id="video"></div>
-    <div>
-        <button class="layui-btn open" id="open">扫码</button>
-    </div>
-    <div id="result"></div>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script src="/static/js/qrscan.js"></script>
@@ -103,44 +96,6 @@
             type: 'date'
         })
     });
-    /*
-    *扫码
-    */
-    var ds = null;
-    var xx = null;
-    var scan = new QRScan('video');
-
-    document.getElementById('open').onclick = function () {
-        scan.openScan();
-        ds = window.setInterval(function () {
-            startScan();
-        }, 1500);
-    };
-    document.getElementById('close').onclick = function () {
-        scan.closeScan();
-        window.clearInterval(ds);
-    };
-    
-    var re_div = document.getElementById('result');
-    function startScan() {
-        scan.getImgDecode(function (data) {
-            console.log(data);
-            var p = document.createElement('p');
-            if (data.success) {
-                window.location.href=data.payload;
-            } else {
-                p.innerHTML = '识别失败，请校准';
-            }
-            re_div.appendChild(p);
-        });
-    };
-
-    /*
-    *删除
-    */
-    $('.del').click(function () {
-        alert(1)
-    })
 </script>
 </body>
 </html>
