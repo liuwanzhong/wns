@@ -32,7 +32,7 @@ class Batch extends Controller {
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
         ->where('tray.is_del',0)
         ->select();
-        return view('fenpei',['res'=>$res,'tp_num'=>$tp_num]);
+        return view('Saoyisao/rk_saoma',['res'=>$res,'tp_num'=>$tp_num]);
     }
     /**
      * 指定拖盘加入货物
@@ -49,7 +49,6 @@ class Batch extends Controller {
             'state'=>1,
             'goods_time'=>strtotime($data['ck_time'])
         ]);
-        echo db('tray')->getlastSql();
         db('tray_log')
         ->insert([
             'tp_num'=>$data['tp_num'],
@@ -60,7 +59,6 @@ class Batch extends Controller {
             'time'=>time()
         ]);
         
-        dump($res);
         if($res){
             $this->success('成功');
         }else{
@@ -131,37 +129,9 @@ class Batch extends Controller {
         ->where('tray.is_del',0)
         ->select();
         $batch=explode(',',$res[0]['batch']);
-        return view('chuku',['res'=>$res,'tp_num'=>$tp_num,'batch'=>$batch]);
+        return redirect('Saoyisao/create_saoyisao',['tp_num'=>$tp_num]);
     }
-    /**
-     * 出库执行
-     */
-    public function tray_ck_insert(){
-        $data=input();
-        $res=db('tray')
-        ->where('tp_num',$data['tp_num'])
-        ->update([
-            'order'=>$data['order'],
-            'delivery'=>$data['delivery'],
-            'state'=>0
-        ]);
-        db('tray_log')
-        ->insert([
-            'tp_num'=>$data['tp_num'],
-            'goods_name'=>$data['goods_name'],
-            'num'=>$data['num'],
-            'order'=>$data['order'],
-            'delivery'=>$data['delivery'],
-            'batch'=>implode(',',$data['batch']),
-            'state'=>1,
-            'time'=>time(),
-        ]);
-        if($res){
-            $this->success('成功');
-        }else{
-            $this->error('失败');
-        }
-    }
+    
     /**
      * 批次日志
      */
@@ -215,5 +185,6 @@ class Batch extends Controller {
         $data=explode(',',$res[0]['batch']);
         return $data;
     }
+    
 }
 // ,'tp_num'=>$tp_num,'batch'=>$batch]

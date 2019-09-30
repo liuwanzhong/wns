@@ -1,3 +1,6 @@
+?<php
+echo 1;
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,9 +20,10 @@
 </head>
 <body>
 <div class="note">
-    <form method="post" class="layui-form" action="{:url('batch/tray_ck_insert',['tp_num'=>$tp_num ])}">
+    <form method="post" class="layui-form" action="{:url('Saoyisao/create_saoyisao',['tp_num'=>$tp_num])}">
         <input type="hidden" name="tp_num" value="$tp_num">
         <div class="form_box">
+            <input type="hidden" class="text" name="tp_num">
             <div class="layui-form-item">
                 <label class="layui-form-label">货物名:</label>
                 <div class="layui-input-inline">
@@ -33,27 +37,9 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">装运单号:</label>
+                <label class="layui-form-label">产品日期:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="order" value=""  required autocomplete="off" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                    <label class="layui-form-label">产品日期:</label>
-                    <div class="layui-input-inline">
-                        <input type="text" class="layui-input" readonly name="ck_time" value="<?php if(!empty($res[0]['goods_time'])){echo date('Y-m-d',$res[0]['goods_time']);}?>">
-                    </div>
-                </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">售达方:</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="delivery" value=""  required autocomplete="off" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">出库仓库:</label>
-                <div class="layui-input-inline">
-                    <input type="text"  value="{$res[0]['name']}" required autocomplete="off" class="layui-input" readonly>
+                    <input type="text" class="layui-input" readonly name="ck_time" value="<?php if(!empty($res[0]['goods_time'])){echo date('Y-m-d',$res[0]['goods_time']);}?>">
                 </div>
             </div>
         </div>
@@ -75,7 +61,7 @@
                 </tbody>
             </table>
             <div class="btn">
-                <button class="layui-btn submit" lay-submit lay-filter="formDemo" >出库</button>
+                <button class="layui-btn submit" lay-submit lay-filter="formDemo" >加入该订单</button>
             </div>
         </div>
     </form>

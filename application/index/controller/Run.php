@@ -416,7 +416,7 @@ class Run extends Controller {
                 $this -> error('编号重复');
                 exit;
             }
-            $text='http://crm.cdqifa.cn:66/index/batch/batch.html?tp_num='.$data['tp_num'];      // 生成的二维码 内容
+            $text='/index/Batch/batch?tp_num='.$data['tp_num'];      // 生成的二维码 内容
             $outfile = ROOT_PATH.'public\\trayimg\\'.$data['tp_num'].'.png';     // 生成的二维码 文件名，false为 不保存
             $level = 'QR_ECLEVEL_L';         //级别,也是容错率。下面会有介绍
             $size = 10;                      //大小
