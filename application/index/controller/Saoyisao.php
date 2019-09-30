@@ -12,6 +12,10 @@ class Saoyisao extends Controller {
      * 生成扫码出库单
      */
     public function index(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $cks = db('warehouse')->where('is_del',1)->select();
         Cookie(null,'think_');
         return view('index',['cks'=>$cks]);
@@ -20,6 +24,10 @@ class Saoyisao extends Controller {
      * 扫码出库
      */
     public function create_saoyisao(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $md=[];
         $warehouse_id=input('warehouse_id');
         $delivery=input('delivery');
@@ -73,6 +81,10 @@ class Saoyisao extends Controller {
      * 生成出库单据
      */
     public function create_order(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data=input();
         $log_id='';
         $tp_num=implode(',',$data['tp_num']);
@@ -114,6 +126,10 @@ class Saoyisao extends Controller {
      * 往期出库
      */
     public function out_log(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $search = '';
         $data=input();
         if(!empty($data['name'])){
@@ -129,7 +145,14 @@ class Saoyisao extends Controller {
         ->select();
         return view('out_log',['res'=>$res,'name'=>$name]);
     }
+    /**
+     * 往期出库详细
+     */
     public function tray_log_xx(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $id=input('id');
         $log_id='';
         $res=db('tray_order')
@@ -144,7 +167,14 @@ class Saoyisao extends Controller {
         }
         return view('tray_log_xx',['res'=>$res,'row'=>$row]);
     }
+    /**
+     * 入库扫码页
+     */
     public function rk_saoma(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         return view();
     }
 }
