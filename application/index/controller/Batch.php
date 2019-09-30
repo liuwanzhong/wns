@@ -8,9 +8,13 @@ use think\Db;
 
 class Batch extends Controller {
     /**
-     * 扫码静茹页面
+     * 扫码判断
      */
     public function batch(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $tp_num=input('tp_num');
         $res=db('tray')
         ->where('tp_num',$tp_num)
@@ -26,6 +30,10 @@ class Batch extends Controller {
      * 分配托盘
      */
     public function fenpei(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $tp_num=input('tp_num');
         $res=db('tray')
         ->where('tray.tp_num',$tp_num)  
@@ -38,6 +46,10 @@ class Batch extends Controller {
      * 指定拖盘加入货物
      */
     public function tray_rk_insert(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data=input();
         $batch=implode(',',$data['batch']);
         $res=db('tray')
@@ -69,6 +81,10 @@ class Batch extends Controller {
      * 托盘查看
      */
     public function show_tray(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $search = '';
         $data=input();
         if(!empty($data['name'])){
@@ -111,6 +127,10 @@ class Batch extends Controller {
      * 批次查看
      */
     public function tray_batch(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $id=$_POST['id'];
         $res=db('tray')
         ->where('id',$id)
@@ -122,6 +142,10 @@ class Batch extends Controller {
      * 托盘出库页
      */
     public function chuku(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $tp_num=input('tp_num');
         $res=db('tray')
         ->where('tray.tp_num',$tp_num)  
@@ -136,6 +160,10 @@ class Batch extends Controller {
      * 批次日志
      */
     public function tray_log(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $search = '';
         $data=input();
         if(!empty($data['name'])){
@@ -178,6 +206,10 @@ class Batch extends Controller {
      * 日志批次查看
      */
     public function tray_log_batch(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $id=$_POST['id'];
         $res=db('tray_log')
         ->where('id',$id)

@@ -443,6 +443,7 @@ class Run extends Controller {
     }
     public function tray_del(){
         $id=$_POST['id'];
+        dump($id);
         $row=db('tray')
         ->where('tray.id',$id)
         ->where('tray.is_del',0)
