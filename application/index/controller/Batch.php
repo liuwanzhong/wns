@@ -30,17 +30,13 @@ class Batch extends Controller {
      * 分配托盘
      */
     public function fenpei(){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
         $tp_num=input('tp_num');
         $res=db('tray')
         ->where('tray.tp_num',$tp_num)  
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
         ->where('tray.is_del',0)
         ->select();
-        return view('Saoyisao/rk_saoma',['res'=>$res,'tp_num'=>$tp_num]);
+        return view('fenpei',['res'=>$res,'tp_num'=>$tp_num]);
     }
     /**
      * 指定拖盘加入货物
@@ -72,7 +68,7 @@ class Batch extends Controller {
         ]);
         
         if($res){
-            $this->success('成功');
+            $this->success('成功','saoyisao/rk_saoma');
         }else{
             $this->error('失败');
         }
@@ -119,7 +115,7 @@ class Batch extends Controller {
         ->where($search)
         ->where('state',1)
         ->field('tray.*,warehouse.name')
-        ->select();
+        ->paginate(100,false,['query'=>['name'=>$name,'tp_num'=>$tp_num,'batch'=>$batch]]);
         $cks = db('warehouse')->where('is_del',1)->select();
         return view('show_tray',['res'=>$res,'cks'=>$cks,'name'=>$name,'tp_num'=>$tp_num,'batch',$batch]);
     }
@@ -198,7 +194,7 @@ class Batch extends Controller {
         ->field('warehouse.name w_name,tray_log.id t_id,tray_log.tp_num tp_num,tray_log.batch t_batch,tray_log.time t_time,tray_log.goods_name t_goods_name,tray_log.order t_order,tray_log.delivery t_delivery,tray_log.id t_id,tray_log.state t_state,tray_log.num t_num')
         ->where($search)
         ->where('tray_log.is_del',0)
-        ->select();
+        ->paginate(100,false,['query'=>['name'=>$name,'tp_num'=>$tp_num,'batch'=>$batch]]);
         $cks = db('warehouse')->where('is_del',1)->select();
         return view('tray_log',['res'=>$res,'cks'=>$cks,'name'=>$name,'tp_num'=>$tp_num,'batch',$batch]);
     }

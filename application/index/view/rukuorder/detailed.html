@@ -54,6 +54,16 @@
 						</div>
 					</div>
 				</form>
+				<div class="layui-form-item">
+					<label class="layui-form-label">所有总计</label>
+					<div class="layui-input-inline">
+						<input type="text" class="layui-input" id="" name=""  value="{$sum}" readonly>
+					</div>
+					<label class="layui-form-label">本页总计</label>
+					<div class="layui-input-inline">
+						<input type="text" class="layui-input" id="" name=""  value="{$sums}" readonly>
+					</div>
+				</div>
 			</div>
 			<div class="bd_content">
 				<table class="layui-table new_list" style="width: 96%; margin: 12px auto 200px;">
@@ -92,9 +102,9 @@
 					{/volist}
 					</tbody>
 				</table>
-			</div>
-			<div style="text-align:center; margin-bottom: 200px;">
-				{$rows->render()}
+				<div style="text-align:center; margin-bottom: 200px;">
+					{$rows->render()}
+				</div>
 			</div>
 		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
@@ -169,6 +179,7 @@
 						$('.new_list #all').prop('checked', true);
 					}
 				}
+
 			})
 
 			// 导出

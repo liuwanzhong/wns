@@ -10,6 +10,7 @@
 		<style type="text/css">
 			.layui-table th{text-align: center;font-weight: bold;}
 			.layui-table td{text-align: center;}
+			label{box-sizing: content-box;}
 		</style>
 	<body>
 		<div class="note">
@@ -22,25 +23,27 @@
 			</div>
 			<div class="search">
                 <form action="{:url('Saoyisao/create_saoyisao')}" method="post" enctype="multipart/form-data" style="display: flex;">
-                    <div class="layui-form-item wrap">
-						<label>出库仓库:</label>
-						<select name="warehouse_id">
-							<option value="0">---请选择所属仓库---</option>
-							{volist name='cks' id='c'}
-							<option value="{$c['id']}">{$c['name']}</option>
-							{/volist}
-						</select>
+					<div class="layui-form-item">
+						<label class="layui-form-label">出库仓库</label>
+						<div class="layui-input-inline">
+							<select name="warehouse_id" id="">
+								<option value="0">---请选择所属仓库---</option>
+								{volist name='cks' id='c'}
+								<option value="{$c['id']}">{$c['name']}</option>
+								{/volist}
+							</select>
+						</div>
 					</div>
 					<div class="layui-form-item">
                         <label class="layui-form-label">收货客户</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input"  name="delivery_name" required autocomplete="off" placeholder=" - " value="<?php if(!empty($batch)){echo $batch;}?>">
+                            <input type="text" class="layui-input"  name="delivery_name" required autocomplete="off" placeholder="  " value="<?php if(!empty($batch)){echo $batch;}?>">
                         </div>
                     </div>  
                     <div class="layui-form-item">
                         <label class="layui-form-label">收货地址</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input"  name="delivery"  required autocomplete="off" placeholder=" - " value="<?php if(!empty($batch)){echo $batch;}?>">
+                            <input type="text" class="layui-input"  name="delivery"  required autocomplete="off" placeholder=" " value="<?php if(!empty($batch)){echo $batch;}?>">
                         </div>
                     </div> 
                     <div class="layui-form-item">
@@ -58,8 +61,17 @@
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script>
-			layui.use('element', function () {
-				let element = layui.element;
+			layui.use(['element','laydate','form'], function(){
+				var laydate = layui.laydate;
+				var element = layui.element;
+				let form = layui.form;
+				laydate.render({
+					elem: '#s_delivery_time'
+					,range: '~'
+					,done: function(value){
+						$('#s_delivery_time').val(value)
+					}
+				});
 			})
 		</script>
 

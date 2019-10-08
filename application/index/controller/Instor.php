@@ -75,6 +75,19 @@ class Instor extends Controller
             }
             $search .= $material_zt;
         }
+        $row = db('rukuform_xq')
+            ->where('rukuform_xq.state!=0')
+            ->where('rukuform_xq.is_del',0)
+            ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id and kc_status.is_del=0',"left")
+            ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id and cabinet.is_del=1','left')
+            ->join('warehouse','cabinet.warehouse_id=warehouse.id','left')
+            ->order('rukuform_xq.create_time desc')
+            ->field('rukuform_xq.*,kc_status.title,cabinet.name,kc_status.title')
+            ->select();
+        $sums=0;
+        foreach($row as $v){
+            $sums += $v['rk_nums'];
+        }
         $order = db('rukuform_xq')
             ->where('rukuform_xq.state!=0')
             ->where('rukuform_xq.is_del',0)
@@ -87,11 +100,12 @@ class Instor extends Controller
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt,'status'=>$status_id]]);
         $orders=$order->all();
         foreach($orders as &$v) {
-            $v['ckname'] = db('rukuform') -> field('a.id,a.ck_id,b.name')
-                               -> alias('a')
-                               -> join('warehouse b', 'a.ck_id = b.id')
-                               -> where('a.is_del', 0) -> where('b.is_del', 1)
-                               -> where('a.id', $v['rukuid'])->find()['name'];
+            $v['ckname'] = db('rukuform') 
+            -> field('a.id,a.ck_id,b.name')
+            -> alias('a')
+            -> join('warehouse b', 'a.ck_id = b.id')
+            -> where('a.is_del', 0) -> where('b.is_del', 1)
+            -> where('a.id', $v['rukuid'])->find()['name'];
             if($v['rukuid']==null){
                 $v['ckname']=db('cabinet')->where('cabinet.id',$v['rk_huowei_id'])->join('warehouse','warehouse.id=cabinet.warehouse_id')->field('warehouse.name')->find()['name'];
             }
@@ -106,9 +120,14 @@ class Instor extends Controller
                 }
             }
         }
+
+        $sum=0;
+        foreach($orders as $v){
+            $sum += $v['rk_nums'];
+        }
         //产品属性
         $status=db('kc_status')->where('is_del',0)->select();
-        return view('index2',['orders'=>$orders,'status'=>$status,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'md'=>$md,'zt'=>$zt,'s_material_zt'=>$s_material_zt,'status_id'=>$status_id]);
+        return view('index2',['orders'=>$orders,'status'=>$status,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'md'=>$md,'zt'=>$zt,'s_material_zt'=>$s_material_zt,'status_id'=>$status_id,'sum'=>$sum,'sums'=>$sums]);
     }
 
     public function zt() {
@@ -292,17 +311,26 @@ class Instor extends Controller
         $data=input();
         if(!empty($data['w_name']) && !empty($data['pd_num'])){
             for ($i=0;$i<count($data['w_name']);$i++){
+                if(empty($data['pd_num'][$i])){
+                    $data['pd_num'][$i]=0;
+                }
+                $chayi='';
+                $chayi=$data['rk_nums'][$i]-$data['pd_num'][$i];
+                dump($chayi);
                 db('pandian')
                 ->insert([
                     'w_name'=>$data['w_name'][$i],
                     'c_name'=>$data['c_name'][$i],
                     'product_name'=>$data['product_name'][$i],
-                    'product_time'=>strtotime($data['product_time'][$i]),
+                    'product_time'=>$data['product_time'][$i],
                     'pd_num'=>$data['pd_num'][$i],
                     'rk_nums'=>$data['rk_nums'][$i],
                     'chayi'=>$data['rk_nums'][$i]-$data['pd_num'][$i],
                     'create_time'=>time(),
-                    'count'=>$data['count']
+                    'count1'=>$data['count1'][$i],
+                    'count2'=>$data['count2'][$i],
+                    'count3'=>$data['count3'][$i],
+                    'count'=>$data['count'],
                 ]);
             }
             return redirect('Instor/pandian');

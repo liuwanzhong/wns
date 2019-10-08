@@ -109,7 +109,16 @@
             <button class="layui-btn save" lay-submit>查询</button>
         </form>
     </div>
-
+    <div class="layui-form-item">
+        <label class="layui-form-label">所有总计</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="" name=""  value="{$sums}" readonly>
+        </div>
+        <label class="layui-form-label">本页总计</label>
+        <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="" name=""  value="{$sum}" readonly>
+        </div>
+    </div>
     <main class="bd_content">
         <table class="layui-table" style="width: 96%; margin: 12px auto;">
             <thead>

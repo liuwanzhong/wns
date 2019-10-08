@@ -10,6 +10,7 @@
 		<style type="text/css">
 			.layui-table th{text-align: center;font-weight: bold;}
 			.layui-table td{text-align: center;}
+			.bd_content{height:650px;}
 		</style>
 	<body>
 		<div class="note">
@@ -31,7 +32,7 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">托盘编号</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="s_delivery_time" name="tp_num" autocomplete="off" placeholder=" - " value="<?php if(!empty($tp_num)){echo $tp_num;}?>">
+                            <input type="text" class="layui-input" id="s_delivery_time" name="tp_num" autocomplete="off" placeholder="  " value="<?php if(!empty($tp_num)){echo $tp_num;}?>">
                         </div>
                     </div>
                     <div class="layui-form-item">
@@ -56,12 +57,12 @@
 					</tr>
 					</thead>
 					<tbody>
-                        {volist name='rows' id='rows'}
+                        {volist name='rows' id='row'}
                         <tr>
-                            <th>{$rows.id}</th>
-                            <th>{$rows.tp_num}</th>
-                            <th>{$rows.name}</th>
-                            <th><?php if(!empty($rows['create_time'])){echo date('Y-m-d',$rows['create_time']);}?></th>
+                            <th>{$row.id}</th>
+                            <th>{$row.tp_num}</th>
+                            <th>{$row.name}</th>
+                            <th><?php if(!empty($row['create_time'])){echo date('Y-m-d',$row['create_time']);}?></th>
                             <th>
 								<a href="#" class="edit ks" title="">详细</a>
 								<a href="#" class="del" title="">删除</a>
@@ -69,10 +70,11 @@
                         </tr>
                         {/volist}
                     </tbody>
+				</table>
+				<div style="text-align:center; margin-bottom: 200px;">
+					{$rows->render()}
 				</div>
 			</main>
-		</div>
-
 		<!--添加-->
 		<div class="model">
 			<div class="head">

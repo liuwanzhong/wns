@@ -270,7 +270,8 @@ class Outbound extends Controller {
             ->where($search)
             ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
-        return view('to_examine',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
+        $cks = db('warehouse')->where('is_del',1)->select();
+        return view('to_examine',['rows'=>$rows,'cks'=>$cks,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     // 出库订单详情
     public function to_examine_show($id) {
@@ -743,5 +744,27 @@ class Outbound extends Controller {
             );
         }
         exit(json_encode($response));
+    }
+    /**
+     * 拆分
+     */
+    public function chaifen(){
+        dump(input());
+    }
+    /**
+     * 拆分总数回显
+     */
+    public function cf_edit($id){
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
+        $row = db('system_order') -> where('id', $id) -> find();
+        if ($row['delivery_time'] != 0) {
+            $row['delivery_time'] = date("Y/m/d", $row['delivery_time']);
+        } else {
+            $arr['delivery_time'] = '暂无时间';
+        }
+        return $row;
     }
 }

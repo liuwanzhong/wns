@@ -55,9 +55,9 @@ class Saoyisao extends Controller {
             Cookie::set('delivery',$delivery,['prefix'=>'think_']);
             Cookie::set('delivery_name',$delivery_name,['prefix'=>'think_']);
         }
-        
         if(empty($name)){
-            $this->error('仓库未选择');
+            // $this->error('仓库未选择');
+        dump(input());
         }
         if(isset($s) && strstr($s,',')){
             $s=explode(',',$s);
@@ -142,7 +142,7 @@ class Saoyisao extends Controller {
         ->where('is_del',0)
         ->where($search )
         ->order('create_time desc')
-        ->select();
+        ->paginate(100,false,['query'=>['name'=>$name]]);
         return view('out_log',['res'=>$res,'name'=>$name]);
     }
     /**

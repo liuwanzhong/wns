@@ -367,7 +367,7 @@ class Run extends Controller {
         ->where('tray.is_del',0)
         ->where($search)
         ->field('tray.*,warehouse.name')
-        ->select();
+        ->paginate(100,false,['query'=>['name'=>$name,'tp_num'=>$tp_num]]);
         $cks = db('warehouse')->where('is_del',1)->select();
         return view('tray',['cks'=>$cks,'rows'=>$rows,'tp_num'=>$tp_num,'name'=>$name]);
     }
