@@ -399,7 +399,7 @@ class Instor extends Controller
             try {
                 //不存在则添加库存
                 $id = db('rukuform')->insertGetId(['shipmentnum' => $data['shipmentnum'], 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id'], 'userintime' => $userintime, 'intime' => $userintime]);
-                $f = db('rukuform_xq')->insert( ['transfers_id' => $data['odd_number'], 'product_name' => $data['customer'], 'rk_status_id' => $data['rk_status_id'], 'rk_huowei_id' => $data['rk_huowei_id'], 'rk_nums' => $data['rk_nums'], 'product_time' => $product_time, 'netweight' => $data['mao'], 'Grossweight' => $data['jin'], 'state' => 1, 'rukuid' => $id]);
+                $f = db('rukuform_xq')->insert( ['transfers_id' => $data['odd_number'], 'product_name' => $data['customer'], 'rk_status_id' => $data['rk_status_id'], 'rk_huowei_id' => $data['rk_huowei_id'], 'rk_nums' => $data['rk_nums'], 'product_time' => $product_time, 'netweight' => $data['mao'], 'Grossweight' => $data['jin'], 'state' => 1, 'rukuid' => $id,'qt_rk'=>1]);
                 $p = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'early_stage' => 0, 'qt_ruku' => $data['rk_nums'], 'balance' => $data['rk_nums'], 'huowei' => $data['rk_huowei_id'], 'count' => $data['content']]);
                 $rk=db('cabinet')->where('id',$data['rk_huowei_id'])->find();
                 $s=db('other_rk')->insert(['product_name'=>$data['customer'],'product_time'=>$product_time,'huowei'=>$rk['name'],'count'=>$data['rk_nums'],'rk_time'=>$userintime,'conter'=>$data['content']]);
