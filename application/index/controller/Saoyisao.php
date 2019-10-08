@@ -52,9 +52,9 @@ class Saoyisao extends Controller {
             Cookie::set('delivery',$delivery,['prefix'=>'think_']);
             Cookie::set('delivery_name',$delivery_name,['prefix'=>'think_']);
         }
-
         if(empty($name)){
-            $this->error('仓库未选择');
+            // $this->error('仓库未选择');
+        dump(input());
         }
         if(isset($s) && strstr($s,',')){
             $s=explode(',',$s);
@@ -134,11 +134,12 @@ class Saoyisao extends Controller {
         }else{
             $name='';
         }
-        $res=db('tray_order')
+        $re=db('tray_order')
         ->where('is_del',0)
         ->where($search )
         ->order('create_time desc')
-        ->select();
+        ->paginate(100,false,['query'=>['name'=>$name]]);
+        $res=$re->all();
         foreach ($res as $k=>$re) {
             foreach ($cks as $ck) {
                 if($re['transport_id']==$ck['name']){
@@ -146,7 +147,9 @@ class Saoyisao extends Controller {
                 }
             }
         }
-        return view('out_log',['res'=>$md,'name'=>$name,'cks'=>$cks]);
+        return view('out_log',['res'=>$re,'name'=>$name,'cks'=>$cks,'md'=>$md]);
+//        ->paginate(100,false,['query'=>['name'=>$name]]);
+//        return view('out_log',['res'=>$res,'name'=>$name]);
     }
     /**
      * 往期出库详细

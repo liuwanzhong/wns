@@ -18,7 +18,16 @@
             .model_edit .content::-webkit-scrollbar{
                 display: none;
             }
-
+            .cf{
+                overflow: hidden;
+            }
+            .cf .content{
+                height: calc(100% - 100px);
+                overflow-x: hidden;
+            }
+            .cf .content::-webkit-scrollbar{
+                display: none;
+            }
         </style>
 	</head>
 	<body>
@@ -67,6 +76,7 @@
                             <td>{$r.detailed}</td>
                             <td>
                                 <a href="#" class="img_edit" title="详细" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
+                                <a href="#" class="chaifen" title="拆分" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
                             </td>
                         </tr>
                         {/volist}
@@ -159,6 +169,30 @@
                 </form>
             </div>
         </div>
+        <!-- 拆分 -->
+        <div class="cf">
+            <div class="head">
+                <span>拆分商品</span>
+                <a href="javascript:" class="close_cf">×</a>
+            </div>
+            <div class="contents">
+                <form action="{:url('Outbound/chaifen')}" method="post" enctype="multipart/form-data">
+                    <div class="wrap">
+                        <label>总数</label>
+                        <input type="text" id="cf_nums" name="num" value="" readonly/>
+                    </div>
+                    <div class="wrap">
+                        <label>拆分数量</label>
+                        <input type="text" id="cf_num" name="detailed[]" value="" />
+                        <input type="text" id="cf_num" name="detailed[]" value="" />
+                        <input type="text" id="cf_num" name="detailed[]" value="" />
+                    </div>
+                    <div class="wrap btn">
+                        <input type="submit" class="save" id="btn_update" value="修改"/>
+                    </div>
+                </form>
+            </div>
+        </div>
         <script src="/static/jquery-1.9.1.min.js"></script>
         <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
         <script src="/layui/layui.js"></script>
@@ -178,9 +212,18 @@
 			$('.img_edit').on('click', function(){
 				$('.model_edit').show();
 			})
+            //拆分
+            $('.chaifen').on('click', function(){
+				$('.cf').show();
+			})
+            // 关闭
             $('.close_edit').on('click', function(){
 				$('.model_edit').hide();
 			})
+            $('.close_cf').on('click', function(){
+				$('.cf').hide();
+			})
+            // 点击详细
             $('.img_edit').click(function(){
 				let val = $(this).parents('tr').find('input[type=hidden]').val();
                 // alert(val);exit;
@@ -206,7 +249,18 @@
 					}
 				})
             })
-
+            // 点击拆分
+            $('.chaifen').click(function(){
+				let val = $(this).parents('tr').find('input[type=hidden]').val();
+				$.ajax({
+					url:'/index/Outbound/cf_edit',
+					type:'post',
+					data:{'id':val},
+					success:function(data){
+						$('#cf_nums').val(data.Delivery_num)
+					}
+				})
+            })
             //全选或全不选
             $("#all").click(function(){
                 let arr = [];

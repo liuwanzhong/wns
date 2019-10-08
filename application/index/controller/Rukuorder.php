@@ -416,6 +416,16 @@ class Rukuorder extends Controller {
             }
             $search .= $material_name;
         }
+        $row=db('rukuform_xq')
+            ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id','left')
+            ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
+            ->join('rukuform','rukuform_xq.rukuid=rukuform.id','left')
+            ->join('warehouse','rukuform.ck_id=warehouse.id','left')
+            ->where('rukuform_xq.is_del',0)
+            ->where('rukuform_xq.qt_rk',0)
+            ->where('rukuform_xq.state',1)
+            ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
+            ->select();
         $rows=db('rukuform_xq')
             ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id','left')
             ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
@@ -427,12 +437,20 @@ class Rukuorder extends Controller {
             ->where('rukuform_xq.state',1)
             ->where("$search")
             ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
-            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+            ->paginate(10,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         //产品属性
         $status=db('kc_status')->where('is_del',0)->select();
 //        $a = $this->request->action();
 //        echo $a;exit;
-        return view('detailed',['rows'=>$rows,'status'=>$status,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
+        $sums=0;
+        $sum=0;
+        foreach($row as $v){
+            $sum += $v['rk_nums'];
+        }
+        foreach($rows as $v){
+            $sums += $v['rk_nums'];
+        }
+        return view('detailed',['rows'=>$rows,'status'=>$status,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'sum'=>$sum,'sums'=>$sums]);
     }
     //导出入库明细
     public function outExcel(){

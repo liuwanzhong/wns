@@ -12,20 +12,21 @@
         .container{display: block;overflow-x: hidden;height: 580px;}
         .container::-webkit-scrollbar{width: 0;}
         .layui-form-radio{margin: 0;padding: 0;}
+        .note{margin: 0;padding: 0;}
+        .container{height: 830px; padding-bottom:30px;}
     </style>
 </head>
 <body>
+
 <div class="note">
-    <div class="nav">
-        <span class="layui-breadcrumb">
-            <a href="/public/main.html" target="box">首页</a>
-            <a href="javascript:;">入库管理</a>
-            <a><cite>入库单</cite></a>
-        </span>
-    </div>
-
-    <form method="post" class="layui-form" action="{:url('Instor/pandian')}">
-
+    <div class="bd_content">
+        <div class="nav">
+            <span class="layui-breadcrumb">
+                <a href="/public/main.html" target="box">首页</a>
+                <a href="javascript:;">入库管理</a>
+                <a><cite>盘点详细</cite></a>
+            </span>
+        </div>
         <div class="container">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
@@ -37,6 +38,9 @@
                         <th>盘点数量</th>
                         <th>实时数量</th>
                         <th>差异</th>
+                        <th>备注1</th>
+                        <th>备注2</th>
+                        <th>备注3</th>
                     </tr>
                 </thead>
                 <tbody class="tbd">
@@ -45,24 +49,40 @@
                     <td>{$l['w_name']}</td>
                     <td>{$l['c_name']}</td>
                     <td>{$l['product_name']}</td>
-                    <td><input type="text" class="text" readonly value="<?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?>" name="product_time"></td>
+                    <td><?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);} ?></td>
                     <td>{$l['pd_num']}</td>
                     <td>{$l['rk_nums']}</td>
                     <td>{$l['chayi']}</td>
-
+                    <td>{$l['count1']}</td>
+                    <td>{$l['count2']}</td>
+                    <td>{$l['count3']}</td>
                 </tr>
                 {/volist}
                 </tbody>
-
             </table>
-    </form>
-    <button class="layui-btn submit" lay-submit lay-filter="formDemo">返回</button>
+            <button class="layui-btn submit" lay-submit lay-filter="formDemo">返回</button>
+        </div>
+    </div>
 </div>
+
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
-
-
+layui.use(['element','laydate','form'], function(){
+    var laydate = layui.laydate;
+    var element = layui.element;
+    let form = layui.form;
+    laydate.render({
+        elem: '#s_delivery_time' 
+        ,range: '~'
+        ,done: function(value){
+            $('#s_delivery_time').val(value)
+        }
+    });
+})
+$('.submit').on('click',  function (){
+            window.location.href="/index/Instor/pandian";
+        })
 </script>
 </body>
 </html>

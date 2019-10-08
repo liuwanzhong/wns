@@ -22,10 +22,10 @@
 				</span>
 			</div>
 			<div class="search">
-                <form action="{:url('Saoyisao/create_saoyisao')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
 
+                <form class="layui-form" action="{:url('Saoyisao/create_saoyisao')}" method="post" enctype="multipart/form-data" style="display: flex;">
 					<div class="layui-form-item">
-						<label class="layui-form-label">仓库名称</label>
+						<label class="layui-form-label">出库仓库</label>
 						<div class="layui-input-inline">
 							<select name="warehouse_id" id="">
 								<option value="0">---请选择所属仓库---</option>
@@ -39,13 +39,13 @@
 					<div class="layui-form-item">
                         <label class="layui-form-label">收货客户</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input"  name="delivery_name" required autocomplete="off" placeholder=" - " value="<?php if(!empty($batch)){echo $batch;}?>">
+                            <input type="text" class="layui-input"  name="delivery_name" required autocomplete="off" placeholder="  " value="<?php if(!empty($batch)){echo $batch;}?>">
                         </div>
                     </div>
                     <div class="layui-form-item">
                         <label class="layui-form-label">收货地址</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input"  name="delivery"  required autocomplete="off" placeholder=" - " value="<?php if(!empty($batch)){echo $batch;}?>">
+                            <input type="text" class="layui-input"  name="delivery"  required autocomplete="off" placeholder=" " value="<?php if(!empty($batch)){echo $batch;}?>">
                         </div>
                     </div>
                     <div class="layui-form-item">

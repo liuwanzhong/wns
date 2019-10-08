@@ -757,4 +757,26 @@ class Outbound extends Controller {
         }
         exit(json_encode($response));
     }
+    /**
+     * 拆分
+     */
+    public function chaifen(){
+        dump(input());
+    }
+    /**
+     * 拆分总数回显
+     */
+    public function cf_edit($id){
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
+        $row = db('system_order') -> where('id', $id) -> find();
+        if ($row['delivery_time'] != 0) {
+            $row['delivery_time'] = date("Y/m/d", $row['delivery_time']);
+        } else {
+            $arr['delivery_time'] = '暂无时间';
+        }
+        return $row;
+    }
 }

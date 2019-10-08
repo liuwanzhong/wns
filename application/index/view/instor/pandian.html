@@ -40,7 +40,7 @@
                 </div>
             </div>
             <main class="bd_content">
-                <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
+                <table class="layui-table new_list" style="width: 96%;margin: 12px auto 200px;">
                     <thead>
                     <tr>
                         <th>仓库</th>
@@ -73,8 +73,17 @@
         <script src="/layui/layui.js"></script>
         <script type="text/javascript">
 
-        layui.use(['element','form'], function(){
+        layui.use(['element','laydate','form'], function(){
+            var laydate = layui.laydate;
+            var element = layui.element;
             let form = layui.form;
+            laydate.render({
+                elem: '#s_delivery_time'
+                ,range: '~'
+                ,done: function(value){
+                    $('#s_delivery_time').val(value)
+                }
+            });
         })
         $('.pandian').on('click',  function (){
              let id = $('#table').val();
