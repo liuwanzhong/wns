@@ -228,6 +228,8 @@ class Outbound extends Controller {
     }
     // 出库计划
     public function to_examine() {
+        static $md;
+        $warehouse=self::$stafss['warehouse'];
         $s_transfers_id=input('s_transfers_id');
         $s_delivery_time=input('s_delivery_time');
         $s_material_name=input('s_material_name');
@@ -245,9 +247,9 @@ class Outbound extends Controller {
                 array_shift($time);
             }
             if (!empty($search)) {
-                $time = ' and outbound_from.delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+                $time = ' and outbound_from.ck_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
             } else {
-                $time = 'outbound_from.delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+                $time = 'outbound_from.ck_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
             }
             $search .= $time;
         }
@@ -264,16 +266,19 @@ class Outbound extends Controller {
         $rows=db('outbound_from')
             ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
             ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->where('warehouse.id','in',$warehouse)
             ->where('outbound_from.is_del',0)
             ->where('outbound_from.state',0)
             ->group('outbound_xq_from.chukuid')
             ->where($search)
             ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
-        return view('to_examine',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
+        $cks=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
+        return view('to_examine',['rows'=>$rows,'cks'=>$cks,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     // 出库订单详情
     public function to_examine_show($id) {
+        $warehouse=self::$stafss['warehouse'];
         $num=0;
         $ms=$this->qx();
         if($ms==0){
@@ -294,7 +299,7 @@ class Outbound extends Controller {
             ->join('cabinet','cabinet.id=outbound_xq_from.ck_huowei_id','left')
             ->field('outbound_xq_from.*,cabinet.name as c_name')
             ->select();
-        $cks = db('warehouse')->where('is_del',1)->select();
+        $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         $cabinet=db('cabinet')->where('is_del',1)->select();
        if(!empty($rows['userintime'])){
            $rows['userintime']=date("Y-m-d",$rows['userintime']);
@@ -427,6 +432,7 @@ class Outbound extends Controller {
     }
     // 出库台账
     public function warehousing() {
+        $warehouse=self::$stafss['warehouse'];
         $s_transfers_id=input('s_transfers_id');
         $s_delivery_time=input('s_delivery_time');
         $s_material_name=input('s_material_name');
@@ -462,13 +468,16 @@ class Outbound extends Controller {
         $rows=db('outbound_from')
             ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
             ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->where('warehouse.id','in',$warehouse)
             ->where('outbound_from.is_del',0)
             ->where('outbound_from.state',1)
+            ->where('outbound_xq_from.qt_ck',0)
             ->group('outbound_from.id')
             ->where($search)
             ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
-        return view('warehousing',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
+        $cks=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
+        return view('warehousing',['rows'=>$rows,'cks'=>$cks,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     //订单详情
     public function warehousing_show($id) {
@@ -522,6 +531,7 @@ class Outbound extends Controller {
     }
     // 出库明细
     public function detailed() {
+        $warehouse=self::$stafss['warehouse'];
         $s_transfers_id=input('s_transfers_id');//工厂
         $s_delivery_time=input('s_delivery_time');//日期
         $s_material_name=input('s_material_name');//产品名称
@@ -557,16 +567,19 @@ class Outbound extends Controller {
             $search .= $material_name;
         }
         $rows=db('outbound_xq_from')
+            ->where('outbound_xq_from.qt_ck',0)
             ->join('outbound_from','outbound_from.id=outbound_xq_from.chukuid','left')
             ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
             ->join('cabinet','outbound_xq_from.ck_huowei_id=cabinet.id','left')
+            ->where('warehouse.id','in',$warehouse)
             ->where('outbound_from.is_del',0)
             ->where('outbound_from.state',1)
             ->group('outbound_xq_from.id')
             ->where($search)
             ->field('outbound_xq_from.*,warehouse.name as w_name,outbound_from.transport_id as t_id,sum(outbound_xq_from.ck_nums) as count,outbound_from.reachout_name,outbound_from.delivery_time,cabinet.name as c_name,outbound_from.ck_time')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
-        return view('detailed',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
+        $cks=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
+        return view('detailed',['rows'=>$rows,'cks'=>$cks,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
 
 

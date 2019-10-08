@@ -50,7 +50,7 @@
                     </tr>
                     </thead>
                     <tbody class="tbd">
-                        {volist name='list' id='l'}
+                        {volist name='li' id='l'}
                         <tr>
                             <th>{$l.w_name}</th>
                             <th><?php if(!empty($l['create_time'])){echo date('Y-m-d',$l['create_time']);}?></th>
@@ -64,6 +64,7 @@
                     </tbody>
                 </table>
                 <div style="text-align:center; margin-bottom: 200px;">
+                    {$list->render()}
                 </div>
             </main>
         </div>

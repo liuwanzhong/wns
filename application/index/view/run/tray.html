@@ -10,6 +10,7 @@
 		<style type="text/css">
 			.layui-table th{text-align: center;font-weight: bold;}
 			.layui-table td{text-align: center;}
+			label{box-sizing: content-box;}
 		</style>
 	<body>
 		<div class="note">
@@ -25,7 +26,12 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">仓库</label>
                         <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="transfers_i" name="name" value="<?php if(!empty($name)){echo $name;}?>" />
+							<select name="name" id="">
+								<option value="0">全部</option>
+								{volist name='cks' id='ck'}
+								<option value="{$ck.name}">{$ck.name}</option>
+								{/volist}
+							</select>
                         </div>
                     </div>
                     <div class="layui-form-item">
@@ -44,8 +50,8 @@
 			<div class="handle">
 				<button type="button" class="layui-btn" id="add">添加</button>
 			</div>
-			<main class="bd_content">
-				<table class="layui-table" style="width: 96%; margin: 12px auto;">
+			<div class="bd_content">
+				<table class="layui-table" style="width: 96%; margin: 12px auto 200px;">
 					<thead>
 					<tr>
 						<th>ID</th>
@@ -69,6 +75,7 @@
                         </tr>
                         {/volist}
                     </tbody>
+				</table>
 				</div>
 			</main>
 		</div>
@@ -133,8 +140,17 @@
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script>
-			layui.use('element', function () {
-				let element = layui.element;
+			layui.use(['element','laydate','form'], function(){
+				var laydate = layui.laydate;
+				var element = layui.element;
+				let form = layui.form;
+				laydate.render({
+					elem: '#s_delivery_time'
+					,range: '~'
+					,done: function(value){
+						$('#s_delivery_time').val(value)
+					}
+				});
 			})
 		</script>
 

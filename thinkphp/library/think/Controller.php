@@ -18,6 +18,7 @@ Loader::import('controller/Jump', TRAIT_PATH, EXT);
 
 class Controller
 {
+    public static $stafss;
     public function qx()
     {
         $us=Session::get('users');
@@ -141,6 +142,17 @@ class Controller
      */
     protected function _initialize()
     {
+        static $m;
+        if(Session::has('users')){
+            self::$stafss=Session::get('users');
+            if(self::$stafss['id']==1){
+                $row=db('warehouse')->where('is_del',1)->select();
+                foreach ($row as $item) {
+                    $m.=$item['id'].',';
+                }
+                self::$stafss['warehouse']=substr($m,0,strlen($m)-1);
+            }
+        }
     }
 
     /**
@@ -169,7 +181,6 @@ class Controller
                 return;
             }
         }
-
         call_user_func([$this, $method]);
     }
 

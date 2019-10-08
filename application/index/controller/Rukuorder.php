@@ -5,10 +5,12 @@ namespace app\index\controller;
 
 use think\Controller;
 use think\Db;
+use think\Session;
 
 class Rukuorder extends Controller {
     //添加入库订单列表
     public function index(){
+        $warehouse=self::$stafss['warehouse'];
         $num=0;
         $z=0;
         $ms=$this->qx();
@@ -24,7 +26,7 @@ class Rukuorder extends Controller {
         //入库状态
         $status = db('kc_status')->where('is_del',0)->select();
         //仓库列表
-        $cks = db('warehouse')->where('is_del',1)->select();
+        $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         $cd=str_replace(array("\",\""),",",$cd);
         $cd=str_replace(array("[\""),"",$cd);
         $cd=str_replace(array("\"]"),"",$cd);
@@ -75,6 +77,9 @@ class Rukuorder extends Controller {
     public function insert(){
         Db::startTrans();
         $data = input();
+        if(empty($data['ck_id'])){
+            $this->error('请选择入库仓库');
+        }
         $userintime=strtotime($data['userintime']);
         try{
             $id = db('rukuform')->insertGetId(['shipmentnum'=>$data['shipmentnum'],'userintime'=>$userintime,'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id']]);
@@ -103,11 +108,12 @@ class Rukuorder extends Controller {
             // 回滚事务
             Db::rollback();
         }
-        $this->success('生成订单成功','index');
+        $this->success('生成订单成功','to_examine');
     }
 
     //入库计划
     public function to_examine() {
+        $warehouse=self::$stafss['warehouse'];
         $s_transfers_id=input('s_transfers_id');//工厂
         $s_delivery_time=input('s_delivery_time');//时间
         $s_material_name=input('s_material_name');//单号
@@ -143,6 +149,7 @@ class Rukuorder extends Controller {
             ->join('warehouse','rukuform.ck_id=warehouse.id','left')
             ->join('rukuform_xq','rukuform.id=rukuform_xq.rukuid','left')
             ->where('rukuform.is_del',0)
+            ->where('warehouse.id','in',$warehouse)
             ->where('rukuform_xq.state',0)
             ->group('rukuform_xq.rukuid')
             ->where($search)
@@ -153,6 +160,7 @@ class Rukuorder extends Controller {
     //rukuform_xq.factory,
     //订单详情
     public function to_examine_show($id) {
+        $warehouse=self::$stafss['warehouse'];
         $num=0;
         $z=0;
         $ms=$this->qx();
@@ -171,12 +179,9 @@ class Rukuorder extends Controller {
             ->join('kc_status','kc_status.id=rukuform_xq.rk_status_id','left')
             ->field('rukuform_xq.*,kc_status.title as w_name,cabinet.name as c_name')
             ->select();
-        $cks = db('warehouse')->where('is_del',1)->select();
+        $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         $status=db('kc_status')->where('is_del',0)->select();
         $cabinet=db('cabinet')->where('is_del',1)->select();
-//        if(!empty($rows['userintime'])){
-//            $rows['userintime']=date("Y-m-d",$rows['userintime']);
-//        }
         foreach ($cats as $k=>$row) {
             $cats[$k]['m']=$row['Grossweight']/$row['rk_nums'];
             $cats[$k]['j']=$row['netweight']/$row['rk_nums'];
@@ -288,6 +293,7 @@ class Rukuorder extends Controller {
 
     //入库台账
     public function warehousing() {
+        $warehouse=self::$stafss['warehouse'];
         $s_transfers_id=input('s_transfers_id');//工厂
         $s_delivery_time=input('s_delivery_time');//时间
         $s_material_name=input('s_material_name');//单号
@@ -323,6 +329,7 @@ class Rukuorder extends Controller {
             ->join('warehouse','rukuform.ck_id=warehouse.id','left')
             ->join('rukuform_xq','rukuform.id=rukuform_xq.rukuid','left')
             ->where('rukuform.is_del',0)
+            ->where('warehouse.id','in',$warehouse)
             ->where('rukuform.state',1)
             ->group('rukuform_xq.rukuid')
             ->where($search)
@@ -375,6 +382,7 @@ class Rukuorder extends Controller {
 
     //入库明细
     public function detailed() {
+        $warehouse=self::$stafss['warehouse'];
         $s_transfers_id=input('s_transfers_id');//工厂
         $s_delivery_time=input('s_delivery_time');//时间
         $s_material_name=input('s_material_name');//产品属性
@@ -413,6 +421,7 @@ class Rukuorder extends Controller {
             ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
             ->join('rukuform','rukuform_xq.rukuid=rukuform.id','left')
             ->join('warehouse','rukuform.ck_id=warehouse.id','left')
+            ->where('warehouse.id','in',$warehouse)
             ->where('rukuform_xq.is_del',0)
             ->where('rukuform_xq.qt_rk',0)
             ->where('rukuform_xq.state',1)

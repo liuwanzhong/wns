@@ -10,6 +10,7 @@
 		<style type="text/css">
 			.layui-table th{text-align: center;font-weight: bold;}
 			.layui-table td{text-align: center;}
+			label{box-sizing: content-box;}
 		</style>
 	<body>
 		<div class="note">
@@ -22,12 +23,17 @@
 			</div>
 			<div class="search">
                 <form action="{:url('Saoyisao/out_log')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">出库仓库</label>
-                        <div class="layui-input-inline">
-                            <input type="text" class="layui-input" id="transfers_i" name="name" value="{$name}" />
-                        </div>
-                    </div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">仓库名称</label>
+						<div class="layui-input-inline">
+							<select name="name" id="">
+								<option value="0">全部</option>
+								{volist name='cks' id='w'}
+								<option value="{$w.name}" <?php if($name==$w['name']){echo 'selected';} ?>>{$w.name}</option>
+								{/volist}
+							</select>
+						</div>
+					</div>
                     <div class="layui-form-item">
                         <div class="layui-input-inline">
                             <button class="layui-btn save" lay-submit>查询</button>
@@ -68,8 +74,17 @@
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
 		<script>
-			layui.use('element', function () {
-				let element = layui.element;
+			layui.use(['element','laydate','form'], function(){
+				var laydate = layui.laydate;
+				var element = layui.element;
+				let form = layui.form;
+				laydate.render({
+					elem: '#s_delivery_time'
+					,range: '~'
+					,done: function(value){
+						$('#s_delivery_time').val(value)
+					}
+				});
 			})
 		</script>
 

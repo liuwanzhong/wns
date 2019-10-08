@@ -36,7 +36,7 @@ class Batch extends Controller {
         }
         $tp_num=input('tp_num');
         $res=db('tray')
-        ->where('tray.tp_num',$tp_num)  
+        ->where('tray.tp_num',$tp_num)
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
         ->where('tray.is_del',0)
         ->select();
@@ -70,7 +70,7 @@ class Batch extends Controller {
             'state'=>0,
             'time'=>time()
         ]);
-        
+
         if($res){
             $this->success('成功');
         }else{
@@ -81,10 +81,7 @@ class Batch extends Controller {
      * 托盘查看
      */
     public function show_tray(){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
+        $warehouse=self::$stafss['warehouse'];
         $search = '';
         $data=input();
         if(!empty($data['name'])){
@@ -115,6 +112,7 @@ class Batch extends Controller {
         }
         $res=db('tray')
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
+            ->where('warehouse.id','in',$warehouse)
         ->where('tray.is_del',0)
         ->where($search)
         ->where('state',1)
@@ -148,22 +146,19 @@ class Batch extends Controller {
         }
         $tp_num=input('tp_num');
         $res=db('tray')
-        ->where('tray.tp_num',$tp_num)  
+        ->where('tray.tp_num',$tp_num)
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
         ->where('tray.is_del',0)
         ->select();
         $batch=explode(',',$res[0]['batch']);
         return redirect('Saoyisao/create_saoyisao',['tp_num'=>$tp_num]);
     }
-    
+
     /**
      * 批次日志
      */
     public function tray_log(){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
+        $warehouse=self::$stafss['warehouse'];
         $search = '';
         $data=input();
         if(!empty($data['name'])){
@@ -197,6 +192,7 @@ class Batch extends Controller {
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
         ->field('warehouse.name w_name,tray_log.id t_id,tray_log.tp_num tp_num,tray_log.batch t_batch,tray_log.time t_time,tray_log.goods_name t_goods_name,tray_log.order t_order,tray_log.delivery t_delivery,tray_log.id t_id,tray_log.state t_state,tray_log.num t_num')
         ->where($search)
+            ->where('warehouse.id','in',$warehouse)
         ->where('tray_log.is_del',0)
         ->select();
         $cks = db('warehouse')->where('is_del',1)->select();
@@ -217,6 +213,6 @@ class Batch extends Controller {
         $data=explode(',',$res[0]['batch']);
         return $data;
     }
-    
+
 }
 // ,'tp_num'=>$tp_num,'batch'=>$batch]

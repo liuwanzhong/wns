@@ -25,7 +25,8 @@ class Staffs extends Controller {
         $rows=db('department')->where('is_del',1)->select();
         $this->read(0);
         $md=self::$md;
-        return view('staffs_add',['rows'=>$rows,'md'=>$md]);
+        $warehouse=db('warehouse')->where('is_del',1)->select();
+        return view('staffs_add',['rows'=>$rows,'md'=>$md,'warehouse'=>$warehouse]);
     }
     //添加管理员
     public function staffs_insert() {
@@ -47,6 +48,10 @@ class Staffs extends Controller {
         if(!empty($data['obj'])){
             $data['power']=implode(",",$data['obj']);
             unset($data['obj']);
+        }
+        if(!empty($data['addr'])){
+            $data['warehouse']=implode(",",$data['addr']);
+            unset($data['addr']);
         }
         $r=db('staffs')->insert($data);
         if ($r){
@@ -87,7 +92,9 @@ class Staffs extends Controller {
         $find=db('staffs')->where('id',$id)->find();
         //权限数组
         $sz=explode(",",$find['power']);
-        return view('staffs_edit',['rows'=>$rows,'md'=>$md,'find'=>$find,'sz'=>$sz,'id'=>$id]);
+        $warehouse=db('warehouse')->where('is_del',1)->select();
+        $w_sz=explode(",",$find['warehouse']);
+        return view('staffs_edit',['rows'=>$rows,'md'=>$md,'find'=>$find,'sz'=>$sz,'id'=>$id,'warehouse'=>$warehouse,'w_sz'=>$w_sz]);
     }
     //修改管理员
     public function staffs_update() {
@@ -110,6 +117,10 @@ class Staffs extends Controller {
         if(!empty($data['obj'])){
             $data['power']=implode(",",$data['obj']);
             unset($data['obj']);
+        }
+        if(!empty($data['addr'])){
+            $data['warehouse']=implode(",",$data['addr']);
+            unset($data['addr']);
         }
         $r=db('staffs')->update($data);
         if ($r){

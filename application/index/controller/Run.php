@@ -83,12 +83,14 @@ class Run extends Controller {
 
     //货位列表
     public function cabinet() {
+        $warehouse=self::$stafss['warehouse'];
         $rows=db('cabinet')
             ->where('cabinet.is_del',1)
             ->join('warehouse','cabinet.warehouse_id=warehouse.id')
+            ->where('warehouse.id','in',$warehouse)
             ->field('cabinet.*,warehouse.name as w_name')
             ->paginate(100);
-        $ware=db('warehouse')->where('is_del',1)->select();
+        $ware=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         return view('cabinet',['rows'=>$rows,'ware'=>$ware]);
     }
     //添加货位
@@ -344,6 +346,8 @@ class Run extends Controller {
      * 托盘管理
      */
     public function tray(){
+        static $md;
+        $warehouse=self::$stafss['warehouse'];
         $search = '';
         $data=input();
         if(!empty($data['name'])){
@@ -363,12 +367,13 @@ class Run extends Controller {
             $tp_num='';
         }
         $rows=db('tray')
-        ->join('warehouse','warehouse.id=tray.warehouse_id','left')
-        ->where('tray.is_del',0)
-        ->where($search)
-        ->field('tray.*,warehouse.name')
-        ->select();
-        $cks = db('warehouse')->where('is_del',1)->select();
+            ->join('warehouse','warehouse.id=tray.warehouse_id','left')
+            ->where('warehouse.id','in',$warehouse)
+            ->where('tray.is_del',0)
+            ->where($search)
+            ->field('tray.*,warehouse.name')
+            ->select();
+        $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         return view('tray',['cks'=>$cks,'rows'=>$rows,'tp_num'=>$tp_num,'name'=>$name]);
     }
     /**

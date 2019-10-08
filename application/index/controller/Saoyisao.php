@@ -12,11 +12,8 @@ class Saoyisao extends Controller {
      * 生成扫码出库单
      */
     public function index(){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
-        $cks = db('warehouse')->where('is_del',1)->select();
+        $warehouse=self::$stafss['warehouse'];
+        $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         Cookie(null,'think_');
         return view('index',['cks'=>$cks]);
     }
@@ -55,7 +52,7 @@ class Saoyisao extends Controller {
             Cookie::set('delivery',$delivery,['prefix'=>'think_']);
             Cookie::set('delivery_name',$delivery_name,['prefix'=>'think_']);
         }
-        
+
         if(empty($name)){
             $this->error('仓库未选择');
         }
@@ -126,10 +123,9 @@ class Saoyisao extends Controller {
      * 往期出库
      */
     public function out_log(){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
+        static $md=[];
+        $warehouse=self::$stafss['warehouse'];
+        $cks=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         $search = '';
         $data=input();
         if(!empty($data['name'])){
@@ -143,7 +139,14 @@ class Saoyisao extends Controller {
         ->where($search )
         ->order('create_time desc')
         ->select();
-        return view('out_log',['res'=>$res,'name'=>$name]);
+        foreach ($res as $k=>$re) {
+            foreach ($cks as $ck) {
+                if($re['transport_id']==$ck['name']){
+                    $md[]=$re;
+                }
+            }
+        }
+        return view('out_log',['res'=>$md,'name'=>$name,'cks'=>$cks]);
     }
     /**
      * 往期出库详细
@@ -171,10 +174,6 @@ class Saoyisao extends Controller {
      * 入库扫码页
      */
     public function rk_saoma(){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
         return view();
     }
 }

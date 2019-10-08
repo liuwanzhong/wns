@@ -109,7 +109,7 @@
             <button class="layui-btn save" lay-submit>查询</button>
         </form>
     </div>
-
+    <a href="#" class="layui-btn save" id="btn" lay-submit style="margin-left:40px">一键结存</a>
     <main class="bd_content">
         <table class="layui-table" style="width: 96%; margin: 12px auto;">
             <thead>
@@ -125,28 +125,31 @@
                 <th>操作</th>
             </tr>
             </thead>
-            <tbody>
-            {volist name='orders' id='v'}
-            <tr>
-                <td>{$v.ckname}</td>
-                <td>{$v.name}</td>
-                <td>{$v.title}</td>
-                <td>{$v.product_name}</td>
-                <td><?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);} ?></td>
-                <td>{$v.rk_nums}</td>
-                <td>{$v.content}</td>
-                <td><?php if($v['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
-                <td>
-                    <a href="{:url('instor/show',['id'=>$v.rk_huowei_id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">查看</a>
-                    <a href="{:url('instor/jiecun',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">结存</a>
-                    <?php if($v['state']==1): ?>
-                    <a href="{:url('Instor/frozen',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm">冻结</a>
-                    <?php else: ?>
-                    <a href="{:url('Instor/frozen_j',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm">解除冻结</a>
-                    <?php endif; ?>
-                </td>
-            </tr>
-            {/volist}
+            <tbody class="tbd">
+                {volist name='orders' id='v'}
+                <tr>
+                    <input type="hidden" name="id" value="{$v.id}">
+                    <td>{$v.ckname}</td>
+                    <td>{$v.name}</td>
+                    <td>{$v.title}</td>
+                    <td>{$v.product_name}</td>
+                    <td><?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);} ?></td>
+                    <td>{$v.rk_nums}</td>
+                    <td>{$v.content}</td>
+                    <td><?php if($v['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
+                    <td>
+                        <a href="{:url('instor/show',['id'=>$v.rk_huowei_id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">查看</a>
+                        <a href="{:url('instor/jiecun',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">结存</a>
+
+                        <?php if($v['state']==1): ?>
+                            <a href="{:url('Instor/frozen',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm">冻结</a>
+                        <?php else: ?>
+                            <a href="{:url('Instor/frozen_j',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm">解除冻结</a>
+                        <?php endif; ?>
+
+                    </td>
+                </tr>
+                {/volist}
             </tbody>
         </table>
         <div style="text-align:center; margin-bottom: 200px;">
@@ -177,6 +180,36 @@
             data:{'zt':1}
         })
         $('.model').hide();
+    })
+    $('#btn').click(function(){
+        console.log(1)
+        let alls = [];
+        let list = $('.tbd tr');
+        list.each(function(){
+            let num = $(this).find('input').val();
+            alls.push(num)
+        })
+        $.ajax({
+            url:'/index/Instor/jiec2',
+            data:{alls},
+            success:function (data) {
+                if(data.error==0){
+                    layer.alert(data.msg, {
+                        icon: 6,
+                        yes:function(){
+                            location.href='/index/Staffs/staffs';
+                        }
+                    });
+                }else{
+                    layer.alert(data.msg, {
+                        icon: 5
+                    });
+                }
+            },
+            error:function(error){
+                console.log('错误提示:' + error)
+            }
+        })
     })
 </script>
 </body>

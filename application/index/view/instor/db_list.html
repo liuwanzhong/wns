@@ -3,11 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>调拨</title>
-    <link rel="stylesheet" href="/images/index.css">
+    <link rel="stylesheet" href="/images/css.css">
     <link rel="stylesheet" href="/images/boot.css">
-    <link rel="stylesheet" href="/layui/css/layui.css">
-
+    <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
 </head>
+<style>
+    .layui-table th{text-align: center;font-weight: bold;}
+    .layui-table td{text-align: center;}
+    label{box-sizing: content-box;}
+</style>
 <body>
 <div class="note">
     <div class="nav">
@@ -17,12 +22,45 @@
                 <a><cite>调拨</cite></a>
             </span>
     </div>
+    <div class="seach">
+        <form action="{:url('Instor/db')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">日期</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">仓库</label>
+                <div class="layui-input-inline">
+                    <select name="s_material_name">
+                        <option value="0">全部</option>
+                        {volist name='cabinet' id='c'}
+                        <option value="{$c.name}" <?php if($s_material_name==$c['name']){echo 'selected';} ?>>{$c.name}</option>
+                        {/volist}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <button class="layui-btn save" lay-submit>查询</button>
+                </div>
+            </div>
+        </form>
+    </div>
     <a href="{:url('Instor/other_db')}" class="layui-btn" style="margin-left: 30px;">调拨</a>
     <main class="bd_content">
         <table class="layui-table" style="width: 96%; margin: 12px auto;">
             <thead>
             <tr>
                 <th>产品名称</th>
+                <th>仓库</th>
                 <th>调拨日期</th>
                 <th>产品日期</th>
                 <th>调出货位</th>
@@ -32,9 +70,10 @@
             </tr>
             </thead>
             <tbody>
-            {volist name='rows' id='row'}
+            {volist name='md' id='row'}
             <tr>
                 <td>{$row['cp_name']}</td>
+                <td>{$row['ck_name']}</td>
                 <td><?php if(!empty($row['db_time'])){echo date('Y-m-d',$row['db_time']);}?></td>
                 <td><?php if(!empty($row['cp_time'])){echo date('Y-m-d',$row['cp_time']);}?></td>
                 <td>{$row['dc_name']}</td>
@@ -54,8 +93,17 @@
 <script src="/static/js/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script>
-    layui.use('element', function () {
-
+    layui.use(['element','laydate','form'], function(){
+        var laydate = layui.laydate;
+        var element = layui.element;
+        let form = layui.form;
+        laydate.render({
+            elem: '#s_delivery_time'
+            // ,range: '~'
+            ,done: function(value){
+                $('#s_delivery_time').val(value)
+            }
+        });
     })
 </script>
 
