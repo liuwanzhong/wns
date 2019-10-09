@@ -3,15 +3,14 @@
 <head>
     <meta charset="utf-8"/>
     <title>在库管理</title>
-    <link rel="stylesheet" href="/images/css.css">
     <link rel="stylesheet" href="/images/boot.css">
     <link href="/images/index.css" type="text/css" rel="stylesheet"/>
-    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
     <style type="text/css">
         .layui-table th{text-align: center;font-weight: bold;}
         .layui-table td{text-align: center;}
         label{box-sizing: content-box;}
-
     </style>
 </head>
 <body>
@@ -47,7 +46,6 @@
             </tr>
             {/volist}
             </tbody>
-
         </table>
     </div>
 </div>
@@ -76,7 +74,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">生产日期</label>
                 <div class="layui-input-inline">
-                    <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+                    <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder="  " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -121,8 +119,8 @@
     </div>
     <a href="#" class="layui-btn save" id="btn" lay-submit style="margin-left:40px">一键结存</a>
 
-    <main class="bd_content">
-        <table class="layui-table" style="width: 96%; margin: 12px auto;">
+    <div class="bd_content">
+        <table class="layui-table" style="width: 96%; margin: 12px auto">
             <thead>
             <tr>
                 <th>仓库名称</th>
@@ -157,7 +155,6 @@
                         <?php else: ?>
                             <a href="{:url('Instor/frozen_j',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm">解除冻结</a>
                         <?php endif; ?>
-
                     </td>
                 </tr>
                 {/volist}
@@ -166,7 +163,7 @@
         <div style="text-align:center; margin-bottom: 200px;">
             {$order->render()}
         </div>
-    </main>
+    </div>
 </div>
 
 <script src="/static/jquery-1.9.1.min.js"></script>
@@ -193,7 +190,6 @@
         $('.model').hide();
     })
     $('#btn').click(function(){
-        console.log(1)
         let alls = [];
         let list = $('.tbd tr');
         list.each(function(){
@@ -216,9 +212,6 @@
                         icon: 5
                     });
                 }
-            },
-            error:function(error){
-                console.log('错误提示:' + error)
             }
         })
     })

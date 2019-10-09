@@ -46,10 +46,14 @@
                         <th>调拨日期</th>
                         <th>调出货位</th>
                         <th>产品日期</th>
+                        <th>产品属性</th>
                         <th>调出货位产品数量</th>
                         <th>调拨数量</th>
                         <th>调入货位</th>
                         <th>调入货位产品数量</th>
+                        <th>产品日期</th>
+                        <th>产品属性</th>
+                        <th>备注</th>
                 </thead>
                 <tbody class="tbd">
                     <tr>
@@ -67,8 +71,14 @@
                         <td class="huowei">
                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
                         </td>
+<!--                        产品日期-->
                         <td class="c_time">
                             <input type="hidden" value="" name="c_time" class="layui-input">
+                            <span></span>
+                        </td>
+<!--                        产品属性-->
+                        <td class="product_time">
+                            <input type="hidden" value="" name="product_time" class="layui-input">
                             <span></span>
                         </td>
                         <td class="count">
@@ -82,8 +92,22 @@
                             <botton class="layui-btn layui-btn-sm dia_r">点击</botton>
                         </td>
                         <td class="count_ss">
-                            <input type="hidden" value="" name="huowei_out_ss" readonly>
+                            <input type="hidden" value="" name="" readonly>
                             <span>0</span>
+                        </td>
+<!--                        调入产品日期-->
+                        <td class="p_time">
+                            <input type="hidden" value="" name="p_time" class="layui-input">
+                            <span></span>
+                        </td>
+<!--                        调入产品产品属性-->
+                        <td class="d_status">
+                            <input type="hidden" value="" name="d_status" class="layui-input">
+                            <span></span>
+                        </td>
+<!--                        备注-->
+                        <td>
+                            <input type="text" value="" name="beizhu" class="layui-input">
                         </td>
                 </tr>
                 </tbody>
@@ -121,7 +145,16 @@
         <span>调拨入库</span>
         <a href="javascript:" class="close2">×</a>
     </div>
-    <div class="content"  style="height: calc(100% - 50px);overflow-x: hidden;box-sizing: border-box;">
+    <div class="seach layui-form" style="margin-top:20px">
+            <div class="layui-form-item">
+                <label class="layui-form-label">货位名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="" name="s_transfers_id" value="" />
+                </div>
+                <button class="layui-btn save" lay-submit>查询</button>
+            </div>
+    </div>
+    <div class="content"  style="height: calc(100% - 120px);overflow-x: hidden;box-sizing: border-box;">
         <table class="layui-table layui-form">
             <thead>
             <tr>
@@ -142,6 +175,38 @@
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
     layui.use(['element', 'form','laydate','layer'], function () {
+        //调入货位搜索
+        $('.save').click(function () {
+            let id = $('#table').val();
+            let na=$("input[name='s_transfers_id']").val();
+            $.ajax({
+                url:'/index/Instor/huowei_ck_r',
+                data:{na,id},
+                success:function (data) {
+                    if(data.length!=0){
+                        $('.kc_list2').empty();
+                        let html = '';
+                        for (let i =0; i<data.length; i++){
+                            html += ` <tr>
+                            <input type="hidden" id="id" class="layui-input" value="${data[i].id}">
+                            <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
+                            <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
+                            <input type="hidden" id="c_id" class="layui-input" value="${data[i].c_id}">
+                            <td><input type="radio" name="redio" value="nan" title=""></td>
+                            <td>${data[i].product_name}</td>
+                            <td>${data[i].product_time}</td>
+                            <td class="hw">${data[i].name}</td>
+                            <td>${data[i].sy_count}</td>
+                        </tr>`;
+                        }
+                        $('.kc_list2').append(html)
+                        form.render()
+                    }
+                }
+            })
+        })
+
+
         let element = layui.element;
         let form = layui.form;
         let laydate = layui.laydate;
@@ -225,11 +290,18 @@
                 url:'/index/Instor/houwei_cd',
                 data:{id},
                 success:function (d) {
+                    console.log(d)
                     // let coun = d.rk_nums;
                     par.find('.count').find('span').text(d.rk_nums);
                     par.find('.count').find('input').val(d.rk_nums);
                     par.find('.c_time').find('input').val(time);
                     par.find('.c_time').find('span').text(time);
+                    par.find('.product_time').find('input').val(d.title);
+                    par.find('.product_time').find('span').text(d.title);
+                    par.find('.p_time').find('input').val(time);
+                    par.find('.p_time').find('span').text(time);
+                    par.find('.d_status').find('input').val(d.rk_status_id);
+                    par.find('.d_status').find('span').text(d.title);
                     par.find('.huowei').html(`<input type="hidden" value="${d.id}" name="rk_id" readonly><span>${d.name}</span>`);
                     $('#r_id').val(d.id)
                 }
@@ -259,7 +331,6 @@
                             <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
                             <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
                             <input type="hidden" id="c_id" class="layui-input" value="${data[i].c_id}">
-
                             <td><input type="radio" name="redio" value="nan" title=""></td>
                             <td>${data[i].product_name}</td>
                             <td>${data[i].product_time}</td>
@@ -338,6 +409,8 @@
         $('.model_table_ss').hide();
 
     })
+
+
 </script>
 </body>
 </html>

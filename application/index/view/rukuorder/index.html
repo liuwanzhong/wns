@@ -186,7 +186,11 @@
                                     ${str}
                                 </select>
                             </td>
-                            <td class="huowei"><select name='huowei[]' class='showhuowei' lay-search><option value=''>请选择货位</option></select></td>
+                            <td class="huowei">
+                                <select name='huowei[]' class='showhuowei' lay-search>
+                                    <option value=''>请选择货位</option>
+                                </select>
+                            </td>
                             <td>
                                 <input type="number" value="0" class="countnum layui-input" id="blur" name="nums[]">
                             </td>
@@ -216,9 +220,7 @@
                         </tr>`;
             $('.tbd').append(html);
             form.render();
-
         })
-
         form.on('select(ck_id)', function(data){
             let id = data.elem.value;
             if(id != 0){

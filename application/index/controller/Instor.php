@@ -97,12 +97,12 @@ class Instor extends Controller
             ->join('warehouse','cabinet.warehouse_id=warehouse.id','left')
             ->where('warehouse.id','in',$warehouse)
             ->where("$search")
-            ->order('rukuform_xq.create_time desc')
+            ->order('cabinet.name asc')
             ->field('rukuform_xq.*,kc_status.title,cabinet.name,kc_status.title')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt,'status'=>$status_id]]);
         $orders=$order->all();
         foreach($orders as &$v) {
-            $v['ckname'] = db('rukuform') 
+            $v['ckname'] = db('rukuform')
             -> field('a.id,a.ck_id,b.name')
             -> alias('a')
             -> join('warehouse b', 'a.ck_id = b.id')
@@ -293,6 +293,7 @@ class Instor extends Controller
             $m=$times[1];
             $rows=db('jc')
                 ->where("date_format(state_time,'%m')=$m and date_format(state_time,'%Y')=$y")
+                ->order('huowei_name asc')
                 ->select();
             }
         foreach ($rows as $k=>$row) {
@@ -344,6 +345,7 @@ class Instor extends Controller
         ->where('warehouse.id',$id)
         ->where('rukuform_xq.rk_nums != 0')
         ->field('cabinet.name c_name,warehouse.name w_name,rukuform_xq.*')
+        ->order('cabinet.name asc')
         ->group('rukuform_xq.id')
         ->select();
         return view('add_pandian',['list'=>$list]);
@@ -358,7 +360,6 @@ class Instor extends Controller
                 }
                 $chayi='';
                 $chayi=$data['rk_nums'][$i]-$data['pd_num'][$i];
-                dump($chayi);
                 db('pandian')
                 ->insert([
                     'w_name'=>$data['w_name'][$i],
@@ -498,7 +499,7 @@ class Instor extends Controller
                 //修改实时数量
                 $a = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $data['rk_huowei_id'])->update(['rk_nums' => $num]);
                 $rk=db('cabinet')->where('id',$data['rk_huowei_id'])->find();
-                $f=db('other_rk')->insert(['product_name'=>$data['customer'],'product_time'=>$product_time,'huowei'=>$rk['name'],'count'=>$data['rk_nums'],'rk_time'=>$userintime,'conter'=>$data['content'],'ck_name'=>$warehouse['name']]);
+                $f=db('other_rk')->insert(['product_name'=>$data['customer'],'product_time'=>$product_time,'huowei'=>$rk['name'],'count'=>$data['rk_nums'],'rk_time'=>$userintime,'conter'=>$data['content'],'ck_name'=>$warehouse['name'],'factory'=>$warehouse['name']]);
                 if ($s && $a && $f) {
                     // 提交事务
                     Db::commit();
@@ -770,10 +771,12 @@ class Instor extends Controller
     //调入货位选择
     public function huowei_ck_r() {
         $id=input('id');
+        $na=input('na');
         $cabinet=db('cabinet')
             ->join('rukuform_xq','cabinet.id=rukuform_xq.rk_huowei_id and rukuform_xq.is_del=0 and rukuform_xq.state=1','left')
             ->where('cabinet.is_del',1)
             ->where('cabinet.warehouse_id',$id)
+            ->where("cabinet.name like '%$na%'")
             ->field('cabinet.*,rukuform_xq.product_name,rukuform_xq.sy_count,rukuform_xq.product_time')
             ->select();
         for ($i=0;$i<count($cabinet);$i++){
@@ -796,7 +799,14 @@ class Instor extends Controller
     //调出
     public function houwei_cd() {
         $id=input('id');
-        $r=db('rukuform_xq')->where('rukuform_xq.is_del',0)->where('rukuform_xq.state',1)->where('rukuform_xq.rk_huowei_id',$id)->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id')->field('rukuform_xq.*,cabinet.name')->find();
+        $r=db('rukuform_xq')
+            ->where('rukuform_xq.is_del',0)
+            ->where('rukuform_xq.state',1)
+            ->where('rukuform_xq.rk_huowei_id',$id)
+            ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id')
+            ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id')
+            ->field('rukuform_xq.*,cabinet.name,kc_status.title')
+            ->find();
         if(!$r){
             $r=db('cabinet')->where('is_del',1)->where('id',$id)->find();
         }
@@ -843,8 +853,8 @@ class Instor extends Controller
             db('rukuform_xq')->where('id',$c['id'])->update(['rk_nums'=>$p]);
         }else{
             //添加
-            db('rukuform_xq')->insert(['product_name'=>$data['goods'],'rk_huowei_id'=>$data['huowei_name'],'rk_nums'=>$data['shu'],'product_time'=>$c_time,'state'=>1]);
-            db('record')->insert(['time'=>$d_time,'task'=>'调拨入库','customer'=>'调拨入库','early_stage'=>0,'db_ruku'=>$data['shu'],'balance'=>$data['shu'],'huowei'=>$data['huowei_name']]);
+            db('rukuform_xq')->insert(['product_name'=>$data['goods'],'rk_huowei_id'=>$data['huowei_name'],'rk_nums'=>$data['shu'],'product_time'=>$c_time,'state'=>1,'rk_status_id'=>$data['d_status']]);
+            db('record')->insert(['time'=>$d_time,'task'=>'调拨入库','customer'=>'调拨入库','early_stage'=>0,'db_ruku'=>$data['shu'],'balance'=>$data['shu'],'huowei'=>$data['huowei_name'],'count'=>$data['beizhu']]);
         }
 
         $dc_name=db('cabinet')->where('id',$r['rk_huowei_id'])->find();

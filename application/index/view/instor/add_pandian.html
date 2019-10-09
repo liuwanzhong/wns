@@ -17,68 +17,68 @@
 </head>
 <body>
 <div class="note">
-<div class="bd_content">
-    <div class="nav">
-        <span class="layui-breadcrumb">
-            <a href="/public/main.html" target="box">首页</a>
-            <a href="javascript:;">入库管理</a>
-            <a><cite>新建盘点</cite></a>
-        </span>
-    </div>
-    <form method="post" class="layui-form" action="{:url('Instor/do_add')}">
-        <div class="container" >
-            <table class="layui-table" style="width: 96%; margin: 12px auto;">
-                <thead>
-                    <tr>
-                        <th>仓库名</th>
-                        <th>货位</th>
-                        <th>产品名</th>
-                        <th>生产日期</th>
-                        <th>盘点数量</th>
-                        <th>实时数量</th>
-                        <th>备注1</th>
-                        <th>备注2</th>
-                        <th>备注3</th>
-                    </tr>
-                </thead>
-                <tbody class="tbd">
-                {volist name='list' id='l'}
-                <tr>
-                    <td>
-                        <input type="hidden" value="{$l['w_name']}" name="w_name[]">
-                        {$l['w_name']}
-                    </td>
-                    <td>
-                        <input type="hidden" value="{$l['c_name']}" name="c_name[]">
-                        {$l['c_name']}
-                    </td>
-                    <td>
-                        <input type="hidden" value="{$l['product_name']}" name="product_name[]">
-                        {$l['product_name']}
-                    </td>
-                    <td><?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?><input type="hidden" class="text" readonly value="{$l['product_time']}" name="product_time[]"></td>
-                    <td><input type="text" class="text1"  value="" name="pd_num[]"></td>
-                    <td>
-                        <input type="hidden" value="{$l['rk_nums']}" name="rk_nums[]">
-                        {$l['rk_nums']}
-                    </td>
-                    <td><input type="text" class="text"  value="" name="count1[]"></td>
-                    <td><input type="text" class="text"  value="" name="count2[]"></td>
-                    <td><input type="text" class="text"  value="" name="count3[]"></td>
-                </tr>
-                {/volist}
-                </tbody>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">备注</label>
-                    <div class="layui-input-inline">
-                        <input type="text" class="layui-input" id="count" name="count" autocomplete="off">
-                    </div>
-                </div>
-            </table>
-            <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
+    <div class="bd_content">
+        <div class="nav">
+            <span class="layui-breadcrumb">
+                <a href="/public/main.html" target="box">首页</a>
+                <a href="javascript:;">入库管理</a>
+                <a><cite>新建盘点</cite></a>
+            </span>
         </div>
-    </form>
-</div>
+        <form method="post" class="layui-form" action="{:url('Instor/do_add')}">
+            <div class="container" >
+                <table class="layui-table" style="width: 96%; margin: 12px auto;">
+                    <thead>
+                        <tr>
+                            <th>仓库名</th>
+                            <th>货位</th>
+                            <th>产品名</th>
+                            <th>生产日期</th>
+                            <th>盘点数量</th>
+                            <th>实时数量</th>
+                            <th>备注1</th>
+                            <th>备注2</th>
+                            <th>备注3</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tbd">
+                    {volist name='list' id='l'}
+                    <tr>
+                        <td>
+                            <input type="hidden" value="{$l['w_name']}" name="w_name[]">
+                            {$l['w_name']}
+                        </td>
+                        <td>
+                            <input type="hidden" value="{$l['c_name']}" name="c_name[]">
+                            {$l['c_name']}
+                        </td>
+                        <td>
+                            <input type="hidden" value="{$l['product_name']}" name="product_name[]">
+                            {$l['product_name']}
+                        </td>
+                        <td><?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?><input type="hidden" class="text" readonly value="{$l['product_time']}" name="product_time[]"></td>
+                        <td><input type="text" class="text1"  value="" name="pd_num[]"></td>
+                        <td>
+                            <input type="hidden" value="{$l['rk_nums']}" name="rk_nums[]">
+                            {$l['rk_nums']}
+                        </td>
+                        <td><input type="text" class="text"  value="" name="count1[]"></td>
+                        <td><input type="text" class="text"  value="" name="count2[]"></td>
+                        <td><input type="text" class="text"  value="" name="count3[]"></td>
+                    </tr>
+                    {/volist}
+                    </tbody>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">备注</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="count" name="count" autocomplete="off">
+                        </div>
+                    </div>
+                </table>
+                <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
+            </div>
+        </form>
+    </div>
 </div>
 
 <script src="/static/jquery-1.9.1.min.js"></script>

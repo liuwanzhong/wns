@@ -10,11 +10,70 @@ use think\Loader;
 class Outbound extends Controller {
     // 显示页
     public function index(){
+        $data=input();
+        $delivery_time='';//发货时间
+        $factory_name='';//工厂名
+        $transport_id='';//装运单号
+        $reachby_name='';//送达方名称
+        $material_name='';//物料名
+        $search = '';
+        if(!empty($data['factory_name'])){
+            $factory_name=$data['factory_name'];
+            $search = 'factory_name like ' . "'%" . $factory_name . '%' . "'";
+        }
+        if(!empty($data['delivery_time'])){
+            $delivery_time=$data['delivery_time'];
+            $time = explode('~', $delivery_time);
+            foreach ($time as $key) {
+                $time[] = strtotime($key);
+                array_shift($time);
+            }
+            if (!empty($search)) {
+                $s_delivery_time = ' and delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            } else {
+                $s_delivery_time = 'delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            }
+            $search .= $s_delivery_time;
+        }
+        if(!empty($data['transport_id'])){
+            $transport_id=$data['transport_id'];
+            if (!empty($search)) {
+                $s_transport_id = ' and transport_id like ' . "'%" . $transport_id . '%' . "'";
+            } else {
+                $s_transport_id = ' transport_id like ' . "'%" . $transport_id . '%' . "'";
+            }
+            $search .= $s_transport_id;
+        }
+        if(!empty($data['reachby_name'])){
+            $reachby_name=$data['reachby_name'];
+            if (!empty($search)) {
+                $s_reachby_name = ' and reachby_name like ' . "'%" . $reachby_name . '%' . "'";
+            } else {
+                $s_reachby_name = ' reachby_name like ' . "'%" . $reachby_name . '%' . "'";
+            }
+            $search .= $s_reachby_name;
+
+        }
+        if(!empty($data['material_name'])){
+            $material_name=$data['material_name'];
+            if (!empty($search)) {
+                $s_material_name = ' and material_name like ' . "'%" . $material_name . '%' . "'";
+            } else {
+                $s_material_name = ' material_name like ' . "'%" . $material_name . '%' . "'";
+            }
+            $search .= $s_material_name;
+        }
+        $res = db('system_order')
+            ->where('is_del',0)
+            ->field('factory_name as name')
+            ->group('factory_name')
+            ->select();
         $list = db('system_order')
             -> where("is_del",0)
             -> order('id desc')
-            -> paginate(100);
-        return view("index", ['list' => $list]);
+            ->where($search)
+            -> paginate(100,false,['query'=>['delivery_time'=>$delivery_time,'factory_name'=>$factory_name,'transport_id'=>$transport_id,'reachby_name'=>$reachby_name,'material_name'=>$material_name]]);
+        return view("index", ['list' => $list,'res'=>$res,'delivery_time' => $delivery_time,'factory_name' => $factory_name,'transport_id' => $transport_id,'reachby_name' => $reachby_name,'material_name' => $material_name]);
     }
     // 系统订单
     public function system_order(){
@@ -124,7 +183,9 @@ class Outbound extends Controller {
         $cd=str_replace(array("[\""),"",$cd);
         $cd=str_replace(array("\"]"),"",$cd);
         $id=str_replace(array("[","]","\""),"",$cd);
-        if(!empty($id)){
+        if(strstr($id,'null')){
+            $this -> error('请选择至少一条数据');
+        }else{
             $id=explode(',',$id);
             // 发货日期
             $fh=$rows = db('system_order')
@@ -166,9 +227,8 @@ class Outbound extends Controller {
                 $num+=$row['num'];
             }
             return view('make_outbound_order',['rows'=>$rows,'fh'=>$fh,'zy'=>$zy,'sd'=>$sd,'cks'=>$cks,'id'=>$cd,'num'=>$num]);
-        }else{
-            $this -> error('请选择至少一条数据');
         }
+            
     }
     // 出库订单
     public function insert(){
@@ -314,7 +374,13 @@ class Outbound extends Controller {
         foreach ($cats as $row) {
             $num+=$row['count'];
         }
-        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num]);
+        $weight=0;
+        $nums=0;
+        foreach($cats as $v){
+            $weight += $v['netweight'];
+            $nums += $v['ck_nums'];
+        }
+        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num,'nums'=>$nums,'weight'=>$weight]);
     }
     //出库修改订单
     public function to_examine_up() {
@@ -761,7 +827,41 @@ class Outbound extends Controller {
      * 拆分
      */
     public function chaifen(){
-        dump(input());
+        $data=input();
+        $num=(int)$data['cf_Delivery_num'];
+        $nums=0;
+        foreach($data['detailed'] as $v){
+            $v=(int)$v;
+            $nums+=$v;
+        }
+        if($num!=$nums){
+            $this->error('数量不匹配，请重新输入');
+        }
+        foreach($data['detailed'] as $v){
+            if($v!=0){
+                db('system_order')
+                ->insert([
+                    'delivery_time'=>strtotime($data['cf_delivery_time']),
+                    'factory_id'=>$data['cf_factory_id'],
+                    'factory_name'=>$data['cf_factory_name'],
+                    'transport_id'=>$data['cf_transport_id'],
+                    'Delivery_id'=>$data['cf_Delivery_id'],
+                    'reachout_id'=>$data['cf_reachout_id'],
+                    'reachout_name'=>$data['cf_reachout_name'],
+                    'reachby_id'=>$data['cf_reachby_id'],
+                    'reachby_name'=>$data['cf_reachby_name'],
+                    'material_id'=>$data['cf_material_id'],
+                    'material_name'=>$data['cf_material_name'],
+                    'Delivery_num'=>$v,
+                    'detailed'=>$data['cf_detailed'],
+                    'create_time'=>time(),
+                ]);
+            }
+        }
+        $id=input('cf_id');
+        $update['is_del']=1;
+        $r = db('system_order') -> where('id', $id)->update($update);//  ->select();
+        return redirect('index');
     }
     /**
      * 拆分总数回显
