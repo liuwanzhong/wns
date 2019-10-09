@@ -10,11 +10,69 @@ use think\Loader;
 class Outbound extends Controller {
     // 显示页
     public function index(){
+        $data=input();
+        $delivery_time='';//发货时间
+        $factory_name='';//工厂名
+        $transport_id='';//装运单号
+        $reachby_name='';//送达方名称
+        $material_name='';//物料名
+        $search = '';
+        dump(input());
+        if(!empty($data['factory_name'])){
+            $factory_name=$data['factory_name'];
+            $search = 'factory_name like ' . "'%" . $factory_name . '%' . "'";
+        }
+        if(!empty($data['delivery_time'])){
+            $delivery_time=$data['delivery_time'];
+            $time = explode('~', $delivery_time);
+            foreach ($time as $key) {
+                $time[] = strtotime($key);
+                array_shift($time);
+            }
+            if (!empty($search)) {
+                $s_delivery_time = ' and delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            } else {
+                $s_delivery_time = 'delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            }
+            $search .= $s_delivery_time;
+        }
+        if(!empty($data['transport_id'])){
+            $transport_id=$data['transport_id'];
+            if (!empty($search)) {
+                $s_transport_id = ' and transport_id like ' . "'%" . $transport_id . '%' . "'";
+            } else {
+                $s_transport_id = ' transport_id like ' . "'%" . $transport_id . '%' . "'";
+            }
+            $search .= $s_transport_id;
+        }
+        if(!empty($data['reachby_name'])){
+            $reachby_name=$data['reachby_name'];
+            if (!empty($search)) {
+                $s_reachby_name = ' and reachby_name like ' . "'%" . $reachby_name . '%' . "'";
+            } else {
+                $s_reachby_name = ' reachby_name like ' . "'%" . $reachby_name . '%' . "'";
+            }
+            $search .= $s_reachby_name;
+
+        }
+        if(!empty($data['material_name'])){
+            $material_name=$data['material_name'];
+            if (!empty($search)) {
+                $s_material_name = ' and material_name like ' . "'%" . $material_name . '%' . "'";
+            } else {
+                $s_material_name = ' material_name like ' . "'%" . $material_name . '%' . "'";
+            }
+            $search .= $s_material_name;
+        }
         $list = db('system_order')
             -> where("is_del",0)
             -> order('id desc')
-            -> paginate(100);
-        return view("index", ['list' => $list]);
+            ->where($search)
+            -> paginate(100,false,['query'=>['delivery_time'=>$delivery_time,'factory_name'=>$factory_name,'transport_id'=>$transport_id,'reachby_name'=>$reachby_name,'material_name'=>$material_name]]);
+
+            echo db('system_order')->getlastSql();
+        // dump($list);
+        return view("index", ['list' => $list,'delivery_time' => $delivery_time,'factory_name' => $factory_name,'transport_id' => $transport_id,'reachby_name' => $reachby_name,'material_name' => $material_name]);
     }
     // 系统订单
     public function system_order(){

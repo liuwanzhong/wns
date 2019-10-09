@@ -44,6 +44,46 @@
                 <button type="button" class="layui-btn" id="outorder">生成出库单</button>
                 <a href="#" class="layui-btn" id="dc">导出</a>
             </div>
+            <div class="seach">
+                    <form action="{:url('Outbound/index')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">仓库名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input" id="factory_name" name="factory_name" autocomplete="off" placeholder="  " value="{$factory_name}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">出库时间</label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input" id="delivery_time" name="delivery_time" autocomplete="off" placeholder="  " value="<?php if(!empty($delivery_time)){echo $delivery_time;}?>">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">装运单号</label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input" id="transport_id" name="transport_id"  value="{$transport_id}"/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">送达方名称</label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input" id="reachby_name" name="reachby_name"  value="{$reachby_name}"/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">物料名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" class="layui-input" id="material_name" name="material_name"  value="{$material_name}"/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-inline">
+                                <button class="layui-btn save" lay-submit>查询</button>
+                                <a href="#" class="layui-btn" id="dc">导出</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             <main class="bd_content">
                 <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
                     <thead>
@@ -213,7 +253,18 @@
             layui.use('element', function () {
 
             })
-
+            layui.use(['element','laydate','form'], function(){
+                var laydate = layui.laydate;
+                var element = layui.element;
+                let form = layui.form;
+                laydate.render({
+                    elem: '#delivery_time'
+                    ,range: '~'
+                    ,done: function(value){
+                        $('#delivery_time').val(value)
+                    }
+                });
+            })
             //导入excel表
 			$('#dialog').on('click', function(){
 				$('.model').show();
