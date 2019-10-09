@@ -75,8 +75,8 @@
                             <td>{$r.Delivery_num}</td>
                             <td>{$r.detailed}</td>
                             <td>
-                                <a href="#" class="img_edit" title="详细" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
-                                <a href="#" class="chaifen" title="拆分" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
+                                <a href="#" class="img_edit" title="详细" style="margin-right: 15px;">详细</a>
+                                <a href="#" class="chaifen" title="拆分" style="margin-right: 15px;">拆分</a>
                             </td>
                         </tr>
                         {/volist}
@@ -179,7 +179,20 @@
                 <form action="{:url('Outbound/chaifen')}" method="post" enctype="multipart/form-data">
                     <div class="wrap">
                         <label>总数</label>
-                        <input type="text" id="cf_nums" name="num" value="" readonly/>
+                        <input type="hidden" id="cf_id" name="cf_id" value="">
+                        <input type="hidden" id="cf_delivery_time" name="cf_delivery_time" value="">
+                        <input type="hidden" id="cf_factory_id" name="cf_factory_id" value="">
+                        <input type="hidden" id="cf_factory_name" name="cf_factory_name" value="">
+                        <input type="hidden" id="cf_transport_id" name="cf_transport_id" value="">
+                        <input type="hidden" id="cf_Delivery_id" name="cf_Delivery_id" value="">
+                        <input type="hidden" id="cf_reachout_id" name="cf_reachout_id" value="">
+                        <input type="hidden" id="cf_reachout_name" name="cf_reachout_name" value="">
+                        <input type="hidden" id="cf_reachby_id" name="cf_reachby_id" value="">
+                        <input type="hidden" id="cf_reachby_name" name="cf_reachby_name" value="">
+                        <input type="hidden" id="cf_material_id" name="cf_material_id" value="">
+                        <input type="hidden" id="cf_material_name" name="cf_material_name" value="">
+                        <input type="text" id="cf_Delivery_num" name="cf_Delivery_num" value="" readonly/>
+                        <input type="hidden" id="cf_detailed" name="cf_detailed" value="">
                     </div>
                     <div class="wrap">
                         <label>拆分数量</label>
@@ -257,7 +270,20 @@
 					type:'post',
 					data:{'id':val},
 					success:function(data){
-						$('#cf_nums').val(data.Delivery_num)
+						$('#cf_id').val(data.id)
+						$('#cf_delivery_time').val(data.delivery_time)
+						$('#cf_factory_id').val(data.factory_id)
+						$('#cf_factory_name').val(data.factory_name)
+						$('#cf_transport_id').val(data.transport_id)
+						$('#cf_Delivery_id').val(data.Delivery_id)
+						$('#cf_reachout_id').val(data.reachout_id)
+						$('#cf_reachout_name').val(data.reachout_name)
+						$('#cf_reachby_id').val(data.reachby_id)
+						$('#cf_reachby_name').val(data.reachby_name)
+						$('#cf_material_id').val(data.material_id)
+						$('#cf_material_name').val(data.material_name)
+						$('#cf_Delivery_num').val(data.Delivery_num)
+						$('#cf_detailed').val(data.detailed)
 					}
 				})
             })

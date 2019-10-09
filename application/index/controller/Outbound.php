@@ -124,7 +124,9 @@ class Outbound extends Controller {
         $cd=str_replace(array("[\""),"",$cd);
         $cd=str_replace(array("\"]"),"",$cd);
         $id=str_replace(array("[","]","\""),"",$cd);
-        if(!empty($id)){
+        if(strstr($id,'null')){
+            $this -> error('请选择至少一条数据');
+        }else{
             $id=explode(',',$id);
             // 发货日期
             $fh=$rows = db('system_order')
@@ -166,9 +168,8 @@ class Outbound extends Controller {
                 $num+=$row['num'];
             }
             return view('make_outbound_order',['rows'=>$rows,'fh'=>$fh,'zy'=>$zy,'sd'=>$sd,'cks'=>$cks,'id'=>$cd,'num'=>$num]);
-        }else{
-            $this -> error('请选择至少一条数据');
         }
+            
     }
     // 出库订单
     public function insert(){
@@ -314,7 +315,13 @@ class Outbound extends Controller {
         foreach ($cats as $row) {
             $num+=$row['count'];
         }
-        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num]);
+        $weight=0;
+        $nums=0;
+        foreach($cats as $v){
+            $weight += $v['netweight'];
+            $nums += $v['ck_nums'];
+        }
+        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num,'nums'=>$nums,'weight'=>$weight]);
     }
     //出库修改订单
     public function to_examine_up() {
@@ -761,7 +768,41 @@ class Outbound extends Controller {
      * 拆分
      */
     public function chaifen(){
-        dump(input());
+        $data=input();
+        $num=(int)$data['cf_Delivery_num'];
+        $nums=0;
+        foreach($data['detailed'] as $v){
+            $v=(int)$v;
+            $nums+=$v;
+        }
+        if($num!=$nums){
+            $this->error('数量不匹配，请重新输入');
+        }
+        foreach($data['detailed'] as $v){
+            if($v!=0){
+                db('system_order')
+                ->insert([
+                    'delivery_time'=>strtotime($data['cf_delivery_time']),
+                    'factory_id'=>$data['cf_factory_id'],
+                    'factory_name'=>$data['cf_factory_name'],
+                    'transport_id'=>$data['cf_transport_id'],
+                    'Delivery_id'=>$data['cf_Delivery_id'],
+                    'reachout_id'=>$data['cf_reachout_id'],
+                    'reachout_name'=>$data['cf_reachout_name'],
+                    'reachby_id'=>$data['cf_reachby_id'],
+                    'reachby_name'=>$data['cf_reachby_name'],
+                    'material_id'=>$data['cf_material_id'],
+                    'material_name'=>$data['cf_material_name'],
+                    'Delivery_num'=>$v,
+                    'detailed'=>$data['cf_detailed'],
+                    'create_time'=>time(),
+                ]);
+            }
+        }
+        $id=input('cf_id');
+        $update['is_del']=1;
+        $r = db('system_order') -> where('id', $id)->update($update);//  ->select();
+        return redirect('index');
     }
     /**
      * 拆分总数回显

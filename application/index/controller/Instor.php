@@ -97,7 +97,7 @@ class Instor extends Controller
             ->join('warehouse','cabinet.warehouse_id=warehouse.id','left')
             ->where('warehouse.id','in',$warehouse)
             ->where("$search")
-            ->order('rukuform_xq.create_time desc')
+            ->order('cabinet.name asc')
             ->field('rukuform_xq.*,kc_status.title,cabinet.name,kc_status.title')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt,'status'=>$status_id]]);
         $orders=$order->all();
@@ -293,7 +293,7 @@ class Instor extends Controller
             $m=$times[1];
             $rows=db('jc')
                 ->where("date_format(state_time,'%m')=$m and date_format(state_time,'%Y')=$y")
-                ->order('state_time desc')
+                ->order('huowei_name asc')
                 ->select();
             }
         foreach ($rows as $k=>$row) {
@@ -345,6 +345,7 @@ class Instor extends Controller
         ->where('warehouse.id',$id)
         ->where('rukuform_xq.rk_nums != 0')
         ->field('cabinet.name c_name,warehouse.name w_name,rukuform_xq.*')
+        ->order('cabinet.name asc')
         ->group('rukuform_xq.id')
         ->select();
         return view('add_pandian',['list'=>$list]);
@@ -359,7 +360,6 @@ class Instor extends Controller
                 }
                 $chayi='';
                 $chayi=$data['rk_nums'][$i]-$data['pd_num'][$i];
-                dump($chayi);
                 db('pandian')
                 ->insert([
                     'w_name'=>$data['w_name'][$i],
