@@ -70,7 +70,7 @@ nav dd a:hover{background:#161a1e;color:#fff;}
 
 .ks{margin-right: 15px;}
 
-.bd_content{height: 100%;overflow-x: hidden;margin-top: 12px;}
+.bd_content{height: 90%;overflow-x: hidden;margin-top: 12px;}
 .bd_content::-webkit-scrollbar{display: none;}
 .bd_content .layui-form{width: 90%;margin: 0 auto;}
 .bd_content .layui-form .layui-input-block{display: flex;}
