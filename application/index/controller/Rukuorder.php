@@ -151,6 +151,7 @@ class Rukuorder extends Controller {
             ->where('rukuform.is_del',0)
             ->where('warehouse.id','in',$warehouse)
             ->where('rukuform_xq.state',0)
+            ->order('rukuform.id desc')
             ->group('rukuform_xq.rukuid')
             ->where($search)
             ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
@@ -331,6 +332,7 @@ class Rukuorder extends Controller {
             ->where('rukuform.is_del',0)
             ->where('warehouse.id','in',$warehouse)
             ->where('rukuform.state',1)
+            ->order('rukuform.id desc')
             ->group('rukuform_xq.rukuid')
             ->where($search)
             ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
@@ -435,6 +437,7 @@ class Rukuorder extends Controller {
             ->where('rukuform_xq.is_del',0)
             ->where('rukuform_xq.qt_rk',0)
             ->where('rukuform_xq.state',1)
+            ->order('rukuform.id desc')
             ->where("$search")
             ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
             ->paginate(10,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);

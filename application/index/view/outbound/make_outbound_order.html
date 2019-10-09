@@ -314,6 +314,7 @@
                     success:function (data) {
                         let html = '';
                         for (let i =0; i<data.length; i++){
+                            
                             html += ` <tr>
                             <input type="hidden" id="id" class="layui-input" value="${data[i].id}">
                             <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
