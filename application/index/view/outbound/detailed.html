@@ -25,15 +25,26 @@
 			<div class="seach">
 				<form action="{:url('Outbound/detailed')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
 					<div class="layui-form-item">
-						<label class="layui-form-label">出库仓库</label>
+						<label class="layui-form-label">仓库名称</label>
 						<div class="layui-input-inline">
-							<input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
+							<select name="s_transfers_id" id="">
+								<option value="0">全部</option>
+								{volist name='cks' id='w'}
+								<option value="{$w.name}" <?php if($s_transfers_id==$w['name']){echo 'selected';} ?>>{$w.name}</option>
+								{/volist}
+							</select>
 						</div>
 					</div>
 					<div class="layui-form-item">
 						<label class="layui-form-label">发货日期</label>
 						<div class="layui-input-inline">
 							<input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">产品名称</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="s_material_name" name="s_material_name" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_material_name)){echo $s_material_name;}?>">
 						</div>
 					</div>
 					<div class="layui-form-item">
@@ -49,10 +60,11 @@
 					<tr>
 						<th>ID</th>
 						<th>出库仓库</th>
-						<th>出库货物</th>
+						<th>产品名称</th>
 						<th>出库货位</th>
 						<th>送达方</th>
 						<th>发货日期</th>
+						<th>出库日期</th>
 						<th>数量</th>
 						<th>净重</th>
 					</tr>
@@ -66,6 +78,7 @@
 						<td>{$row.c_name}</td>
 						<td>{$row.reachout_name}</td>
 						<td><?php if(!empty($row['delivery_time'])){echo date('Y-m-d',$row['delivery_time']);}?></td>
+						<td><?php if(!empty($row['ck_time'])){echo date('Y-m-d',$row['ck_time']);}?></td>
 						<td>{$row.ck_nums}</td>
 						<td>{$row.netweight}</td>
 					</tr>

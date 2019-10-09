@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="/images/index.css">
-    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" href="/images/index.css" />
+    <link rel="stylesheet" href="/layui/css/layui.css" />
     <style>
         .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
         .btn{margin-left: 30px;margin-top: 30px;}
@@ -30,19 +31,25 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">装运单号:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="transport_id" value="{$rows['transport_id']}" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">发货日期:</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="userintime" value="<?php if(!empty($rows['delivery_time'])){echo date('Y-m-d',$rows['delivery_time']);}?>" autocomplete="off" class="layui-input" id="time">
+                    <input type="text" name="transport_id" value="{$rows['transport_id']}" autocomplete="off" class="layui-input" readonly>
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">售达方:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="reachout_name" value="{$rows['reachout_name']}" autocomplete="off" class="layui-input" id="reachout_name">
+                    <input type="text" name="reachout_name" value="{$rows['reachout_name']}" autocomplete="off" class="layui-input" id="reachout_name" readonly>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">发货日期:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="delivery_time" value="<?php if(!empty($rows['delivery_time'])){echo date('Y-m-d',$rows['delivery_time']);}?>" autocomplete="off" class="layui-input" readonly >
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">出库日期:</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="userintime" value="<?php if(!empty($rows['ck_time'])){echo date('Y-m-d',$rows['ck_time']);}?>" autocomplete="off" class="layui-input" id="time">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -97,15 +104,16 @@
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
                     <tr>
-                        <th class="ckgc">出库工厂</th>
                         <th>产品名称</th>
-                        <th>出库货位</th>
+                        <th>总数量</th>
+                        <th>货位</th>
                         <th>实发数量</th>
+                        <th>实际重量</th>
+                        <th>货位剩余数</th>
                         <th>产品日期</th>
                         <th>产品批次</th>
                         <th>备注</th>
-                        <th>净重</th>
-                        <th class="ddbh">订单编号</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody class="tbd">
@@ -113,47 +121,98 @@
                     <tr>
                         <input type="hidden" name="cd[]" value="{$v.id}">
                         <input type="hidden" name="gross_min" value="{$v.j}">
-                        <td>
-                            <input type="hidden" value="{$rows['w_name']}" name="transfers_factory[]" readonly>
-                            {$rows['w_name']}
-                        </td>
-                        <td>
+                        <input type="hidden" name="delivery_id[]" value="{$v.delivery_id}">
+                        <td class="status">
                             <input type="hidden" value="{$v.product_name}" name="material_name[]" readonly>
                             {$v.product_name}
                         </td>
+                        <td>
+                            <input type="hidden" value="{$v.count}" name="delivery_num[]" readonly>
+                            {$v.count}
+                        </td>
+
                         <?php if($v['ck_huowei_id']==0): ?>
                             <td class="huowei">
-                                <select name='huowei[]' class='showhuowei'>
-                                    <option value='0'>请选择货位</option>
-                                </select>
+                                <input type="hidden" name="huowei[]" value="">
+                                <botton class="layui-btn layui-btn-sm dia">点击</botton>
                             </td>
                         <?php else:?>
                             <td class="huowei">
-                                <select name='huowei[]'>
-                                    <?php foreach($cabinet as $s): ?>
-                                    <option value="{$s.id}" <?php if($s['id']==$v['ck_huowei_id']){echo 'selected';} ?>>{$s.name}</option>
-                                    <?php endforeach;?>
-                                </select>
+                                <?php foreach($cabinet as $s): ?>
+                                    <?php if($s['id']==$v['ck_huowei_id']): ?>
+                                        <input type="hidden" value="{$s.id}" name="huowei[]")>{$s.name}
+                                    <?php endif; ?>
+                                <?php endforeach; ?>
                             </td>
                         <?php endif; ?>
-                        <td>
-                            <input type="number" value="{$v.ck_nums}" class="countnum layui-input" id="blur" name="nums[]">
+
+                        <?php if($v['ck_nums']==0): ?>
+                            <td class="count">
+                                <input type="hidden" value="{$v.ck_nums}" name="nums[]" readonly>
+                                <span>{$v.ck_nums}</span>
+                            </td>
+                        <?php else:?>
+                            <td>
+                                <input type="text" name="nums[]" value="{$v['ck_nums']}" readonly style="border:0">
+                            </td>
+                        <?php endif; ?>
+
+                        <?php if($v['netweight']==0): ?>
+                            <td class="jin">
+                                <input type="hidden" value="jin" name="netweight[]" readonly>
+                                <span>0</span>
+                            </td>
+                        <?php else:?>
+                            <td>
+                                <input type="text" name="netweight[]" value="{$v['netweight']}" readonly style="border:0">
+                            </td>
+                        <?php endif; ?>
+
+                        <?php if($v['sy_count']==''): ?>
+                        <td class="sy_count">
+                            <input type="hidden" value="" name="sy_count[]" readonly>
+                            <span>0</span>
                         </td>
-                        <td><input type="date" name="intime[]" class="layui-input" value="{$v.product_time}"></td>
+                        <?php else:?>
+                        <td>
+                            <input type="text" name="sy_count[]" value="{$v['sy_count']}" readonly style="border:0">
+                        </td>
+                        <?php endif; ?>
+
+
+                        <?php if($v['product_time']==''): ?>
+                        <td class="indate">
+                            <input type="hidden" name="product_time[]" id="" class="layui-input" style="border:0">
+                            <span>0</span>
+                        </td>
+                        <?php else:?>
+                        <td>
+<!--                            <?php echo date('Y-m-d',$v['product_time']) ?>-->
+                            <input type="date" name="product_time[]" value="<?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);} ?>" readonly style="border:0">
+                        </td>
+                        <?php endif; ?>
+
                         <td><input type="text" name="storno[]" placeholder="请输入批次" value="{$v.product_batch}" class="layui-input"></td>
                         <td><textarea name="content[]" class="layui-textarea">{$v.content}</textarea></td>
+                        <?php if($v['c_name']==''): ?>
                         <td>
-                            <div class="num"><input type="hidden" class="num" name="netweight[]" value="{$v.netweight}" readonly></div>
-                            <span>{$v.netweight}</span>
+                            <button type="button" class="layui-btn layui-btn-sm add">
+                                <i class="layui-icon">&#xe654;</i>
+                            </button>
                         </td>
-                        <td>
-                            <input type="hidden" name="delivery_id[]" value="{$v.delivery_id}" readonly>
-                            {$v.delivery_id}
-                        </td>
+                        <?php endif;?>
                     </tr>
                     {/volist}
                 </tbody>
             </table>
+            <div class="total">
+                <input type="hidden" name="all_count" value="">
+                <input type="hidden" name="all_weight" value="">
+                <p>总数量：<span class="allNum">{$num}</span></p>
+                <p>实发数量：<span class="all_count">0</span></p>
+                <p>合计重量：<span class="all_weight">0</span></p>
+                <p>派车人签字：</p>
+            </div>
             <div class="btn">
                 <button class="layui-btn submit" lay-submit lay-filter="formDemo" id="del">立即提交</button>
                 <a class="layui-btn" href="{:url('Outbound/to_examine')}">返回</a>
@@ -161,10 +220,33 @@
         </div>
     </form>
 </div>
+<div class="model_table" style="display: none; top: 45%; overflow: hidden;right:-30%">
+    <div class="head">
+        <span>修改商品</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content" style="height: 100%;overflow-x: hidden;">
+        <table class="layui-table layui-form">
+            <thead>
+            <tr>
+                <th></th>
+                <th>产品名称</th>
+                <th>产品日期</th>
+                <th>货位名称</th>
+                <th>库存数量</th>
+                <th>出库数量</th>
+            </tr>
+            </thead>
+            <tbody class="kc_list"></tbody>
+        </table>
+        <button class="layui-btn sure" style="margin: 20px auto 100px;">确定</button>
+    </div>
 
+</div>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
+
     layui.use(['element', 'form','laydate'], function () {
         let laydate = layui.laydate;
         let form = layui.form;
@@ -183,83 +265,182 @@
                 str += `<option value="${status[i].value}">${status[i].text}</option>`
             }
             let html = `<tr>
-                        <input type="hidden" name="min" value="">
-                        <input type="hidden" name="cd[]" value="">
-                        <input type="hidden" class='gross_min' name="gross_min" value="">
-                        <td>
-                            <input type="hidden" value="${child[3].innerText}" name="transfers_factory[]" readonly>
+                        <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
+                        <input type="hidden" name="gross_min" value="{$v.j}">
+                        <input type="hidden" name="delivery_id[]" value="{$v.delivery_id}">
+                        <td class="status">
+                            <input type="hidden" value="${child[3].innerText}" name="material_name[]" readonly>
                             ${child[3].innerText}
                         </td>
                         <td>
-                            <input type="hidden" value="${child[4].innerText}" name="material_name[]" readonly>
+                            <input type="hidden" value="${child[4].innerText}" name="delivery_num[]" readonly>
                             ${child[4].innerText}
                         </td>
-                        <?php if($v['ck_huowei_id']==0): ?>
-                            <td class="huowei">
-                                <select name='huowei[]' class='showhuowei'>
-                                    <option value='0'>请选择货位</option>
-                                </select>
-                            </td>
-                        <?php else:?>
-                            <td class="huowei">
-                                <select name='huowei[]'>
-                                    <?php foreach($cabinet as $s): ?>
-                                    <option value="{$s.id}" <?php if($s['id']==$v['ck_huowei_id']){echo 'selected';} ?>>{$s.name}</option>
-                                    <?php endforeach;?>
-                                </select>
-                            </td>
-                        <?php endif; ?>
-                        <td>
-                            <input type="number" value="{$v.ck_nums}" class="countnum layui-input" id="blur" name="nums[]">
+                        <td class="huowei">
+                            <input type="hidden" name="huowei[]" value="">
+                            <botton class="layui-btn layui-btn-sm dia">点击</botton>
                         </td>
-                        <td><input type="date" name="intime[]" class="layui-input" value="{$v.product_time}"></td>
+                        <td class="count">
+                            <input type="hidden" value="0" name="nums[]" readonly>
+                            <span>{$v.ck_nums}</span>
+                        </td>
+                        <td class="jin">
+                            <input type="hidden" value="0" name="netweight[]" readonly>
+                            <span>0</span>
+                        </td>
+                        <td class="sy_count">
+                            <input type="hidden" value="0" name="sy_count[]" readonly>
+                            <span>0</span>
+                        </td>
+                        <td class="indate">
+                            <input type="hidden" name="product_time[]" id="" class="layui-input" style="border:0">
+                            <span>0</span>
+                        </td>
                         <td><input type="text" name="storno[]" placeholder="请输入批次" value="{$v.product_batch}" class="layui-input"></td>
                         <td><textarea name="content[]" class="layui-textarea">{$v.content}</textarea></td>
-                        <td>
-                            <div class="num"><input type="hidden" class="num" name="netweight[]" value="{$v.netweight}" readonly></div>
-                            <span>{$v.netweight}</span>
-                        </td>
-                        <td>
-                            <input type="hidden" name="delivery_id[]" value="${child[12].innerText}" readonly>
-                            ${child[12].innerText}
-                        </td>
+                       <td>
+                <button type="button" class="layui-btn layui-btn-sm remove ">
+                    <i class="layui-icon">&#xe640;</i>
+                </button>
+            </td>
                     </tr>`;
             $('.tbd').append(html);
             form.render();
 
         })
+        //
+        // // 入库货位 数据请求
+        // form.on('select(ck_id)', function(data){
+        //     let id = data.elem.value;
+        //     if(id != 0){
+        //         $('.showhuowei').empty();
+        //         $.ajax({
+        //             type: "get",//请求方式有post，get请求方式，这里是post请求
+        //             url: '/index/table/show/id/' + id,//请求的方法的路径
+        //             dataType: 'json',//请求参数的格式为json.另外还有text等
+        //             success: function(data){
+        //                 var data = JSON.parse(data);
+        //                 console.log(data);
+        //                 $('.showhuowei').append("<option value='0'>请选择货位</option>");
+        //                 for (var i=0;i<data.length;i++)
+        //                 {
+        //                     $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
+        //                 }
+        //                 $(".forzentitle").val(data.title);
+        //                 $('.frozencount').val(data.goods_feel);
+        //                 $(".editfrozenid").val(data.id);
+        //                 form.render();
+        //             }
+        //         })
+        //     }
+        // })
 
-        // 入库货位 数据请求
-        form.on('select(ck_id)', function(data){
-            let id = data.elem.value;
-            if(id != 0){
-                $('.showhuowei').empty();
+
+        let par = '';
+        $('.tbd').on('click', '.dia', function () {
+            let id = $('#table').val();
+            let ne = $(this).parents('tr').find('.status input').val();
+            if(id == 0){
+                layer.alert('请选择仓库',{icon:5});
+                return false;
+            }
+            else {
+                par = $(this).parents('tr');
+                $('.kc_list').empty();
+                $('.model_table').show();
                 $.ajax({
-                    type: "get",//请求方式有post，get请求方式，这里是post请求
-                    url: '/index/table/show/id/' + id,//请求的方法的路径
-                    dataType: 'json',//请求参数的格式为json.另外还有text等
-                    success: function(data){
-                        var data = JSON.parse(data);
-                        console.log(data);
-                        $('.showhuowei').append("<option value='0'>请选择货位</option>");
-                        for (var i=0;i<data.length;i++)
-                        {
-                            $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
+                    url:'/index/Table/houwei_ck',
+                    data: {id,ne},
+                    success:function (data) {
+                        console.log(data)
+                        let html = '';
+                        for (let i =0; i<data.length; i++){
+                            html += ` <tr>
+                            <input type="hidden" id="id" class="layui-input" value="${data[i].id}">
+                            <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
+                            <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
+                            <input type="hidden" id="c_id" class="layui-input" value="${data[i].c_id}">
+
+                            <td><input type="radio" name="sex" value="nan" title=""></td>
+                            <td>${data[i].product_name}</td>
+                            <td>${data[i].product_time}</td>
+                            <td class="hw">${data[i].name}</td>
+                            <td>${data[i].sy_count}</td>
+                            <td><input type="text" class="layui-input" style="width: 80px;"></td>
+                        </tr>`;
                         }
-                        $(".forzentitle").val(data.title);
-                        $('.frozencount').val(data.goods_feel);
-                        $(".editfrozenid").val(data.id);
-                        form.render();
+                        $('.kc_list').append(html)
+                        form.render()
                     }
                 })
             }
+        })
 
+
+        $('.sure').on('click', function () {
+            let che = $('.kc_list').find('input:radio:checked')[0];
+            let tr = $(che).parents('tr');
+            let id = tr.find('#id').val();
+            let m = tr.find('#m').val();
+            let j = tr.find('#j').val();
+            let c_id = tr.find('#c_id').val();
+            let hw = tr.find('.hw').text();
+            let num = tr.find('input[type=text]').val();
+            let allcount = $('.all_count').text();
+            let allweight = $('.all_weight').text();
+            let time = tr.find('td:eq(2)').text();
+            let allnum = $('.allNum').text();
+            if(Number(allnum) < (Number(allcount) + Number(num))){
+                layer.alert('实发数量不得超过总数量',{icon:5})
+                return false;
+            }
+            $('.model_table').hide();
+            par.find('.indate').find('input').val(time);
+            par.find('.indate').find('span').text(time);
+            $.ajax({
+                url:'/index/Table/houwei_cd',
+                data:{id, m, j, count:num},
+                success:function (d) {
+                    par.find('.rukuform_xq_id').val(id);
+                    par.find('.huowei').html(`<input type="hidden" value="${c_id}" name="huowei[]" readonly><span>${hw}</span>`);
+                    par.find('.count').find('span').text(num);
+                    par.find('.count').find('input').val(num);
+                    par.find('.jin').find('span').text(d.m);
+                    par.find('.jin').find('input').val(d.m);
+                    par.find('.sy_count').find('span').text(d.sy);
+                    par.find('.sy_count').find('input').val(d.sy);
+                    let count = Number(allcount) + Number(num);
+                    let weight = [(Number(allweight) + Number(d.m))*1000]/1000;
+                    let we=Math.round(weight*1000)/1000;
+                    $('.all_count').text(count);
+                    $('.all_weight').text(we);
+                    $('input[name=all_count]').val(count);
+                    $('input[name=all_weight]').val(we);
+                }
+            })
         })
     })
 
     // 点击删除按钮移除当前行
     $('.tbd').on('click','.remove', function(){
         let p = $(this).parents('tr');
+        let id=p.find('.rukuform_xq_id').val();
+        let num=p.find('.count').find('input').val();
+        let jin = p.find('.jin input').val();
+        let allcount = $('.all_count').text();
+        let allweight = $('.all_weight').text();
+        if(jin != 0 || num != 0){
+            let weight = [(Number(allweight) - Number(jin))*1000]/1000;
+            let we=Math.round(weight*1000)/1000;
+            $('.all_count').text(Number(allcount) - Number(num));
+            $('.all_weight').text(we);
+            $('input[name=all_count]').val(Number(allcount) - Number(num));
+            $('input[name=all_weight]').val(we);
+        }
+        $.ajax({
+            url:'/index/Table/huifu',
+            data:{id,num}
+        })
         p.remove();
     })
 
@@ -271,25 +452,26 @@
     // 修改商品数量
     $('.tbd').on('blur', '.countnum', function(){
         let parent =$(this).parents('tr');
-        console.log(parent)
         //净重
         let min = parent.find('input[name=gross_min]').val();
-        console.log(min);
         //毛重
         let gross_min = $(this).parents('tr').find('input[name=min]').val();
-        console.log(gross_min)
         let max = $(this).val()
         $.ajax({
             url:'/index/Rukuorder/blur',
             data:{'min':min,'max':max,'groos_min':gross_min},
             success:function (data) {
-                console.log(data)
                 parent.find('.num').next().text(data.number)
                 parent.find('.groos').next().text(data.groos)
                 parent.find('.groos').val(data.groos)
                 parent.find('.num').val(data.number)
             }
         })
+    })
+
+    $('.close').on('click', function(){
+        $('.model_table').hide();
+
     })
 </script>
 </body>

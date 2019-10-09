@@ -19,7 +19,7 @@
             </span>
     </div>
     <div class="bd_content">
-        <table class="layui-table" style="width: 96%; margin: 12px auto 80px;">
+        <table class="layui-table" style="width: 96%; margin: 12px auto 50px;">
             <thead>
             <tr>
                 <th rowspan="2">日期</th>
@@ -44,7 +44,7 @@
             <tbody>
             {volist name='rows' id='row'}
             <tr>
-                <td><?php if(!empty($row['time'])){echo date('Y-m-d',$row['time']);} ?></td>
+                <td><?php if(!empty($row['time'])){echo date('Y-m-d H:i:s',$row['time']);} ?></td>
                 <td>{$row.odd_number}</td>
                 <td>{$row.task}</td>
                 <td>{$row.customer}</td>
@@ -61,6 +61,7 @@
             {/volist}
             </tbody>
         </table>
+        <a style="margin-left:28px" href="{:url('Instor/index',['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">返回</a>
     </div>
 </div>
 

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no" />
+    <title>获取设备摄像头 getUserMedia</title>
+    <link rel="stylesheet" href="/images/index.css">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+    <style>
+        video {
+            display: block;
+            margin: 0 auto;
+            width: 400px;
+            height: 400px;
+            background: #000;
+            border-radius: 5px;
+        }
+        .video_info{margin: 10px 30px;}
+    </style>
+</head>
+<body>
+    <div class="note">
+        <div class="nav">
+            <span class="layui-breadcrumb">
+                <a href="/public/main.html" target="box">首页</a>
+                <a href="javascript:;">扫码</a>
+                <a><cite>入库扫码</cite></a>
+            </span>
+        </div>
+        <div class="video_info">
+            <div id="video"></div>
+            <div>
+                <button class="layui-btn" id="open">开始扫码</button>
+                <button class="layui-btn" id="close">关闭</button>
+            </div>
+            <div id="result"></div>
+        </div>
+    </div>
+</body>
+<script src="/static/js/qrscan.js"></script>
+<script src="/layui/layui.js"></script>
+<script>
+    var ds = null;
+    var scan = new QRScan('video');
+
+    document.getElementById('open').onclick = function () {
+        scan.openScan();
+        ds = window.setInterval(function () {
+            startScan();
+        }, 1500);
+    };
+    document.getElementById('close').onclick = function () {
+        scan.closeScan();
+        window.clearInterval(ds);
+    };
+    var re_div = document.getElementById('result');
+    function startScan() {
+        scan.getImgDecode(function (data) {
+            console.log(data);
+            var p = document.createElement('p');
+            if (data.success) {
+                window.location.href=data.payload;
+            } else {
+                p.innerHTML = '识别失败，请校准';
+            }
+            re_div.appendChild(p);
+        });
+    };
+    
+    
+    layui.use('element', function () {
+        
+    })
+</script>
+</html>

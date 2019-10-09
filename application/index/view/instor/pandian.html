@@ -40,7 +40,7 @@
                 </div>
             </div>
             <main class="bd_content">
-                <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
+                <table class="layui-table new_list" style="width: 96%;margin: 12px auto 200px;">
                     <thead>
                     <tr>
                         <th>仓库</th>
@@ -50,17 +50,21 @@
                     </tr>
                     </thead>
                     <tbody class="tbd">
-                        {volist name='list' id='l'}
+                        {volist name='li' id='l'}
                         <tr>
                             <th>{$l.w_name}</th>
                             <th><?php if(!empty($l['create_time'])){echo date('Y-m-d',$l['create_time']);}?></th>
                             <th>{$l.count}</th>
-                            <th><a href="{:url('Instor/xiangxi',['time'=>$l.create_time])}">详细</a></th>
+                            <th>
+                                <a href="{:url('Instor/xiangxi',['time'=>$l.create_time])}">详细</a>
+                                <a href="{:url('Instor/del_pandian',['time'=>$l.create_time])}">删除</a>
+                            </th>
                         </tr>
                         {/volist}
                     </tbody>
                 </table>
                 <div style="text-align:center; margin-bottom: 200px;">
+                    {$list->render()}
                 </div>
             </main>
         </div>
@@ -69,10 +73,19 @@
         <script src="/layui/layui.js"></script>
         <script type="text/javascript">
 
-        layui.use(['element','form'], function(){
+        layui.use(['element','laydate','form'], function(){
+            var laydate = layui.laydate;
+            var element = layui.element;
             let form = layui.form;
+            laydate.render({
+                elem: '#s_delivery_time'
+                ,range: '~'
+                ,done: function(value){
+                    $('#s_delivery_time').val(value)
+                }
+            });
         })
-         $('.pandian').on('click',  function (){
+        $('.pandian').on('click',  function (){
              let id = $('#table').val();
              console.log(id);
                 if(id == 0){
@@ -81,7 +94,7 @@
                 }else{
                     window.location.href="/index/Instor/add_pandian?id="+id;
                 }
-         })
+        })
         </script>
 	</body>
 </html>

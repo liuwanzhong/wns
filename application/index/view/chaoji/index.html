@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>后台登陆</title>
+    <link href="/layui/css/layui.css" rel="stylesheet">
+    <style>
+
+        html, body {
+            height: 100%;
+            background-color: #eee;
+            overflow: hidden;
+        }
+
+        form {
+            width: 340px;
+            height: 300px;
+            margin: 180px auto 0;
+            background: rgba(255,255,255,1);
+            padding: 20px;
+            box-shadow: 5px 5px 10px rgba(53,53,53,.3);
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: bold;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+            padding-bottom: 30px;
+        }
+
+        .layui-form-item {
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .layadmin-user-login-icon{
+            position: absolute;
+            left: 1px;
+            top: 1px;
+            width: 38px;
+            line-height: 36px;
+            text-align: center;
+            color: #d2d2d2;
+        }
+
+        .layui-input-block {
+            margin-left: 0;
+        }
+
+        .layui-input {
+            padding-left: 38px;
+        }
+
+        .layui-btn {
+            width: 100%;
+        }
+        input::-webkit-input-placeholder{
+            color: #d2d2d2;
+        }
+    </style>
+</head>
+<body>
+<form action="{:url('Chaoji/pwd')}" class="layui-form">
+    <h3>超级权限</h3>
+    <div class="layui-form-item">
+        <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="password"></label>
+        <input autocomplete="off" id="password" class="layui-input" name="pwd" placeholder="请输入密码" required type="password">
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-filter="formDemo" lay-submit>立即登录</button>
+        </div>
+    </div>
+</form>
+
+<script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/layui/layui.js"></script>
+</body>
+</html>

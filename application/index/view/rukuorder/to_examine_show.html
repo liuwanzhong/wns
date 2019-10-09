@@ -8,11 +8,12 @@
     <style>
         .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
         .btn{margin-left: 30px;margin-top: 30px;}
-        .container{display: block;overflow-x: hidden;height: 580px;}
+        .container{display: block;overflow-x: hidden;height: 580px;margin-top: 15px;}
         .container::-webkit-scrollbar{width: 0;}
         input[type="date"]::-webkit-inner-spin-button {
             display: none;
         }
+        .a{width:100%!important;}
     </style>
 </head>
 <body>
@@ -70,7 +71,7 @@
             </div>
         </div>
         <div class="container">
-            <table class="layui-table" style="width: 96%; margin: 12px auto;">
+            <table class="layui-table" style="width: 96%; margin: 12px auto 120px;">
                 <thead>
                     <tr>
                         <th class="ckgc">出库工厂</th>
@@ -111,8 +112,8 @@
                         </td>
                         <?php if($v['rk_huowei_id']==0): ?>
                             <td class="huowei">
-                                <select name='huowei[]' class='showhuowei'>
-                                    <option value='0'>请选择货位</option>
+                                <select name='huowei[]' class='showhuowei' lay-search>
+                                    <option value=''>请选择货位</option>
                                 </select>
                             </td>
                         <?php else:?>
@@ -125,10 +126,10 @@
                             </td>
                         <?php endif; ?>
                         <td>
-                            <input type="number" value="{$v.rk_nums}" class="countnum layui-input" id="blur" name="nums[]">
+                            <input type="number" value="{$v.rk_nums}" class="countnum layui-input a" id="blur" name="nums[]">
                         </td>
-                        <td><input type="date" name="intime[]" class="layui-input" value="<?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);} ?>"></td>
-                        <td><input type="text" name="storno[]" placeholder="请输入批次" value="{$v.product_batch}" class="layui-input"></td>
+                        <td><input type="date" name="intime[]" class="layui-input a" value="<?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);} ?>"></td>
+                        <td><input type="text" name="storno[]" placeholder="请输入批次" value="{$v.product_batch}" class="layui-input a"></td>
                         <td><textarea name="content[]" class="layui-textarea">{$v.content}</textarea></td>
                         <td>
                             <div class="groos"><input type="hidden" class="groos" name="Grossweight[]" value="{$v.Grossweight}" readonly></div>
@@ -151,6 +152,10 @@
                     {/volist}
                 </tbody>
             </table>
+            <div>
+                <span style="margin:0 40px">总数量:{$num}</span>
+                <span>总吨数:{$z}</span>
+            </div>
             <div class="btn">
                 <button class="layui-btn submit" lay-submit lay-filter="formDemo" id="del">保存</button>
                 <a class="layui-btn" href="{:url('Rukuorder/to_examine')}">返回</a>
@@ -197,10 +202,10 @@
                             </td>
                             <td class="huowei"><select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select></td>
                             <td>
-                                <input type="number" value="0" class="countnum layui-input" id="blur" name="nums[]">
+                                <input type="number" value="0" class="countnum layui-input a" id="blur" name="nums[]">
                             </td>
-                            <td><input type="date" name="intime[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd"></td>
-                            <td><input type="text" name="storno[]" class="layui-input" placeholder="请输入批次"></td>
+                            <td><input type="date" name="intime[]" id="" class="layui-input indate a" placeholder="yyyy-MM-dd"></td>
+                            <td><input type="text" name="storno[]" class="layui-input a" placeholder="请输入批次"></td>
                             <td><textarea name="content[]" class="layui-textarea"></textarea></td>
                             <td>
                                 <input type="hidden"class="groos" name="Grossweight[]" value="0" readonly>
@@ -215,9 +220,6 @@
                                 ${child[13].innerText}
                             </td>
                             <td width="95px;">
-                                <button type="button" class="layui-btn layui-btn-sm add">
-                                    <i class="layui-icon">&#xe654;</i>
-                                </button>
                                 <button type="button" class="layui-btn layui-btn-sm remove">
                                     <i class="layui-icon">&#xe640;</i>
                                 </button>
@@ -261,9 +263,23 @@
         p.remove();
     })
 
-    // 点击提交后删除session
+    //生成时删除sessionstorage
     $('#del').on('click', function () {
-        sessionStorage.removeItem('session')
+        let that = $(this);
+        let status = [];
+        $('.tbd ').find('.status select').each(function () {
+            status.push($(this).val());
+        })
+        let result = status.every(function (val) {
+            return val != '0';
+        })
+        if (!result){
+            layer.alert('请确定产品属性是否选择完毕',{icon:5});
+            return false;
+        }else {
+            that.prop('type','submit');
+            sessionStorage.removeItem('session');
+        }
     })
 
     // 修改商品数量
@@ -278,7 +294,6 @@
             url:'/index/Rukuorder/blur',
             data:{'min':min,'max':max,'groos_min':gross_min},
             success:function (data) {
-                console.log(data)
                 parent.find('.num').next().text(data.number)
                 parent.find('.groos').next().text(data.groos)
                 parent.find('.groos').val(data.groos)

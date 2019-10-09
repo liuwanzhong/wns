@@ -191,7 +191,7 @@ class Cwmanagement extends Controller {
         $data['transfers_into_time'] = strtotime($data['transfers_into_time']);
         $data['delivery_time'] = strtotime($data['delivery_time']);
         $data['production_time'] = strtotime($data['production_time']);
-        unset($data['/index/cwmanagement/record_update_html']);
+        array_shift($data);
         $r = db('cw_management') -> where('id', $id) -> update($data);
         if ($r) {
             return redirect('cwmanagement/index');

@@ -20,7 +20,7 @@
         <span class="layui-breadcrumb">
             <a href="/public/main.html" target="box">首页</a>
             <a href="javascript:;">入库管理</a>
-            <a><cite>入库台账详情</cite></a>
+            <a><cite>出库台账详情</cite></a>
         </span>
     </div>
     <div class="container">
@@ -36,6 +36,12 @@
                     <label class="layui-form-label">发货日期:</label>
                     <div class="layui-input-inline">
                         <input type="text" name="userintime" value="<?php if(!empty($rows['delivery_time'])){echo date('Y-m-d',$rows['delivery_time']);}?>" autocomplete="off" class="layui-input" id="time" readonly>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">出库日期:</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="userintime" value="<?php if(!empty($rows['ck_time'])){echo date('Y-m-d',$rows['ck_time']);}?>" autocomplete="off" class="layui-input" readonly>
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -98,6 +104,7 @@
                     <th>产品名称</th>
                     <th>出库货位</th>
                     <th>实发数量</th>
+                    <th>货位剩余数量</th>
                     <th>产品日期</th>
                     <th>产品批次</th>
                     <th>备注</th>
@@ -122,6 +129,9 @@
                     <td>
                             {$v.ck_nums}
                     </td>
+                    <td>
+                        {$v.sy_count}
+                    </td>
                     <td><?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);}?></td>
                     <td>{$v.product_batch}</td>
                     <td>{$v.content}</td>
@@ -135,6 +145,8 @@
                 {/volist}
             </tbody>
         </table>
+        <span style="margin:0 40px">总数:{$num}</span>
+        <span>总吨数:{$z}吨</span>
         <div class="btn">
             <a class="layui-btn" href="{:url('Outbound/warehousing')}">返回</a>
         </div>

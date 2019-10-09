@@ -43,9 +43,9 @@
                 <thead>
                     <tr>
                         <th>产品名称</th>
-                        <th>产品日期</th>
                         <th>调拨日期</th>
                         <th>调出货位</th>
+                        <th>产品日期</th>
                         <th>调出货位产品数量</th>
                         <th>调拨数量</th>
                         <th>调入货位</th>
@@ -62,16 +62,17 @@
                             </select>
                         </td>
                         <td class="jin">
-                            <input type="date" value="" name="c_time" class="layui-input">
-                        </td>
-                        <td class="jin">
                             <input type="date" value="" name="d_time" class="layui-input">
                         </td>
                         <td class="huowei">
                             <botton class="layui-btn layui-btn-sm dia">点击</botton>
                         </td>
+                        <td class="c_time">
+                            <input type="hidden" value="" name="c_time" class="layui-input">
+                            <span></span>
+                        </td>
                         <td class="count">
-                            <input type="hidden" value="huowei_out" name="huowei_out" readonly>
+                            <input type="hidden" value="" name="huowei_out" readonly>
                             <span>0</span>
                         </td>
                         <td class="jin">
@@ -81,7 +82,7 @@
                             <botton class="layui-btn layui-btn-sm dia_r">点击</botton>
                         </td>
                         <td class="count_ss">
-                            <input type="hidden" value="huowei_out_ss" name="huowei_out_ss" readonly>
+                            <input type="hidden" value="" name="huowei_out_ss" readonly>
                             <span>0</span>
                         </td>
                 </tr>
@@ -110,7 +111,7 @@
             </thead>
             <tbody class="kc_list"></tbody>
         </table>
-        <button class="layui-btn sure" style="margin-top: 20px;">确定</button>
+        <button class="layui-btn sure" style="margin:20px auto 100px;">确定</button>
     </div>
 
 </div>
@@ -120,7 +121,7 @@
         <span>调拨入库</span>
         <a href="javascript:" class="close2">×</a>
     </div>
-    <div class="content" style="height: 100%;overflow-x: hidden;">
+    <div class="content"  style="height: calc(100% - 50px);overflow-x: hidden;box-sizing: border-box;">
         <table class="layui-table layui-form">
             <thead>
             <tr>
@@ -219,15 +220,16 @@
             let che = $('.kc_list').find('input:radio:checked')[0];
             let tr = $(che).parents('tr');
             let id = tr.find('#id').val();
+            let time = tr.find('td:eq(2)').text();
             $.ajax({
                 url:'/index/Instor/houwei_cd',
                 data:{id},
                 success:function (d) {
-                    console.log(d)
                     // let coun = d.rk_nums;
                     par.find('.count').find('span').text(d.rk_nums);
                     par.find('.count').find('input').val(d.rk_nums);
-                    // // par.find('.rukuform_xq_id').val(id);
+                    par.find('.c_time').find('input').val(time);
+                    par.find('.c_time').find('span').text(time);
                     par.find('.huowei').html(`<input type="hidden" value="${d.id}" name="rk_id" readonly><span>${d.name}</span>`);
                     $('#r_id').val(d.id)
                 }
@@ -278,11 +280,6 @@
             let che = $('.kc_list2').find('input:radio:checked')[0];
             let tr = $(che).parents('tr');
             let id = tr.find('#id').val();
-            let m = tr.find('#m').val();
-            let j = tr.find('#j').val();
-            let num = tr.find('input[type=text]').val();
-            let allcount = $('.all_count').text();
-            let allweight = $('.all_weight').text();
             $.ajax({
                 url:'/index/Instor/houwei_cd',
                 data:{id},
@@ -290,21 +287,8 @@
                     let count = d.rk_nums == undefined ? 0 : d.rk_nums;
                     par2.find('.count_ss').find('span').text(count);
                     par2.find('.count_ss').find('input').val(count);
-                    // par.find('.rukuform_xq_id').val(id);
                     par2.find('.huowei_r').html(`<input type="hidden" value="${d.id}" name="huowei_name" readonly><span>${d.name}</span>`);
-                    // par.find('.count').find('span').text(num);
-                    // par.find('.count').find('input').val(num);
-                    // par.find('.jin').find('span').text(d.m);
-                    // par.find('.jin').find('input').val(d.m);
-                    // par.find('.sy_count').find('span').text(d.sy);
-                    // par.find('.sy_count').find('input').val(d.sy);
-                    // let count = Number(allcount) + Number(num);
-                    // let weight = [(Number(allweight) + Number(d.m))*1000]/1000;
-                    // let we=Math.round(weight*1000)/1000;
-                    // $('.all_count').text(count);
-                    // $('.all_weight').text(we);
-                    // $('input[name=all_count]').val(count);
-                    // $('input[name=all_weight]').val(we);
+
                 }
             })
         })
@@ -343,13 +327,6 @@
             data:{id,num}
         })
         p.remove();
-        //     let id=p.find('.rukuform_xq_id').val();
-        // let num=p.find('.count').find('input').val();
-        // p.remove();
-        // $.ajax({
-        //     url:'/index/Table/huifu',
-        //     data:{id,num}
-        // })
     })
 
     $('.close').on('click', function(){

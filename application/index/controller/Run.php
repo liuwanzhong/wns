@@ -83,12 +83,14 @@ class Run extends Controller {
 
     //货位列表
     public function cabinet() {
+        $warehouse=self::$stafss['warehouse'];
         $rows=db('cabinet')
             ->where('cabinet.is_del',1)
             ->join('warehouse','cabinet.warehouse_id=warehouse.id')
+            ->where('warehouse.id','in',$warehouse)
             ->field('cabinet.*,warehouse.name as w_name')
             ->paginate(100);
-        $ware=db('warehouse')->where('is_del',1)->select();
+        $ware=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         return view('cabinet',['rows'=>$rows,'ware'=>$ware]);
     }
     //添加货位
@@ -291,11 +293,6 @@ class Run extends Controller {
             $this->error("删除失败");
         }
     }
-
-    
-
-
-
     //导入
     public function upload_excel() {
         $ms = $this -> qx();
@@ -338,6 +335,131 @@ class Run extends Controller {
             return redirect('goods_name');
         } else {
             $this -> error('添加失败');
+        }
+    }
+
+
+
+
+
+    /**
+     * 托盘管理
+     */
+    public function tray(){
+        static $md;
+        $warehouse=self::$stafss['warehouse'];
+        $search = '';
+        $data=input();
+        if(!empty($data['name'])){
+            $name=$data['name'];
+            $search = 'name like ' . "'%" . $name . '%' . "'";
+        }else{
+            $name='';
+        }
+        if(!empty($data['tp_num'])){
+            $tp_num=$data['tp_num'];
+            if (!empty($search)) {
+                $search .= ' and tp_num like ' . "'%" . $tp_num . '%' . "'";
+            }else{
+                $search = 'tp_num like ' . "'%" . $tp_num . '%' . "'";
+            }
+        }else{
+            $tp_num='';
+        }
+        $rows=db('tray')
+            ->join('warehouse','warehouse.id=tray.warehouse_id','left')
+            ->where('warehouse.id','in',$warehouse)
+            ->where('tray.is_del',0)
+            ->where($search)
+            ->field('tray.*,warehouse.name')
+            ->paginate(100,false,['query'=>['name'=>$name,'tp_num'=>$tp_num]]);
+        $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
+        return view('tray',['cks'=>$cks,'rows'=>$rows,'tp_num'=>$tp_num,'name'=>$name]);
+    }
+    /**
+     * 托盘详细
+     */
+    public function tray_xx(){
+        $id=$_POST['id'];
+        $row=db('tray')
+        ->join('warehouse','warehouse.id=tray.warehouse_id','left')
+        ->where('tray.warehouse_id = warehouse.id')
+        ->where('tray.id',$id)
+        ->where('tray.is_del',0)
+        ->field('tray.*,warehouse.name')
+        ->select();
+        return $row[0];
+    }
+    /**
+     * 清空托盘
+     */
+    public function clean(){
+        $id=$_POST['id'];
+        $res=db('tray')
+        ->where('id',$id)
+        ->update([
+            'batch'=>'',
+            'state'=>0,
+            'num'=>'',
+            'goods_name'=>''
+        ]);
+        if($res){
+            return 1;
+        }
+    }
+    /**
+     * 新增托盘 二维码
+     */
+    public function tray_add(){
+        $data=input();
+
+        if(!empty($data['tp_num'])&&!empty($data['warehouse_id'])){
+            $res=db('tray')
+            ->where('tp_num',$data['tp_num'])
+            ->select();
+            if($res){
+                $this -> error('编号重复');
+                exit;
+            }
+            $text='/index/Batch/batch?tp_num='.$data['tp_num'];      // 生成的二维码 内容
+            $outfile = ROOT_PATH.'public\\trayimg\\'.$data['tp_num'].'.png';     // 生成的二维码 文件名，false为 不保存
+            $level = 'QR_ECLEVEL_L';         //级别,也是容错率。下面会有介绍
+            $size = 10;                      //大小
+            $margin = 4;                     //外边距
+            $saveandprint=true;              //是否 保存和打印。true为保存并打印
+            //不带LOGO
+            Vendor('phpqrcode.phpqrcode');
+            //生成二维码图片
+            $object = new \QRcode();
+            $object->png($text, $outfile, $level, $size,$margin, $saveandprint);
+            $path='../../trayimg\\'.$data['tp_num'].'.png';
+            $res=db('tray')
+            ->insert([
+                'tp_num'=>$data['tp_num'],
+                'warehouse_id'=>$data['warehouse_id'],
+                'create_time'=>time(),
+                'pic'=>$outfile,
+                'path'=>$path
+            ]);
+            return redirect('tray');
+        }else{
+            $this -> error('请填写完整数据');
+        }
+    }
+    public function tray_del(){
+        $id=$_POST['id'];
+        dump($id);
+        $row=db('tray')
+        ->where('tray.id',$id)
+        ->where('tray.is_del',0)
+        ->update([
+            'is_del'=>1,
+            'del_time'=>time()
+        ]);
+        if($row){
+            return 1;
+        }else{
+            return 0;
         }
     }
 }

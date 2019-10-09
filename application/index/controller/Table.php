@@ -23,6 +23,7 @@ class Table extends Controller {
     public function houwei_ck() {
         $sy=isset($_POST['sy']) ? $_POST['sy'] : 0;
         $id=input('id');
+        $ne=input('ne');
         static $md=[];
         $ck=db('cabinet')
         ->where('warehouse_id',$id)
@@ -30,6 +31,7 @@ class Table extends Controller {
         ->select();
         foreach ($ck as $c) {
             $rukuform=db('rukuform_xq')
+                ->where("rukuform_xq.product_name like '%$ne%'")
                 ->where('rukuform_xq.state',1)
                 ->where('rukuform_xq.is_del',0)
                 ->where('rukuform_xq.sy_count>=1')
@@ -47,6 +49,7 @@ class Table extends Controller {
             $md[$k]['j']=$row['netweight']/$row['rk_nums'];
             $md[$k]['sy']=$row['rk_nums']-$sy;
             $md[$k]['c_id']=$row['c_id'];
+            $md[$k]['product_time']=date('Y-m-d',$row['product_time']);
         }
         return $md;
     }
@@ -58,6 +61,10 @@ class Table extends Controller {
         db('rukuform_xq')->where('id',$data['id'])->update(['sy_count'=>$row['sy_count']-$data['count']]);
         $row=db('rukuform_xq')->where('id',$data['id'])->find();
         $mj['sy']=$row['sy_count'];
+
+        $row=db('rukuform_xq')->where('id',$data['id'])->find();
+        $row['product_time']=date('Y-m-d',$row['product_time']);
+        $mj['row']=$row;
         return $mj;
     }
     public function huifu() {

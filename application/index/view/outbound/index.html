@@ -4,7 +4,7 @@
 		<meta charset="utf-8"/>
 		<title>后台管理系统</title>
 		<link rel="stylesheet" href="/images/css.css">
-<!--        <link rel="stylesheet" href="/images/boot.css">-->
+        <link rel="stylesheet" href="/images/boot.css">
         <link href="/images/index.css" type="text/css" rel="stylesheet"/>
         <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
         <style>
@@ -18,7 +18,16 @@
             .model_edit .content::-webkit-scrollbar{
                 display: none;
             }
-
+            .cf{
+                overflow: hidden;
+            }
+            .cf .content{
+                height: calc(100% - 100px);
+                overflow-x: hidden;
+            }
+            .cf .content::-webkit-scrollbar{
+                display: none;
+            }
         </style>
 	</head>
 	<body>
@@ -33,6 +42,7 @@
             <div class="handle">
                 <button type="button" class="layui-btn" id="dialog">导入excel表</button>
                 <button type="button" class="layui-btn" id="outorder">生成出库单</button>
+                <a href="#" class="layui-btn" id="dc">导出</a>
             </div>
             <main class="bd_content">
                 <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
@@ -66,6 +76,7 @@
                             <td>{$r.detailed}</td>
                             <td>
                                 <a href="#" class="img_edit" title="详细" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
+                                <a href="#" class="chaifen" title="拆分" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
                             </td>
                         </tr>
                         {/volist}
@@ -158,14 +169,38 @@
                 </form>
             </div>
         </div>
+        <!-- 拆分 -->
+        <div class="cf">
+            <div class="head">
+                <span>拆分商品</span>
+                <a href="javascript:" class="close_cf">×</a>
+            </div>
+            <div class="contents">
+                <form action="{:url('Outbound/chaifen')}" method="post" enctype="multipart/form-data">
+                    <div class="wrap">
+                        <label>总数</label>
+                        <input type="text" id="cf_nums" name="num" value="" readonly/>
+                    </div>
+                    <div class="wrap">
+                        <label>拆分数量</label>
+                        <input type="text" id="cf_num" name="detailed[]" value="" />
+                        <input type="text" id="cf_num" name="detailed[]" value="" />
+                        <input type="text" id="cf_num" name="detailed[]" value="" />
+                    </div>
+                    <div class="wrap btn">
+                        <input type="submit" class="save" id="btn_update" value="修改"/>
+                    </div>
+                </form>
+            </div>
+        </div>
         <script src="/static/jquery-1.9.1.min.js"></script>
         <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
         <script src="/layui/layui.js"></script>
         <script type="text/javascript">
             layui.use('element', function () {
-                
+
             })
-            
+
             //导入excel表
 			$('#dialog').on('click', function(){
 				$('.model').show();
@@ -177,9 +212,18 @@
 			$('.img_edit').on('click', function(){
 				$('.model_edit').show();
 			})
+            //拆分
+            $('.chaifen').on('click', function(){
+				$('.cf').show();
+			})
+            // 关闭
             $('.close_edit').on('click', function(){
 				$('.model_edit').hide();
 			})
+            $('.close_cf').on('click', function(){
+				$('.cf').hide();
+			})
+            // 点击详细
             $('.img_edit').click(function(){
 				let val = $(this).parents('tr').find('input[type=hidden]').val();
                 // alert(val);exit;
@@ -205,7 +249,18 @@
 					}
 				})
             })
-
+            // 点击拆分
+            $('.chaifen').click(function(){
+				let val = $(this).parents('tr').find('input[type=hidden]').val();
+				$.ajax({
+					url:'/index/Outbound/cf_edit',
+					type:'post',
+					data:{'id':val},
+					success:function(data){
+						$('#cf_nums').val(data.Delivery_num)
+					}
+				})
+            })
             //全选或全不选
             $("#all").click(function(){
                 let arr = [];
@@ -227,8 +282,6 @@
                 var orders = sessionStorage.getItem('out_session');
                 location.href = "/index/Outbound/make_outbound_order/id/"+orders;
             })
-
-
 
             let out_session=[];
             $('.tbd').on('click','input[type=checkbox]',function () {
@@ -276,6 +329,30 @@
                 }
             },'json')
         })
+            $('#dc').on('click', function() {
+                var data = sessionStorage.out_session;
+                console.log(data)
+                if(data !=  undefined || data != null){
+                    var params = {id: data};
+                    $.post("{:url('Outbound/outExcel')}", params, function (res) {
+                        if(res.error==0){
+                            alert(res.msg);
+                            return false;
+                        }
+                        if (res.status) {
+                            window.location.href = ("{:Url('index/Outbound/download')}?file=" + res.url);
+                        } else {
+                            layer.msg('系统错误，操作失败');
+                        }
+                    }, 'json')
+                }
+                else {
+                    layer.alert('请选择需要导出的数据',{icon:5})
+                    return false;
+                }
+            })
+
+
         </script>
 	</body>
 </html>

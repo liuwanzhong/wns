@@ -71,6 +71,14 @@
 						</div>
 					</div>
 					<div class="layui-form-item">
+						<label class="layui-form-label">地区：</label>
+						<div class="layui-input-block addr">
+							{volist name='warehouse' id='w'}
+							<input type="checkbox" name="warehouse[]" value="{$w.id}" lay-skin="primary" title="{$w.name}">
+							{/volist}
+						</div>
+					</div>
+					<div class="layui-form-item">
 						<label class="layui-form-label">员工权限：</label>
 						<div class="layui-input-block">
 							<div class="d" id="a">
@@ -116,13 +124,20 @@
 
 		<script>
 			let check_all=[];
-
+			let addr_check = [];
 			// 点击提交
 			$('#btn').click(function () {
-				var s=$("input:checkbox:checked");
+				var s=$(".d input:checkbox:checked");
 				for (let i in s) {
 					if(s[i].checked){
 						check_all.push(s[i].value);
+					}
+				}
+
+				let addr = $(".addr input:checkbox:checked");
+				for (let j in addr) {
+					if(addr[j].checked){
+						addr_check.push(addr[j].value);
 					}
 				}
 				let staffs_number=$('#staffs_number').val();
@@ -141,9 +156,8 @@
 				$.ajax({
 					url:"/index/Staffs/staffs_insert",
 					type:"post",
-					data:{"obj":check_all,"staffs_number":staffs_number,"staffs_name":staffs_name,"password":password,"tel":tel,"qq":qq,"email":email,"department_id":department_id},
+					data:{"obj":check_all,"staffs_number":staffs_number,"staffs_name":staffs_name,"password":password,"tel":tel,"qq":qq,"email":email,"department_id":department_id,'addr':addr_check},
 					success:function (data) {
-						console.log(data)
 						if(data.error==1){
 							layer.alert(data.ts, {
 								icon: 6,

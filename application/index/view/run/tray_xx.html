@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta charset="UTF-8">
+		<title>后台管理系统</title>
+        <link rel="stylesheet" href="/images/boot.css">
+        <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+        <link rel="stylesheet" href="/images/css.css">
+        <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+        <style>
+            .search{margin-top: 20px;margin-left: 30px;}
+            .search .layui-form-label{width: auto;}
+        </style>
+	</head>
+	<body>
+		<div class="note">
+            <div class="nav">
+				<span class="layui-breadcrumb">
+					<a href="/public/main.html" target="box">首页</a>
+					<a href="javascript:;">在库管理</a>
+					<a><cite>托盘管理</cite></a>
+				</span>
+            </div>
+            <div class="form_box layui-form">
+                <div class="layui-form-item">
+                    <button class="layui-btn add" lay-submit>添加托盘</button>
+                </div>
+            </div>
+            <main class="bd_content">
+                <table class="layui-table new_list" style="width: 96%;margin: 12px auto;">
+                    <thead>
+                    <tr>
+                        <th>仓库</th>
+                        <th>托盘编号</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody class="tbd">
+                        {volist name='res' id='r'}
+                        <th>{$r['name']}</th>
+                        <th>{$r['tp_num']}</th>
+                        <th>
+                            <a href="{:url('Run/tray_xx',['id'=>$r.id])}">详细</a>
+                            <a href="{:url('Run/tray_del',['id'=>$r.id])}">删除</a>
+                        </th>
+                        {/volist}
+                    </tbody>
+                </table>
+                <div style="text-align:center; margin-bottom: 200px;">
+                </div>
+            </main>
+        </div>
+        <script src="/static/jquery-1.9.1.min.js"></script>
+        <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+        <script src="/layui/layui.js"></script>
+        <script type="text/javascript">
+
+        layui.use(['element','form'], function(){
+            let form = layui.form;
+        })
+        $('.add').on('click',  function (){
+             let id = $('#table').val();
+             console.log(id);
+                if(id == 0){
+                    layer.alert('请选择仓库',{icon:5});
+                    return false;
+                }else{
+                    window.location.href="/index/Run/tray_add?id="+id;
+                }
+        })
+        </script>
+	</body>
+</html>

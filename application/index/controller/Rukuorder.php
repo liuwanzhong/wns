@@ -5,10 +5,14 @@ namespace app\index\controller;
 
 use think\Controller;
 use think\Db;
+use think\Session;
 
 class Rukuorder extends Controller {
     //添加入库订单列表
     public function index(){
+        $warehouse=self::$stafss['warehouse'];
+        $num=0;
+        $z=0;
         $ms=$this->qx();
         if($ms==0){
             $this->error('警告:越权操作');
@@ -22,7 +26,7 @@ class Rukuorder extends Controller {
         //入库状态
         $status = db('kc_status')->where('is_del',0)->select();
         //仓库列表
-        $cks = db('warehouse')->where('is_del',1)->select();
+        $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         $cd=str_replace(array("\",\""),",",$cd);
         $cd=str_replace(array("[\""),"",$cd);
         $cd=str_replace(array("\"]"),"",$cd);
@@ -35,7 +39,11 @@ class Rukuorder extends Controller {
                 $rows[$k]['j']=$row['netweight'];
             }
         }
-        return view('index',['rows'=>$rows,'status'=>$status,'cks'=>$cks,'id'=>$cd]);
+        foreach ($rows as $row) {
+            $num+=$row['countnum'];
+            $z+=$row['netweight'];
+        }
+        return view('index',['rows'=>$rows,'status'=>$status,'cks'=>$cks,'id'=>$cd,'num'=>$num,'z'=>$z]);
     }
     //货位
     public function show($id){
@@ -67,7 +75,11 @@ class Rukuorder extends Controller {
     }
     //添加入库订单
     public function insert(){
+        Db::startTrans();
         $data = input();
+        if(empty($data['ck_id'])){
+            $this->error('请选择入库仓库');
+        }
         $userintime=strtotime($data['userintime']);
         try{
             $id = db('rukuform')->insertGetId(['shipmentnum'=>$data['shipmentnum'],'userintime'=>$userintime,'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id']]);
@@ -96,11 +108,12 @@ class Rukuorder extends Controller {
             // 回滚事务
             Db::rollback();
         }
-        $this->success('生成订单成功','index');
+        $this->success('生成订单成功','to_examine');
     }
 
     //入库计划
     public function to_examine() {
+        $warehouse=self::$stafss['warehouse'];
         $s_transfers_id=input('s_transfers_id');//工厂
         $s_delivery_time=input('s_delivery_time');//时间
         $s_material_name=input('s_material_name');//单号
@@ -136,15 +149,20 @@ class Rukuorder extends Controller {
             ->join('warehouse','rukuform.ck_id=warehouse.id','left')
             ->join('rukuform_xq','rukuform.id=rukuform_xq.rukuid','left')
             ->where('rukuform.is_del',0)
-            ->where('rukuform.state',0)
-            ->group('rukuform_xq.factory,rukuform_xq.rukuid')
+            ->where('warehouse.id','in',$warehouse)
+            ->where('rukuform_xq.state',0)
+            ->group('rukuform_xq.rukuid')
             ->where($search)
             ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
             ->paginate(20,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         return view('to_examine',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
+    //rukuform_xq.factory,
     //订单详情
     public function to_examine_show($id) {
+        $warehouse=self::$stafss['warehouse'];
+        $num=0;
+        $z=0;
         $ms=$this->qx();
         if($ms==0){
             $this->error('警告:越权操作');
@@ -161,17 +179,18 @@ class Rukuorder extends Controller {
             ->join('kc_status','kc_status.id=rukuform_xq.rk_status_id','left')
             ->field('rukuform_xq.*,kc_status.title as w_name,cabinet.name as c_name')
             ->select();
-        $cks = db('warehouse')->where('is_del',1)->select();
+        $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         $status=db('kc_status')->where('is_del',0)->select();
         $cabinet=db('cabinet')->where('is_del',1)->select();
-//        if(!empty($rows['userintime'])){
-//            $rows['userintime']=date("Y-m-d",$rows['userintime']);
-//        }
         foreach ($cats as $k=>$row) {
             $cats[$k]['m']=$row['Grossweight']/$row['rk_nums'];
             $cats[$k]['j']=$row['netweight']/$row['rk_nums'];
         }
-        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'status'=>$status,'cks'=>$cks,'cabinet'=>$cabinet]);
+        foreach ($cats as $row) {
+            $num+=$row['rk_nums'];
+            $z+=$row['netweight'];
+        }
+        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'status'=>$status,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num,'z'=>$z]);
     }
     //修改订单
     public function to_examine_up() {
@@ -213,6 +232,7 @@ class Rukuorder extends Controller {
     }
     //审核
     public function to_examine_yes() {
+        Db::startTrans();
         $ms=$this->qx();
         if($ms==0){
             $this->error('警告：越权操作');
@@ -224,23 +244,24 @@ class Rukuorder extends Controller {
             $this->error('缺少必要参数,请重试');
         }
         $s=db('rukuform_xq')
+            ->where('rukuid',$id)
+            ->select();
+        foreach ($s as $v) {
+            if($v['rk_huowei_id']==0 || $v['product_time']==''){
+                $this->error('请完善信息');
+            }
+        }
+        try{
+            $s=db('rukuform_xq')
                 ->where('rukuid',$id)
                 ->select();
-        foreach ($s as $c){
-            $jc='';
-            $a=db('record')->where('huowei',$c['rk_huowei_id'])->order('id desc')->limit(1)->select();
-            db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$c['transfers_id'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums'],'huowei'=>$c['rk_huowei_id']]);
-        }
-
-
-
-        try{
+            foreach ($s as $c){
+                $a=db('record')->where('huowei',$c['rk_huowei_id'])->order('id desc')->limit(1)->select();
+                $b=db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$c['transfers_id'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums'],'huowei'=>$c['rk_huowei_id']]);
+            }
             $r=db('rukuform')->where('id',$id)->update(['state'=>1]);
             $s=db('rukuform_xq')->where('rukuid',$id)->update(['state'=>1]);
-            if($r && $s) {
-
-
-                return redirect('to_examine');
+            if($r && $s && $b) {
                 Db::commit();
             }
         } catch (\Exception $e) {
@@ -248,6 +269,7 @@ class Rukuorder extends Controller {
             // 回滚事务
             Db::rollback();
         }
+        return redirect('to_examine');
     }
     //删除
     public function to_examine_del() {
@@ -271,6 +293,7 @@ class Rukuorder extends Controller {
 
     //入库台账
     public function warehousing() {
+        $warehouse=self::$stafss['warehouse'];
         $s_transfers_id=input('s_transfers_id');//工厂
         $s_delivery_time=input('s_delivery_time');//时间
         $s_material_name=input('s_material_name');//单号
@@ -306,17 +329,20 @@ class Rukuorder extends Controller {
             ->join('warehouse','rukuform.ck_id=warehouse.id','left')
             ->join('rukuform_xq','rukuform.id=rukuform_xq.rukuid','left')
             ->where('rukuform.is_del',0)
+            ->where('warehouse.id','in',$warehouse)
             ->where('rukuform.state',1)
-            ->group('rukuform_xq.factory,rukuform_xq.rukuid')
+            ->group('rukuform_xq.rukuid')
             ->where($search)
             ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count')
             ->where('rukuform_xq.rk_nums>0')
             ->paginate(20,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
-        // var_dump($rows);exit;
         return view('warehousing',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
     //订单详情
     public function warehousing_show($id) {
+        $num=0;
+        $mao=0;
+        $jing=0;
         $rows=db('rukuform')
             ->join('warehouse','rukuform.ck_id=warehouse.id')
             ->where('rukuform.is_del',0)
@@ -329,7 +355,12 @@ class Rukuorder extends Controller {
             ->join('kc_status','kc_status.id=rukuform_xq.rk_status_id')
             ->field('rukuform_xq.*,kc_status.title as w_name,cabinet.name as c_name')
             ->select();
-        return view('warehousing_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id]);
+        foreach ($cats as $cat) {
+            $num+=$cat['rk_nums'];
+            $mao+=$cat['Grossweight'];
+            $jing+=$cat['netweight'];
+        }
+        return view('warehousing_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'num'=>$num,'mao'=>$mao,'jing'=>$jing]);
     }
     //删除
     public function warehousing_del() {
@@ -351,6 +382,7 @@ class Rukuorder extends Controller {
 
     //入库明细
     public function detailed() {
+        $warehouse=self::$stafss['warehouse'];
         $s_transfers_id=input('s_transfers_id');//工厂
         $s_delivery_time=input('s_delivery_time');//时间
         $s_material_name=input('s_material_name');//产品属性
@@ -384,21 +416,41 @@ class Rukuorder extends Controller {
             }
             $search .= $material_name;
         }
-        $rows=db('rukuform_xq')
+        $row=db('rukuform_xq')
             ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id','left')
             ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
             ->join('rukuform','rukuform_xq.rukuid=rukuform.id','left')
             ->join('warehouse','rukuform.ck_id=warehouse.id','left')
             ->where('rukuform_xq.is_del',0)
+            ->where('rukuform_xq.qt_rk',0)
+            ->where('rukuform_xq.state',1)
+            ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
+            ->select();
+        $rows=db('rukuform_xq')
+            ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id','left')
+            ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
+            ->join('rukuform','rukuform_xq.rukuid=rukuform.id','left')
+            ->join('warehouse','rukuform.ck_id=warehouse.id','left')
+            ->where('warehouse.id','in',$warehouse)
+            ->where('rukuform_xq.is_del',0)
+            ->where('rukuform_xq.qt_rk',0)
             ->where('rukuform_xq.state',1)
             ->where("$search")
             ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
-            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+            ->paginate(10,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         //产品属性
         $status=db('kc_status')->where('is_del',0)->select();
 //        $a = $this->request->action();
 //        echo $a;exit;
-        return view('detailed',['rows'=>$rows,'status'=>$status,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
+        $sums=0;
+        $sum=0;
+        foreach($row as $v){
+            $sum += $v['rk_nums'];
+        }
+        foreach($rows as $v){
+            $sums += $v['rk_nums'];
+        }
+        return view('detailed',['rows'=>$rows,'status'=>$status,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'sum'=>$sum,'sums'=>$sums]);
     }
     //导出入库明细
     public function outExcel(){
@@ -442,7 +494,7 @@ class Rukuorder extends Controller {
                 $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['w_name']);
                 $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['c_name']);
                 $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, date('Y-m-d',$v['time']));
-                $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['product_time']);
+                $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, date('Y-m-d',$v['product_time']));
                 $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['rk_nums']);
                 $phpExcel->getActiveSheet()->setCellValue('I' . $rownum, $v['netweight']);
                 $phpExcel->getActiveSheet()->setCellValue('J' . $rownum, $v['Grossweight']);

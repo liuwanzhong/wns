@@ -73,7 +73,6 @@
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
                     <tr>
-                        <th>出库工厂</th>
                         <th>产品名称</th>
                         <th>产品属性</th>
                         <th>入库货位</th>
@@ -88,9 +87,6 @@
                 </thead>
                 <tbody class="tbd">
                     <tr>
-                        <td>
-                            <input type="text" value="" class="countnum layui-input" name="factory">
-                        </td>
                         <td>
                             <select class="product_name" lay-filter="product_name" name="customer" lay-search>
                                 <option value="">请选择产品名称</option>
@@ -108,7 +104,7 @@
                             </select>
                         </td>
                         <td class="huowei">
-                            <select name='rk_huowei_id' class='showhuowei' lay-search>
+                            <select name='rk_huowei_id' class='showhuowei' lay-search lay-filter="hh_w">
                                 <option value=''>请选择货位</option>
                             </select>
                         </td>
@@ -176,8 +172,31 @@
                     }
                 })
             }
-
         })
+
+        //入库货位时间
+        form.on('select(hh_w)', function(data){
+            let id = data.elem.value;
+            let pp = $(data.elem).parents('tr');
+            if(id != 0){
+                $.ajax({
+                    type: "get",//请求方式有post，get请求方式，这里是post请求
+                    url: '/index/Instor/huowei_w/id/' + id,//请求的方法的路径
+                    dataType: 'json',//请求参数的格式为json.另外还有text等
+                    success: function(data){
+                        if(data!=false){
+                            pp.find('input[name=product_time]').val(data.product_time)
+                            pp.find('input[name=product_time]').prop('readonly',true)
+                        }else{
+                            pp.find('input[name=product_time]').val(' ')
+                            pp.find('input[name=product_time]').prop('readonly',false)
+                        }
+                    }
+                })
+            }
+        })
+
+
 
         form.on('select(product_name)', function(data){
             let par = $(data.elem).parents('tr');
@@ -214,7 +233,7 @@
                     data:{'mao': mao, 'jing':jin, 'num':val},
                     dataType: 'json',//请求参数的格式为json.另外还有text等
                     success: function(data){
-                        console.log(data)
+                        console.log(mao,jin,val)
                         par.find(".mao input").val(data.mao);
                         par.find(".mao span").text(data.mao);
                         par.find(".jin input").val(data.jing);

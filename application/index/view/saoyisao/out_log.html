@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>新增权限</title>
+		<link rel="stylesheet" href="/images/boot.css">
+		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
+		<link rel="stylesheet" href="/images/css.css">
+		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+		<style type="text/css">
+			.layui-table th{text-align: center;font-weight: bold;}
+        	.layui-table td{text-align: center;}
+			label{box-sizing: content-box;}
+			.bd_content{height: 680px;}
+		</style>
+	<body>
+		<div class="note">
+			<div class="nav">
+				<span class="layui-breadcrumb">
+					<a href="/public/main.html" target="box">首页</a>
+					<a href="javascript:;">管理</a>
+					<a><cite>往期出库</cite></a>
+				</span>
+			</div>
+			<div class="search">
+                <form action="{:url('Saoyisao/out_log')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+					<div class="layui-form-item">
+						<label class="layui-form-label">仓库名称</label>
+						<div class="layui-input-inline">
+							<select name="name" id="">
+								<option value="0">全部</option>
+								{volist name='cks' id='w'}
+								<option value="{$w.name}" <?php if($name==$w['name']){echo 'selected';} ?>>{$w.name}</option>
+								{/volist}
+							</select>
+						</div>
+					</div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <button class="layui-btn save" lay-submit>查询</button>
+                        </div>
+                    </div>
+                 </form>
+            </div>
+			<div class="bd_content">
+				<table class="layui-table" style="width: 96%; margin: 12px auto;">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>出库仓库</th>
+						<th>售达方</th>
+						<th>客户名</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+					<tbody>
+                        {volist name='md' id='r'}
+                        <tr>
+                            <th>{$r.id}</th>
+                            <th>{$r.transport_id}</th>
+                            <th>{$r.delivery}</th>
+                            <th>{$r.delivery_name}</th>
+                            <th>
+								<a href="tray_log_xx?id={$r.id}" class="edit ks" title="">详细</a>
+								<a href="#" class="del" title="">删除</a>
+							</th>
+                        </tr>
+                        {/volist}
+                    </tbody>
+				</table>
+			</div>
+			<div style="text-align:center; margin-bottom: 200px;">
+				{$res->render()}
+			</div>
+		</div>
+
+		<script src="/static/jquery-1.9.1.min.js"></script>
+		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/layui/layui.js"></script>
+		<script>
+			layui.use(['element','laydate','form'], function(){
+				var laydate = layui.laydate;
+				var element = layui.element;
+				let form = layui.form;
+				laydate.render({
+					elem: '#s_delivery_time'
+					,range: '~'
+					,done: function(value){
+						$('#s_delivery_time').val(value)
+					}
+				});
+			})
+
+
+			$('.del').click(function () {
+				let id=$(this).parents('tr').find('th').eq(0).text();
+				let p = $(this).parents('tr');
+				console.log(id);
+				$.ajax({
+					url:'/index/Run/tray_del',
+					type:'post',
+					data:{"id":id},
+					success:function (data) {
+						if(data){
+							p.remove();
+						}else{
+							alert('删除失败')
+						}
+					}
+				})
+			})
+		</script>
+	</body>
+</html>

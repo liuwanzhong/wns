@@ -137,7 +137,7 @@
                             <span>0</span>
                         </td>
                         <td>
-                            <input type="date" name="product_time[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd">
+                            <input type="date" name="product_time[]" id="" class="layui-input indate" placeholder="yyyy-MM-dd" readonly>
                         </td>
                         <td>
                             <input type="text" value="" name="product_batch[]" class="layui-input" >
@@ -154,17 +154,6 @@
                 </tr>
                 </tbody>
             </table>
-            <div class="total">
-                <input type="hidden" name="all_count" value="">
-                <input type="hidden" name="all_weight" value="">
-                <p>合计数量：<span class="all_count">0</span></p>
-                <p>合计重量：<span class="all_weight">0</span></p>
-                <p>派车人签字：</p>
-            </div>
-            <div class="sign">
-                <span>保管签字：</span>
-                <span>司机确认：</span>
-            </div>
             <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
         </div>
     </form>
@@ -188,7 +177,7 @@
             </thead>
             <tbody class="kc_list"></tbody>
         </table>
-        <button class="layui-btn sure" style="margin-top: 20px;">确定</button>
+        <button class="layui-btn sure" style="margin: 20px auto 100px;">确定</button>
     </div>
 
 </div>
@@ -249,9 +238,6 @@
                 ${child[8].innerText}
             </td>
             <td>
-                <button type="button" class="layui-btn layui-btn-sm add">
-                    <i class="layui-icon">&#xe654;</i>
-                </button>
                 <button type="button" class="layui-btn layui-btn-sm remove ">
                     <i class="layui-icon">&#xe640;</i>
                 </button>
@@ -289,6 +275,7 @@
         let par = '';
         $('.tbd').on('click', '.dia', function () {
             let id = $('#table').val();
+            let ne = $(this).parents('tr').find('.status input').val();
             if(id == 0){
                 layer.alert('请选择仓库',{icon:5});
                 return false;
@@ -299,7 +286,7 @@
                 $('.model_table').show();
                 $.ajax({
                     url:'/index/Table/houwei_ck',
-                    data: {id},
+                    data: {id,ne},
                     success:function (data) {
                         let html = '';
                         for (let i =0; i<data.length; i++){
@@ -308,7 +295,6 @@
                             <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
                             <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
                             <input type="hidden" id="c_id" class="layui-input" value="${data[i].c_id}">
-
                             <td><input type="radio" name="sex" value="nan" title=""></td>
                             <td>${data[i].product_name}</td>
                             <td>${data[i].product_time}</td>
@@ -349,6 +335,7 @@
                     par.find('.jin').find('input').val(d.m);
                     par.find('.sy_count').find('span').text(d.sy);
                     par.find('.sy_count').find('input').val(d.sy);
+                    par.find('.indate').val(d.row.product_time);
                     let count = Number(allcount) + Number(num);
                     let weight = [(Number(allweight) + Number(d.m))*1000]/1000;
                     let we=Math.round(weight*1000)/1000;

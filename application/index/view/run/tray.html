@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>新增权限</title>
+		<link rel="stylesheet" href="/images/boot.css">
+		<link href="/images/index.css" type="text/css" rel="stylesheet"/>
+		<link rel="stylesheet" href="/images/css.css">
+		<link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+		<style type="text/css">
+			.layui-table th{text-align: center;font-weight: bold;}
+			.layui-table td{text-align: center;}
+			label{box-sizing: content-box;}
+			.bd_content{height:650px;}
+		</style>
+	<body>
+		<div class="note">
+			<div class="nav">
+				<span class="layui-breadcrumb">
+					<a href="/public/main.html" target="box">首页</a>
+					<a href="javascript:;">管理</a>
+					<a><cite>货位管理</cite></a>
+				</span>
+			</div>
+			<div class="search">
+                <form action="{:url('Run/tray')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">仓库</label>
+                        <div class="layui-input-inline">
+							<select name="name" id="">
+								<option value="0">全部</option>
+								{volist name='cks' id='ck'}
+								<option value="{$ck.name}">{$ck.name}</option>
+								{/volist}
+							</select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">托盘编号</label>
+                        <div class="layui-input-inline">
+                            <input type="text" class="layui-input" id="s_delivery_time" name="tp_num" autocomplete="off" placeholder="  " value="<?php if(!empty($tp_num)){echo $tp_num;}?>">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <button class="layui-btn save" lay-submit>查询</button>
+                        </div>
+                    </div>
+                 </form>
+            </div>
+			<div class="handle">
+				<button type="button" class="layui-btn" id="add">添加</button>
+			</div>
+			<div class="bd_content">
+				<table class="layui-table" style="width: 96%; margin: 12px auto 200px;">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>托盘编号</th>
+						<th>所属仓库</th>
+						<th>创建时间</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+					<tbody>
+                        {volist name='rows' id='row'}
+                        <tr>
+                            <th>{$row.id}</th>
+                            <th>{$row.tp_num}</th>
+                            <th>{$row.name}</th>
+                            <th><?php if(!empty($row['create_time'])){echo date('Y-m-d',$row['create_time']);}?></th>
+                            <th>
+								<a href="#" class="edit ks" title="">详细</a>
+								<a href="#" class="del" title="">删除</a>
+							</th>
+                        </tr>
+                        {/volist}
+                    </tbody>
+				</table>
+
+				<div style="text-align:center; margin-bottom: 200px;">
+					{$rows->render()}
+				</div>
+			</div>
+		<!--添加-->
+		</div>
+		<div class="model">
+			<div class="head">
+				<span>添加</span>
+				<a href="javascript:" class="close">×</a>
+			</div>
+			<div class="content">
+				<form action="{:url('Run/tray_add')}" method="post">
+					<div class="wrap">
+						<label>托盘编号:</label>
+						<input type="text" name="tp_num" value="" required oninput="setCustomValidity('')" placeholder='请不要重复'/>
+					</div>
+					<div class="wrap">
+						<label>所属仓库:</label>
+						<select name="warehouse_id">
+							<option value="0">---请选择所属仓库---</option>
+							{volist name='cks' id='c'}
+							<option value="{$c['id']}">{$c['name']}</option>
+							{/volist}
+						</select>
+					</div>
+					<div class="wrap btn">
+						<input type="submit" class="save" value="确定"/>
+						<input type="reset" class="reset" value="重置"/>
+					</div>
+				</form>
+			</div>
+		</div>
+		<!--修改-->
+		<div class="model_edit">
+			<div class="head">
+				<span>详细</span>
+				<a href="javascript:" class="close_edit">×</a>
+			</div>
+			<div class="content">
+				<form action="{:url('Run/cabinet_edit')}" method="post">
+					<input type="hidden" name="id" id="id">
+					<div class="wrap">
+						<label>托盘编号:</label>
+						<input type="text" name="tp_num" id="tp_num" value="" required oninput="setCustomValidity('')" readonly/>
+					</div>
+					<div class="wrap">
+						<label>所属仓库:</label>
+						<input type="text" name="name" id="name" value="" required oninput="setCustomValidity('')" readonly/>
+					</div>
+					<div class="wrap">
+						<label>二维码</label>
+						<img id="path" src="" alt="">
+					</div>
+					<div class="wrap btn">
+						<input type="submit" class="save" value="确定"/>
+						<input type="reset" class="reset" value="重置"/>
+					</div>
+				</form>
+			</div>
+		</div>
+		<script src="/static/jquery-1.9.1.min.js"></script>
+		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/layui/layui.js"></script>
+		<script>
+			layui.use(['element','laydate','form'], function(){
+				var laydate = layui.laydate;
+				var element = layui.element;
+				let form = layui.form;
+				laydate.render({
+					elem: '#s_delivery_time'
+					,range: '~'
+					,done: function(value){
+						$('#s_delivery_time').val(value)
+					}
+				});
+			})
+		</script>
+
+		<script type="text/javascript">
+			//添加
+			$('#add').on('click', function(){
+				$('.model').show();
+			})
+			$('.close').on('click', function(){
+				$('.model').hide();
+			})
+
+			//删除
+			$('.edit').on('click', function(){
+				$('.model_edit').show();
+			})
+			$('.close_edit').on('click', function(){
+				$('.model_edit').hide();
+			})
+
+			//查看数据
+			$('.ks').click(function () {
+				let id=$(this).parents('tr').find('th').eq(0).text();
+				console.log(id);
+				$.ajax({
+					url:'/index/Run/tray_xx',
+					type:'post',
+					data:{"id":id},
+					success:function (data) {
+						var path =data.path
+						$('#tp_num').val(data.tp_num)
+						$('#name').val(data.name)
+						$('#path').attr('src',path)
+					}
+				})
+			})
+			$('.del').click(function () {
+				let id=$(this).parents('tr').find('th').eq(0).text();
+				let p = $(this).parents('tr');
+				console.log(id);
+				$.ajax({
+					url:'/index/Run/tray_del',
+					type:'post',
+					data:{"id":id},
+					success:function (data) {
+						if(data){
+							p.remove();
+						}else{
+							alert('删除失败')
+						}
+					}
+				})
+			})
+		</script>
+	</body>
+</html>

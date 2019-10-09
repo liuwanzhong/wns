@@ -141,9 +141,12 @@
                     {/volist}
                 </tbody>
             </table>
+            <div>
+                <span style="margin:0 40px">总数量:{$num}</span>
+                <span>总吨数:{$z}</span>
+            </div>
             <input type="button" class="layui-btn submit" value="立即提交" id="del" />
         </div>
-
     </form>
 </div>
 <script src="/static/jquery-1.9.1.min.js"></script>
@@ -269,15 +272,13 @@
         $('.tbd ').find('.status select').each(function () {
             status.push($(this).val());
         })
-        console.log(status)
         let result = status.every(function (val) {
             return val != '0';
         })
         if (!result){
             layer.alert('请确定产品属性是否选择完毕',{icon:5});
             return false;
-        }
-        else {
+        }else {
             that.prop('type','submit');
             sessionStorage.removeItem('session');
         }

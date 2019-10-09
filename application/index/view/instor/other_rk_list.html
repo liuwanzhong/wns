@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>其他入库</title>
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" href="/images/boot.css">
+    <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
+
+</head>
+<style>
+    .layui-table th{text-align: center;font-weight: bold;}
+    .layui-table td{text-align: center;}
+    label{box-sizing: content-box;}
+</style>
+<body>
+<div class="note">
+    <div class="nav">
+            <span class="layui-breadcrumb">
+                <a href="/public/main.html" target="box">首页</a>
+                <a href="javascript:;">在库管理</a>
+                <a><cite>其他入库</cite></a>
+            </span>
+    </div>
+    <div class="seach">
+        <form action="{:url('Instor/other_rk_list')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">日期</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">仓库</label>
+                <div class="layui-input-inline">
+                    <select name="s_material_name">
+                        <option value="0">全部</option>
+                        {volist name='cabinet' id='c'}
+                        <option value="{$c.name}" <?php if($s_material_name==$c['name']){echo 'selected';} ?>>{$c.name}</option>
+                        {/volist}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <button class="layui-btn save" lay-submit>查询</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <a href="{:url('Instor/other_rk')}" class="layui-btn" style="margin-left: 30px;">添加其他入库</a>
+    <main class="bd_content">
+        <table class="layui-table" style="width: 96%; margin: 12px auto;">
+            <thead>
+            <tr>
+                <th>产品名称</th>
+                <th>仓库</th>
+                <th>产品日期</th>
+                <th>入库货位</th>
+                <th>入库数量</th>
+                <th>操作时间</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {volist name='md' id='row'}
+            <tr>
+                <td>{$row['product_name']}</td>
+                <td>{$row['ck_name']}</td>
+                <td><?php if(!empty($row['product_time'])){echo date('Y-m-d',$row['product_time']);}?></td>
+                <td>{$row['huowei']}</td>
+                <td>{$row['count']}</td>
+                <td><?php if(!empty($row['rk_time'])){echo date('Y-m-d',$row['rk_time']);}?></td>
+                <td>{$row['conter']}</td>
+                <td><a href="{:url('Instor/other_del','id='.$row.id    )}" class="layui-btn submit" lay-submit lay-filter="formDemo">删除</a></td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
+        <div style="text-align:center; margin-bottom: 200px;">
+            {$rows->render()}
+        </div>
+    </main>
+</div>
+
+<script src="/static/js/jquery-1.9.1.min.js"></script>
+<script src="/layui/layui.js"></script>
+<script>
+    layui.use(['element','laydate','form'], function(){
+        var laydate = layui.laydate;
+        var element = layui.element;
+        let form = layui.form;
+        laydate.render({
+            elem: '#s_delivery_time'
+            // ,range: '~'
+            ,done: function(value){
+                $('#s_delivery_time').val(value)
+            }
+        });
+    })
+</script>
+
+</body>
+</html>

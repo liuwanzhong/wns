@@ -18,17 +18,18 @@ class Staffs extends Controller {
     }
     //添加管理员视图
     public function staffs_add() {
-        $rows=db('department')->where('is_del',1)->select();
-        $this->read(0);
-        $md=self::$md;
-        return view('staffs_add',['rows'=>$rows,'md'=>$md]);
-    }
-    //添加管理员
-    public function staffs_insert() {
         $ms=$this->qx();
         if($ms==0){
             $this->error('警告：越权操作');
         }
+        $rows=db('department')->where('is_del',1)->select();
+        $this->read(0);
+        $md=self::$md;
+        $warehouse=db('warehouse')->where('is_del',1)->select();
+        return view('staffs_add',['rows'=>$rows,'md'=>$md,'warehouse'=>$warehouse]);
+    }
+    //添加管理员
+    public function staffs_insert() {
         $data=input();
         if($data['department_id']==0){
             $msg=["error"=>103,'ts'=>"请选择部门"];
@@ -47,6 +48,10 @@ class Staffs extends Controller {
         if(!empty($data['obj'])){
             $data['power']=implode(",",$data['obj']);
             unset($data['obj']);
+        }
+        if(!empty($data['addr'])){
+            $data['warehouse']=implode(",",$data['addr']);
+            unset($data['addr']);
         }
         $r=db('staffs')->insert($data);
         if ($r){
@@ -87,7 +92,9 @@ class Staffs extends Controller {
         $find=db('staffs')->where('id',$id)->find();
         //权限数组
         $sz=explode(",",$find['power']);
-        return view('staffs_edit',['rows'=>$rows,'md'=>$md,'find'=>$find,'sz'=>$sz,'id'=>$id]);
+        $warehouse=db('warehouse')->where('is_del',1)->select();
+        $w_sz=explode(",",$find['warehouse']);
+        return view('staffs_edit',['rows'=>$rows,'md'=>$md,'find'=>$find,'sz'=>$sz,'id'=>$id,'warehouse'=>$warehouse,'w_sz'=>$w_sz]);
     }
     //修改管理员
     public function staffs_update() {
@@ -110,6 +117,10 @@ class Staffs extends Controller {
         if(!empty($data['obj'])){
             $data['power']=implode(",",$data['obj']);
             unset($data['obj']);
+        }
+        if(!empty($data['addr'])){
+            $data['warehouse']=implode(",",$data['addr']);
+            unset($data['addr']);
         }
         $r=db('staffs')->update($data);
         if ($r){
@@ -277,27 +288,14 @@ class Staffs extends Controller {
         }
         return $msg;
     }
-    //修改权限状态
-    public function pow_state($id)
-    {
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
-        $state=db('pow')->where('id',$id)->find();
-        if($state['cj']==3){
-            $this->error('该规则不能显示');
-        }
-        if($state['state']=='正常'){
-            db('pow')->where('id',$id)->update(['state'=>'隐藏']);
-        }else{
-            db('pow')->where('id',$id)->update(['state'=>'正常']);
-        }
-        return redirect('Staffs/pow');
-    }
     //数据回显
     public function pow_up_edit()
     {
+        $ms=$this->qx();
+        if($ms==0){
+            $msg=['error'=>0,'msg'=>'警告:越权操作'];
+            return $msg;
+        }
         $id=$_POST['id'];
         $row=db('pow')->where('id',$id)->find();
         return $row;

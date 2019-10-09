@@ -15,47 +15,75 @@
             <span class="layui-breadcrumb">
                 <a href="/public/main.html" target="box">首页</a>
                 <a href="javascript:;">在库管理</a>
-                <a><cite>仓储查询</cite></a>
+                <a><cite>月度查询</cite></a>
             </span>
-            <button calss="dayin">打印</button>
     </div>
-    <table class="layui-table" style="width: 96%; margin: 12px auto;">
-        <thead>
-        <tr>
-            <th rowspan="2">货位</th>
-            <th rowspan="2">产品</th>
-            <th rowspan="2">初期数量</th>
-            <th rowspan="2">上月入库</th>
-            <th rowspan="2">上月出库</th>
-            <th colspan="3">上月结余</th>
-        </tr>
-        </thead>
-        <tbody>
-       {volist name='xx' id='xx'}
-            <tr>
-                <td>{$xx['name']}</td>
-                <td>{$xx['goods_name']}</td>
-                <td>{$xx['chuqi']}</td>
-                <td>{$xx['ru']}</td>
-                <td>{$xx['chu']}</td>
-                <td>{$xx['jiecun']}</td>
-            </tr>
-        {/volist}
-        </tbody>
-    </table>
-</div>
+    <div class="layui-form">
+        <div class="layui-form-item">
+            </div>
+            <div class="layui-inline">
+            <label class="layui-form-label">年月选择器</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="test3" placeholder="yyyy-MM" value="<?php if(!empty($time)){echo $time;}?>">
+            </div>
+            <button class="layui-btn pandian" lay-submit>查询</button>
+        </div>
 
+    </div>
+    <main class="bd_content">
+            <table class="layui-table" style="width: 96%; margin: 12px auto 120px;">
+                <thead>
+                    <tr>
+                        <th>结存时间</th>
+                        <th>仓库名称</th>
+                        <th>货位</th>
+                        <th>产品名称</th>
+                        <th>生产日期</th>
+                        <th>结存剩余数量</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {volist name='rows' id='row'}
+                    <tr>
+                        <td>{$row.state_time}</td>
+                        <td>{$row.warehouse_name}</td>
+                        <td>{$row.huowei_name}</td>
+                        <td>{$row.product_name}</td>
+                        <td>{$row.product_time}</td>
+                        <td>{$row.num}</td>
+                        <td>{$row.ctenter}</td>
+                        <td><a href="{:url('Instor/show_month_xx',['id'=>$row.id,'time'=>$time])}" class="layui-btn">查看流水</a></td>
+                    </tr>
+                    {/volist}
+                </tbody>
+            </table>
+        </main>
+</div>
 
 <script src="/static/js/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script>
-    layui.use('element', function () {
+    layui.use(['laydate','layer'], function(){
+        var laydate = layui.laydate,
+            layer = layui.layer;
+        //年月选择器
+        laydate.render({
+            elem: '#test3'
+            ,type: 'month'
+        });
+    });
 
-    })
-    $('#dayin').on('click', function(){
-        alert(1);
-        window.print();
-    })
+    $('.pandian').on('click',  function (){
+             let time = $('#test3').val();
+                if(time == 0){
+                    layer.alert('请选择时间',{icon:5});
+                    return false;
+                }else{
+                    window.location.href="/index/Instor/show_month?time="+time;
+                }
+         })
 </script>
 </body>
 </html>
