@@ -64,15 +64,15 @@
 					<tbody>
                         {volist name='res' id='r'}
                         <tr>
-                            <th>{$r['id']}</th>
-                            <th>{$r['tp_num']}</th>
-                            <th>{$r['name']}</th>
-                            <th>{$r['goods_name']}</th>
-                            <th>{$r['num']}</th>
-                            <th><button class="layui-btn layui-btn-sm batch" lay-submit lay-filter="formDemo">查看</button></th>
-                            <th>
+                            <td>{$r['id']}</td>
+                            <td>{$r['tp_num']}</td>
+                            <td>{$r['name']}</td>
+                            <td>{$r['goods_name']}</td>
+                            <td>{$r['num']}</td>
+                            <td><button class="layui-btn layui-btn-sm batch" lay-submit lay-filter="formDemo">查看</button></td>
+                            <td>
                                 <button class="layui-btn layui-btn-sm del" lay-submit lay-filter="formDemo">清空托盘</button>
-                            </th>
+                            </td>
                         </tr>
                         {/volist}
                     </tbody>
