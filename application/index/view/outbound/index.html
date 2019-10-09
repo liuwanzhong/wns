@@ -49,7 +49,12 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">仓库名称</label>
                             <div class="layui-input-inline">
-                                <input type="text" class="layui-input" id="factory_name" name="factory_name" autocomplete="off" placeholder="  " value="{$factory_name}">
+                                <select name="factory_name" id="factory_name">
+                                    <option value="">请选择</option>
+                                    {volist name='res' id='r'}
+                                    <option value="{$r['name']}" <?php if($factory_name==$r['name']){echo 'selected';} ?>>{$r['name']}</option>
+                                    {/volist}
+                                </select>
                             </div>
                         </div>
                         <div class="layui-form-item">

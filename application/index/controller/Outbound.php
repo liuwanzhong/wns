@@ -17,7 +17,6 @@ class Outbound extends Controller {
         $reachby_name='';//送达方名称
         $material_name='';//物料名
         $search = '';
-        dump(input());
         if(!empty($data['factory_name'])){
             $factory_name=$data['factory_name'];
             $search = 'factory_name like ' . "'%" . $factory_name . '%' . "'";
@@ -64,15 +63,17 @@ class Outbound extends Controller {
             }
             $search .= $s_material_name;
         }
+        $res = db('system_order')
+            ->where('is_del',0)
+            ->field('factory_name as name')
+            ->group('factory_name')
+            ->select();
         $list = db('system_order')
             -> where("is_del",0)
             -> order('id desc')
             ->where($search)
             -> paginate(100,false,['query'=>['delivery_time'=>$delivery_time,'factory_name'=>$factory_name,'transport_id'=>$transport_id,'reachby_name'=>$reachby_name,'material_name'=>$material_name]]);
-
-            echo db('system_order')->getlastSql();
-        // dump($list);
-        return view("index", ['list' => $list,'delivery_time' => $delivery_time,'factory_name' => $factory_name,'transport_id' => $transport_id,'reachby_name' => $reachby_name,'material_name' => $material_name]);
+        return view("index", ['list' => $list,'res'=>$res,'delivery_time' => $delivery_time,'factory_name' => $factory_name,'transport_id' => $transport_id,'reachby_name' => $reachby_name,'material_name' => $material_name]);
     }
     // 系统订单
     public function system_order(){
