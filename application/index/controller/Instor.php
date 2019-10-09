@@ -82,9 +82,12 @@ class Instor extends Controller
             ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id and kc_status.is_del=0',"left")
             ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id and cabinet.is_del=1','left')
             ->join('warehouse','cabinet.warehouse_id=warehouse.id','left')
-            ->order('rukuform_xq.create_time desc')
+            ->where('warehouse.id','in',$warehouse)
+            ->where("$search")
+            ->order('cabinet.name asc')
             ->field('rukuform_xq.*,kc_status.title,cabinet.name,kc_status.title')
             ->select();
+        //总数
         $sums=0;
         foreach($row as $v){
             $sums += $v['rk_nums'];
@@ -101,6 +104,10 @@ class Instor extends Controller
             ->field('rukuform_xq.*,kc_status.title,cabinet.name,kc_status.title')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt,'status'=>$status_id]]);
         $orders=$order->all();
+        $sum=0;
+        foreach($orders as $v){
+            $sum += $v['rk_nums'];
+        }
         foreach($orders as &$v) {
             $v['ckname'] = db('rukuform')
             -> field('a.id,a.ck_id,b.name')
@@ -122,11 +129,8 @@ class Instor extends Controller
                 }
             }
         }
+        //当前页数量
 
-        $sum=0;
-        foreach($orders as $v){
-            $sum += $v['rk_nums'];
-        }
         //产品属性
         $status=db('kc_status')->where('is_del',0)->select();
         return view('index2',['orders'=>$orders,'status'=>$status,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'md'=>$md,'zt'=>$zt,'s_material_zt'=>$s_material_zt,'status_id'=>$status_id,'sum'=>$sum,'sums'=>$sums]);

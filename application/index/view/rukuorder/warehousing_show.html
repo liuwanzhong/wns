@@ -67,7 +67,6 @@
                 </div>
             </div>
         </div>
-
         <table class="layui-table" style="width: 96%; margin: 12px auto;">
             <thead>
             <tr>
@@ -105,16 +104,22 @@
         <span style="margin-left:40px">总数:{$num}</span>
         <span style="margin:0 40px">总毛重:{$mao}吨</span>
         <span>总净重:{$jing}吨</span>
-        <div class="btn">
-            <a class="layui-btn" href="{:url('Rukuorder/to_examine')}">返回</a>
-        </div>
+
+    </div>
+    <div class="btn">
+        <a class="layui-btn" href="{:url('Rukuorder/to_examine')}">返回</a>
+        <a class="layui-btn" id="dy">打印</a>
     </div>
 </div>
 
 
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
+<script src="/images/jquery.PrintArea.js"></script>
 <script type="text/javascript">
+    $('#dy').click(function () {
+        $('.container').printArea();
+    })
     layui.use(['element'], function () {
 
     })

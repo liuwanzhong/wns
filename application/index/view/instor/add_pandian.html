@@ -17,7 +17,6 @@
 </head>
 <body>
 <div class="note">
-<div class="bd_content">
     <div class="nav">
         <span class="layui-breadcrumb">
             <a href="/public/main.html" target="box">首页</a>
@@ -25,8 +24,8 @@
             <a><cite>新建盘点</cite></a>
         </span>
     </div>
-    <form method="post" class="layui-form" action="{:url('Instor/do_add')}">
-        <div class="container" >
+<div class="bd_content">
+    <form method="post" class="" action="{:url('Instor/do_add')}">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
                     <tr>
@@ -57,14 +56,14 @@
                         {$l['product_name']}
                     </td>
                     <td><?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?><input type="hidden" class="text" readonly value="{$l['product_time']}" name="product_time[]"></td>
-                    <td><input type="text" class="text1"  value="" name="pd_num[]"></td>
+                    <td><input type="text" class="text1 layui-input"  value="" name="pd_num[]"></td>
                     <td>
                         <input type="hidden" value="{$l['rk_nums']}" name="rk_nums[]">
                         {$l['rk_nums']}
                     </td>
-                    <td><input type="text" class="text"  value="" name="count1[]"></td>
-                    <td><input type="text" class="text"  value="" name="count2[]"></td>
-                    <td><input type="text" class="text"  value="" name="count3[]"></td>
+                    <td><input type="text" class="text layui-input"  value="" name="count1[]"></td>
+                    <td><input type="text" class="text layui-input"  value="" name="count2[]"></td>
+                    <td><input type="text" class="text layui-input"  value="" name="count3[]"></td>
                 </tr>
                 {/volist}
                 </tbody>
@@ -76,7 +75,6 @@
                 </div>
             </table>
             <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
-        </div>
     </form>
 </div>
 </div>
@@ -92,7 +90,7 @@
             var element = layui.element;
             let form = layui.form;
             laydate.render({
-                elem: '#s_delivery_time' 
+                elem: '#s_delivery_time'
                 ,range: '~'
                 ,done: function(value){
                     $('#s_delivery_time').val(value)
