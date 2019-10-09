@@ -17,8 +17,8 @@
 			<div class="nav">
 				<span class="layui-breadcrumb">
 					<a href="/public/main.html" target="box">首页</a>
-					<a href="javascript:;">管理</a>
-					<a><cite>货位管理</cite></a>
+					<a href="javascript:;">批次管理</a>
+					<a><cite>托盘状态</cite></a>
 				</span>
 			</div>
 			<div class="search">
@@ -69,9 +69,9 @@
                             <th>{$r['name']}</th>
                             <th>{$r['goods_name']}</th>
                             <th>{$r['num']}</th>
-                            <th><button class="layui-btn batch" lay-submit lay-filter="formDemo">查看</button></th>
+                            <th><button class="layui-btn layui-btn-sm batch" lay-submit lay-filter="formDemo">查看</button></th>
                             <th>
-                                <button class="layui-btn del" lay-submit lay-filter="formDemo">清空托盘</button>
+                                <button class="layui-btn layui-btn-sm del" lay-submit lay-filter="formDemo">清空托盘</button>
                             </th>
                         </tr>
                         {/volist}

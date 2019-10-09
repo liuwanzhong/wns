@@ -80,7 +80,7 @@
                 <td>{$row['count']}</td>
                 <td><?php if(!empty($row['rk_time'])){echo date('Y-m-d',$row['rk_time']);}?></td>
                 <td>{$row['conter']}</td>
-                <td><a href="{:url('Instor/other_del','id='.$row.id    )}" class="layui-btn submit" lay-submit lay-filter="formDemo">删除</a></td>
+                <td><a href="{:url('Instor/other_del','id='.$row.id    )}" class="layui-btn layui-btn-sm submit" lay-submit lay-filter="formDemo">删除</a></td>
             </tr>
             {/volist}
             </tbody>
