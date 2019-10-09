@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="/images/index.css">
-    <link rel="stylesheet" href="/layui/css/layui.css">
+    <link rel="stylesheet" href="/images/index.css" />
+    <link rel="stylesheet" href="/layui/css/layui.css" />
     <style>
         .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
         .btn{margin-left: 30px;margin-top: 30px;}
-        .container{display: block;overflow-x: hidden;height: 580px;}
+        .container{display: block;overflow-x: hidden;height: 580px;margin-top: 15px;}
         .container::-webkit-scrollbar{width: 0;}
         input[type="date"]::-webkit-inner-spin-button {
             display: none;
@@ -70,7 +70,7 @@
                 </div>
             </div>
         </div>
-        <div class="container bd_content">
+        <div class="container">
             <table class="layui-table" style="width: 96%; margin: 12px auto 120px;">
                 <thead>
                     <tr>
@@ -112,8 +112,8 @@
                         </td>
                         <?php if($v['rk_huowei_id']==0): ?>
                             <td class="huowei">
-                                <select name='huowei[]' class='showhuowei'>
-                                    <option value='0'>请选择货位</option>
+                                <select name='huowei[]' class='showhuowei' lay-search>
+                                    <option value=''>请选择货位</option>
                                 </select>
                             </td>
                         <?php else:?>
@@ -200,7 +200,11 @@
                                     ${str}
                                 </select>
                             </td>
-                            <td class="huowei"><select name='huowei[]' class='showhuowei'><option value='0'>请选择货位</option></select></td>
+                            <td class="huowei">
+                                <select name='huowei[]' class='showhuowei' lay-search>
+                                    <option value=''>请选择货位</option>
+                                </select>
+                            </td>
                             <td>
                                 <input type="number" value="0" class="countnum layui-input a" id="blur" name="nums[]">
                             </td>
@@ -241,7 +245,7 @@
                     dataType: 'json',//请求参数的格式为json.另外还有text等
                     success: function(data){
                         console.log(data);
-                        $('.showhuowei').append("<option value='0'>请选择货位</option>");
+                        $('.showhuowei').append("<option value=''>请选择货位</option>");
                         for (var i=0;i<data.length;i++)
                         {
                             $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
