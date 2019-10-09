@@ -2,29 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>调拨</title>
+    <link rel="stylesheet" href="/images/index.css">
+    <link rel="stylesheet" href="/layui/css/layui.css">
+
 </head>
 <body>
-<a href="{:url('Instor/other_db')}" class="layui-btn ">调拨</a>
-<table border="1">
-    <tr>
-        <th>产品名称</th>
-        <th>调拨日期</th>
-        <th>产品日期</th>
-        <th>调出货位</th>
-        <th>调入货位</th>
-        <th>调拨数量</th>
-    </tr>
-    {volist name='rows' id='row'}
-    <tr>
-        <td>{$row['cp_name']}</td>
-        <td><?php if(!empty($row['db_time'])){echo date('Y-m-d',$row['db_time']);}?></td>
-        <td><?php if(!empty($row['cp_time'])){echo date('Y-m-d',$row['cp_time']);}?></td>
-        <td>{$row['dc_name']}</td>
-        <td>{$row['dr_name']}</td>
-        <td>{$row['db_num']}</td>
-    </tr>
-    {/volist}
-</table>
+    <div class="note">
+        <div class="nav">
+            <span class="layui-breadcrumb">
+                <a href="/public/main.html" target="box">首页</a>
+                <a href="javascript:;">在库管理</a>
+                <a><cite>调拨</cite></a>
+            </span>
+        </div>
+        <a href="{:url('Instor/other_db')}" class="layui-btn" style="margin-left: 30px;">调拨</a>
+        <main class="bd_content">
+            <table class="layui-table" style="width: 96%; margin: 12px auto;">
+                <thead>
+                    <tr>
+                        <th>产品名称</th>
+                        <th>调拨日期</th>
+                        <th>产品日期</th>
+                        <th>调出货位</th>
+                        <th>调入货位</th>
+                        <th>调拨数量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {volist name='rows' id='row'}
+                    <tr>
+                        <td>{$row['cp_name']}</td>
+                        <td><?php if(!empty($row['db_time'])){echo date('Y-m-d',$row['db_time']);}?></td>
+                        <td><?php if(!empty($row['cp_time'])){echo date('Y-m-d',$row['cp_time']);}?></td>
+                        <td>{$row['dc_name']}</td>
+                        <td>{$row['dr_name']}</td>
+                        <td>{$row['db_num']}</td>
+                    </tr>
+                    {/volist}
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script src="/layui/layui.js"></script>
+    <script>
+        layui.use('element', function () {
+            
+        })
+    </script>
+
 </body>
 </html>
