@@ -230,6 +230,68 @@ class Run extends Controller {
     }
 
 
+    //工人列表
+    public function warker(){
+        $list = db('warker')->where('is_del',1)->paginate(100);
+        return view('warker',['list'=>$list]);
+    }
+    //添加工人
+    public function warker_add(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $data = input();
+        array_shift($data);
+        $rs = db('warker')->insert($data);
+        if($rs){
+            return redirect('warker');
+        }else{
+            $this->error("添加失败");
+        }
+    }
+    //修改查看接口
+    public function warker_show($id){
+        $ms=$this->qx();
+        if($ms==0){
+            $msg=['error'=>0,'msg'=>'警告:越权操作'];
+            return $msg;
+        }
+        $list = db('warker')->where('is_del',1)->where('id',$id)->find();
+        return $list;
+    }
+    //修改
+    public function warker_edit(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $data = input();
+        array_shift($data);
+        $rs = db('warker')->update($data);
+        if($rs){
+            return redirect('warker');
+        }else{
+            $this->error("修改失败");
+        }
+    }
+    //删除
+    public function warker_delete($id){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $rs = db('warker')->where('id',$id)->update(['is_del'=>0]);
+        if($rs){
+            return redirect('warker');
+        }else{
+            $this->error("删除失败");
+        }
+    }
+
+
+
+
 
 
     //库存列表

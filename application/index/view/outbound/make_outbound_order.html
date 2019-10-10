@@ -83,7 +83,13 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">工人:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="workers" autocomplete="off" class="layui-input">
+<!--                    <input type="text" name="workers" autocomplete="off" class="layui-input">-->
+                    <select name="workers" lay-filter="ck_id" onchange="showtable(this.value)">
+                        <option value="0">请选择工人</option>
+                        <?php foreach($warker as $w): ?>
+                        <option value="<?=$w['id']?>"><?=$w['name']?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
             </div>
             <div class="layui-form-item">
@@ -185,7 +191,7 @@
 </div>
 <div class="model_table" style="display: none; top: 45%; overflow: hidden;">
     <div class="head">
-        <span>修改商品</span>
+        <span>选择货位</span>
         <a href="javascript:" class="close">×</a>
     </div>
     <div class="content" style="height: 100%;overflow-x: hidden;">
@@ -223,7 +229,6 @@
         $('.layui-table').on('click', '.add', function(){
             let _tr = $(this).parents('tr');
             let child = _tr[0].children;
-
             let html = `<tr>
             <input type="hidden" class="rukuform_xq_id" value="${child[0].value}">
             <input type="hidden" value="${child[1].value}" name="Delivery_id[]" readonly>
@@ -236,9 +241,9 @@
                 <span>0</span>
             </td>
             <td class="huowei">
-                <input type="hidden" name="huowei[]" value="">
-                <botton class="layui-btn layui-btn-sm dia">点击</botton>
-            </td>
+                            <input type="hidden" name="huowei[]" value="">
+                            <botton class="layui-btn layui-btn-sm dia">点击</botton>
+                        </td>
             <td class="count">
                 <input type="hidden" value="0" name="huowei_out[]" readonly>
                 <span>0</span>
@@ -300,6 +305,7 @@
         $('.tbd').on('click', '.dia', function () {
             let id = $('#table').val();
             let ne = $(this).parents('tr').find('.status input').val()
+            console.log(id,ne)
             if(id == 0){
                 layer.alert('请选择仓库',{icon:5});
                 return false;
@@ -312,9 +318,9 @@
                     url:'/index/Table/houwei_ck',
                     data: {id,ne},
                     success:function (data) {
+                        console.log(data)
                         let html = '';
                         for (let i =0; i<data.length; i++){
-                            
                             html += ` <tr>
                             <input type="hidden" id="id" class="layui-input" value="${data[i].id}">
                             <input type="hidden" id="m" class="layui-input" value="${data[i].m}">

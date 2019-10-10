@@ -59,6 +59,7 @@
 					<thead>
 					<tr>
 						<th>ID</th>
+						<th>保管名称</th>
 						<th>审核</th>
 						<th>出库仓库</th>
 						<th>装运单号</th>
@@ -71,6 +72,7 @@
 					{volist name='rows' id='row'}
 					<tr>
 						<td>{$row.id}</td>
+						<td>{$row.staffs_name}</td>
 						<td>已审核</td>
 						<td>{$row.w_name}</td>
 						<td>{$row.transport_id}</td>

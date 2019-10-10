@@ -53,11 +53,64 @@
 				</tbody>
 			</table>
 		</div>
+		<!--查看-->
+		<div class="model_select">
+			<div class="head">
+				<span>操作日志</span>
+				<a href="javascript:" class="close_select">×</a>
+			</div>
+			<div class="content"   style="height: calc(100% - 50px);overflow-x: hidden;box-sizing: border-box;">
+				<table class="layui-table">
+					<thead>
+					<tr>
+						<th>操作时间</th>
+						<th>工厂名</th>
+						<th>产品名</th>
+						<th>总数量</th>
+						<th>吨数</th>
+					</tr>
+					</thead>
+					<tbody class="t">
+
+					</tbody>
+				</table>
+			</div>
+		</div>
 		<script src="/static/jquery-1.9.1.min.js"></script>
 		<script src="/layui/layui.js"></script>
 		<script>
+			$('.select').on('click', function(){
+				$('.model_select').show();
+			})
+			$('.close_select').on('click', function(){
+				$('.model_select').hide();
+			})
 			layui.use('element', function () {
 				var element = layui.element;
+			})
+			//查看数据
+			$('.select').click(function () {
+				let id=$(this).parents('tr').find('td').eq(0).text();
+				$('.t').empty();
+				$.ajax({
+					url:'/index/Staffs/staffs_id',
+					type:'post',
+					data:{"id":id},
+					success:function (data) {
+						console.log(data)
+						let html = '';
+						for(let i in data){
+							html += `<tr>
+									<td>${data[i].create_time}</td>
+									<td>${data[i].factory}</td>
+									<td>${data[i].product_name}</td>
+									<td>${data[i].rk_nums}</td>
+									<td>${data[i].netweight}</td>
+								</tr>`
+						}
+						$('.t').append(html);
+					}
+				})
 			})
 		</script>
 

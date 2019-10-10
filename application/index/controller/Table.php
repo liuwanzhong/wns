@@ -29,15 +29,16 @@ class Table extends Controller {
         ->where('warehouse_id',$id)
         ->where('is_del',1)
         ->select();
+        $rukuform=db('rukuform_xq')
+            ->where("rukuform_xq.product_name like '%$ne%'")
+            ->where('rukuform_xq.state',1)
+            ->where('rukuform_xq.is_del',0)
+            ->where('rukuform_xq.sy_count>=1')
+//            ->order('rukuform_xq.product_time asc')
+            ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id')
+            ->field('rukuform_xq.*,cabinet.name,cabinet.id as c_id')
+            ->select();
         foreach ($ck as $c) {
-            $rukuform=db('rukuform_xq')
-                ->where("rukuform_xq.product_name like '%$ne%'")
-                ->where('rukuform_xq.state',1)
-                ->where('rukuform_xq.is_del',0)
-                ->where('rukuform_xq.sy_count>=1')
-                ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id')
-                ->field('rukuform_xq.*,cabinet.name,cabinet.id as c_id')
-                ->select();
             foreach ($rukuform as $k=>$item) {
                 if($c['id']==$item['rk_huowei_id']){
                     $md[]=$item;

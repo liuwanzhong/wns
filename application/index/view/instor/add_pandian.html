@@ -7,12 +7,7 @@
     <link rel="stylesheet" href="/images/index.css" />
     <link rel="stylesheet" href="/layui/css/layui.css" />
     <style>
-        .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
         .submit{margin-left: 30px;margin-top: 30px;}
-        /*.container{display: block;overflow-x: hidden;height: 580px;}*/
-        .container::-webkit-scrollbar{width: 0;}
-        .layui-form-radio{margin: 0;padding: 0;}
-        .note{padding: 30px 30px;}
     </style>
 </head>
 <body>
@@ -24,8 +19,9 @@
             <a><cite>新建盘点</cite></a>
         </span>
     </div>
-<div class="bd_content">
-    <form method="post" class="" action="{:url('Instor/do_add')}">
+
+    <div class="bd_content">
+        <form method="post" class="" action="{:url('Instor/do_add')}">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
                     <tr>
@@ -41,31 +37,31 @@
                     </tr>
                 </thead>
                 <tbody class="tbd">
-                {volist name='list' id='l'}
-                <tr>
-                    <td>
-                        <input type="hidden" value="{$l['w_name']}" name="w_name[]">
-                        {$l['w_name']}
-                    </td>
-                    <td>
-                        <input type="hidden" value="{$l['c_name']}" name="c_name[]">
-                        {$l['c_name']}
-                    </td>
-                    <td>
-                        <input type="hidden" value="{$l['product_name']}" name="product_name[]">
-                        {$l['product_name']}
-                    </td>
-                    <td><?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?><input type="hidden" class="text" readonly value="{$l['product_time']}" name="product_time[]"></td>
-                    <td><input type="text" class="text1 layui-input"  value="" name="pd_num[]"></td>
-                    <td>
-                        <input type="hidden" value="{$l['rk_nums']}" name="rk_nums[]">
-                        {$l['rk_nums']}
-                    </td>
-                    <td><input type="text" class="text layui-input"  value="" name="count1[]"></td>
-                    <td><input type="text" class="text layui-input"  value="" name="count2[]"></td>
-                    <td><input type="text" class="text layui-input"  value="" name="count3[]"></td>
-                </tr>
-                {/volist}
+                    {volist name='list' id='l'}
+                    <tr>
+                        <td>
+                            <input type="hidden" value="{$l['w_name']}" name="w_name[]">
+                            {$l['w_name']}
+                        </td>
+                        <td>
+                            <input type="hidden" value="{$l['c_name']}" name="c_name[]">
+                            {$l['c_name']}
+                        </td>
+                        <td>
+                            <input type="hidden" value="{$l['product_name']}" name="product_name[]">
+                            {$l['product_name']}
+                        </td>
+                        <td><?php if(!empty($l['product_time'])){echo date('Y-m-d',$l['product_time']);}?><input type="hidden" class="text" readonly value="{$l['product_time']}" name="product_time[]"></td>
+                        <td><input type="text" class="text1 layui-input"  value="" name="pd_num[]"></td>
+                        <td>
+                            <input type="hidden" value="{$l['rk_nums']}" name="rk_nums[]">
+                            {$l['rk_nums']}
+                        </td>
+                        <td><input type="text" class="text layui-input"  value="" name="count1[]"></td>
+                        <td><input type="text" class="text layui-input"  value="" name="count2[]"></td>
+                        <td><input type="text" class="text layui-input"  value="" name="count3[]"></td>
+                    </tr>
+                    {/volist}
                 </tbody>
                 <div class="layui-form-item">
                     <label class="layui-form-label">备注</label>
@@ -75,8 +71,9 @@
                 </div>
             </table>
             <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
-    </form>
-</div>
+        </form>
+    </div>
+
 </div>
 
 <script src="/static/jquery-1.9.1.min.js"></script>

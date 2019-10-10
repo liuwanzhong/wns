@@ -130,6 +130,15 @@ class Staffs extends Controller {
         }
         return $msg;
     }
+    //查看管理员操作日志
+    public function staffs_id($id,$task) {
+        if($task=='到货入库'){
+            $rows=db('rukuform_xq')->where('is_del',0)->where('rukuid',$id)->select();
+        }elseif($task=='销售出库'){
+            $rows=db('outbound_xq_from')->where('is_del',0)->where('chukuid',$id)->field('product_name,ck_nums as nums,netweight')->select();
+        }
+        return $rows;
+    }
 
 
     //找子级

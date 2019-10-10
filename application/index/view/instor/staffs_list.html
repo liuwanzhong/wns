@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>调拨</title>
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" href="/images/boot.css">
+    <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css" />
+</head>
+<style>
+    .layui-table th{text-align: center;font-weight: bold;}
+    .layui-table td{text-align: center;}
+    label{box-sizing: content-box;}
+</style>
+<body>
+<div class="note">
+    <div class="nav">
+            <span class="layui-breadcrumb">
+                <a href="/public/main.html" target="box">首页</a>
+                <a href="javascript:;">在库管理</a>
+                <a><cite>操作日志</cite></a>
+            </span>
+    </div>
+    <div class="seach">
+        <form action="{:url('Instor/staffs_id')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">保管名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">操作时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <button class="layui-btn save" lay-submit>查询</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <main class="bd_content">
+        <table class="layui-table" style="width: 96%; margin: 12px auto;">
+            <thead>
+            <tr>
+                <th>保管名称</th>
+                <th>操作时间</th>
+                <th>类型</th>
+                <th>总数量</th>
+                <th>总吨位</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {volist name='row' id='ro'}
+            <tr>
+                <input type="hidden" value="{$ro['rukuform_id']}">
+                <input type="hidden" value="{$ro['task']}">
+                <td>{$ro['staffs_name']}</td>
+                <td>{$ro['state_time']}</td>
+                <td>{$ro['task']}</td>
+                <td>{$ro['nums']}</td>
+                <td>{$ro['dun']}</td>
+                <td><?php if($ro['state']==0){echo "<span style='color:red'>未审核</span>";}else{echo "<span>已审核</span>";} ?></td>
+                <td><a href="#" title="查看" class="select"><i class="ico">&#xe61a;</i></a></td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
+        <div style="text-align:center; margin-bottom: 200px;">
+            {$row->render()}
+        </div>
+    </main>
+</div>
+<!--查看-->
+<div class="model_select">
+    <div class="head">
+        <span>操作日志</span>
+        <a href="javascript:" class="close_select">×</a>
+    </div>
+    <div class="content"   style="height: calc(100% - 50px);overflow-x: hidden;box-sizing: border-box;">
+        <table class="layui-table">
+            <thead>
+            <tr>
+                <th>工厂名</th>
+                <th>产品名</th>
+                <th>总数量</th>
+                <th>总重量</th>
+            </tr>
+            </thead>
+            <tbody class="t">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="/static/js/jquery-1.9.1.min.js"></script>
+<script src="/layui/layui.js"></script>
+<script>
+    layui.use(['element','laydate','form'], function(){
+        var laydate = layui.laydate;
+        var element = layui.element;
+        let form = layui.form;
+        laydate.render({
+            elem: '#s_delivery_time'
+            ,range: '~'
+            ,done: function(value){
+                $('#s_delivery_time').val(value)
+            }
+        });
+    })
+    $('.select').on('click', function(){
+        $('.model_select').show();
+    })
+    $('.close_select').on('click', function(){
+        $('.model_select').hide();
+    })
+    $('.select').click(function () {
+        let id=$(this).parents('tr').find('input').eq(0).val();
+        let task=$(this).parents('tr').find('input').eq(1).val();
+        $('.t').empty();
+        $.ajax({
+            url:'/index/Staffs/staffs_id',
+            type:'post',
+            data:{id,task},
+            success:function (data) {
+                console.log(data)
+                let html = '';
+                for(let i in data){
+                    html += `<tr>
+									<td>${data[i].factory}</td>
+									<td>${data[i].product_name}</td>
+									<td>${data[i].nums}</td>
+									<td>${data[i].netweight}</td>
+								</tr>`
+                }
+                $('.t').append(html);
+            }
+        })
+    })
+</script>
+
+</body>
+</html>

@@ -20,7 +20,7 @@
         <span>库存预警</span>
         <a href="javascript:" class="close">×</a>
     </div>
-    <div class="content">
+    <div class="content" style="height: calc(100% - 50px);overflow-x: hidden;box-sizing: border-box;">
         <table class="layui-table">
             <thead>
                 <tr>
@@ -74,7 +74,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">生产日期</label>
                 <div class="layui-input-inline">
-                    <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+                    <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder="  " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
                 </div>
             </div>
             <div class="layui-form-item">
@@ -117,7 +117,7 @@
             <input type="text" class="layui-input" id="" name=""  value="{$sum}" readonly style="border:0">
         </div>
     </div>
-    <a href="#" class="layui-btn save" id="btn" lay-submit style="margin-left:40px">一键结存</a>
+    <a href="#" class="layui-btn save" id="btn" lay-submit style="margin-left:40px">结存</a>
 
     <div class="bd_content">
         <table class="layui-table" style="width: 96%; margin: 12px auto">
@@ -148,7 +148,7 @@
                     <td><?php if($v['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
                     <td>
                         <a href="{:url('instor/show',['id'=>$v.rk_huowei_id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">查看</a>
-                        <a href="{:url('instor/jiecun',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">结存</a>
+<!--                        <a href="{:url('instor/jiecun',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm shows">结存</a>-->
 
                         <?php if($v['state']==1): ?>
                             <a href="{:url('Instor/frozen',['id'=>$v.id,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt])}" class="layui-btn layui-btn-sm">冻结</a>

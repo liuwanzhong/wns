@@ -52,6 +52,7 @@
 				<thead>
 				<tr>
 					<th>ID</th>
+					<th>保管名称</th>
 					<th>审核</th>
 					<th>出库工厂</th>
 					<th>装运单号</th>
@@ -65,12 +66,13 @@
 				{volist name='rows' id='row'}
 				<tr>
 					<td>{$row.id}</td>
+					<td>{$row.staffs_name}</td>
 					<td>已审核</td>
 					<td>{$row.x_name}</td>
 					<td>{$row.shipmentnum}</td>
 					<td>{$row.w_name}</td>
 					<td><?php if(!empty($row['userintime'])){echo date('Y-m-d',$row['userintime']);} ?></td>
-					<td>{$row.count}</td>
+					<td>{$row.nums}</td>
 					<td>
 						<a href="#" class="edit xq" title="详情" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
 						<a href="{:url('Rukuorder/warehousing_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>

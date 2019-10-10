@@ -79,7 +79,13 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">装卸工:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="workers" value="{$rows['workers']}" autocomplete="off" class="layui-input">
+<!--                    <input type="text" name="workers" value="{$rows['workers']}" autocomplete="off" class="layui-input">-->
+                    <select name="workers" lay-filter="ck_id" onchange="showtable(this.value)">
+                        <option value="0">请选择工人</option>
+                        <?php foreach($warker as $w): ?>
+                        <option value="<?=$w['id']?>" <?php if($rows['workers']==$w['id']){echo 'selected';} ?>><?=$w['name']?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
             </div>
             <div class="layui-form-item">
@@ -241,7 +247,6 @@
         </table>
         <button class="layui-btn sure" style="margin: 20px auto 100px;">确定</button>
     </div>
-
 </div>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
@@ -352,7 +357,6 @@
                     url:'/index/Table/houwei_ck',
                     data: {id,ne},
                     success:function (data) {
-                        console.log(data)
                         let html = '';
                         for (let i =0; i<data.length; i++){
                             html += ` <tr>

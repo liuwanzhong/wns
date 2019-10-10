@@ -1040,4 +1040,36 @@ class Instor extends Controller
             $this->error('删除失败,请联系管理员');
         }
     }
+
+    //操作日志
+    public function staffs_id() {
+        $s_transfers_id=input('s_transfers_id');//保管名称
+        $s_delivery_time=input('s_delivery_time');//操作时间
+        $search = '';
+        //保管名称
+        if (!empty($s_transfers_id)) {
+            $search = 'staffs.staffs_name like ' . "'%" . $s_transfers_id . '%' . "'";
+        }
+        // 产品日期
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
+            foreach ($time as $key) {
+                $time[] = strtotime($key);
+                array_shift($time);
+            }
+            if (!empty($search)) {
+                $time = ' and unix_timestamp(staffs_id.state_time) BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            } else {
+                $time = 'unix_timestamp(staffs_id.state_time) BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            }
+            $search .= $time;
+        }
+        $row=db('staffs_id')
+            ->join('staffs','staffs_id.staffs_id=staffs.id')
+            ->order('state_time desc')
+            ->where("$search")
+            ->field('staffs_id.*,staffs.staffs_name')
+            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]]);
+        return view('staffs_list',['row'=>$row,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]);
+    }
 }

@@ -7,19 +7,80 @@ use think\Controller;
 use think\Db;
 use think\Request;
 use think\Loader;
+use think\Session;
+
 class Outbound extends Controller {
     // 显示页
     public function index(){
+        $data=input();
+        $delivery_time='';//发货时间
+        $factory_name='';//工厂名
+        $transport_id='';//装运单号
+        $reachby_name='';//送达方名称
+        $material_name='';//物料名
+        $search = '';
+        if(!empty($data['factory_name'])){
+            $factory_name=$data['factory_name'];
+            $search = 'factory_name like ' . "'%" . $factory_name . '%' . "'";
+        }
+        if(!empty($data['delivery_time'])){
+            $delivery_time=$data['delivery_time'];
+            $time = explode('~', $delivery_time);
+            foreach ($time as $key) {
+                $time[] = strtotime($key);
+                array_shift($time);
+            }
+            if (!empty($search)) {
+                $s_delivery_time = ' and delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            } else {
+                $s_delivery_time = 'delivery_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            }
+            $search .= $s_delivery_time;
+        }
+        if(!empty($data['transport_id'])){
+            $transport_id=$data['transport_id'];
+            if (!empty($search)) {
+                $s_transport_id = ' and transport_id like ' . "'%" . $transport_id . '%' . "'";
+            } else {
+                $s_transport_id = ' transport_id like ' . "'%" . $transport_id . '%' . "'";
+            }
+            $search .= $s_transport_id;
+        }
+        if(!empty($data['reachby_name'])){
+            $reachby_name=$data['reachby_name'];
+            if (!empty($search)) {
+                $s_reachby_name = ' and reachby_name like ' . "'%" . $reachby_name . '%' . "'";
+            } else {
+                $s_reachby_name = ' reachby_name like ' . "'%" . $reachby_name . '%' . "'";
+            }
+            $search .= $s_reachby_name;
+
+        }
+        if(!empty($data['material_name'])){
+            $material_name=$data['material_name'];
+            if (!empty($search)) {
+                $s_material_name = ' and material_name like ' . "'%" . $material_name . '%' . "'";
+            } else {
+                $s_material_name = ' material_name like ' . "'%" . $material_name . '%' . "'";
+            }
+            $search .= $s_material_name;
+        }
+        $res = db('system_order')
+            ->where('is_del',0)
+            ->field('factory_name as name')
+            ->group('factory_name')
+            ->select();
         $list = db('system_order')
             -> where("is_del",0)
             -> order('id desc')
-            -> paginate(100);
-        return view("index", ['list' => $list]);
+            ->where($search)
+            -> paginate(100,false,['query'=>['delivery_time'=>$delivery_time,'factory_name'=>$factory_name,'transport_id'=>$transport_id,'reachby_name'=>$reachby_name,'material_name'=>$material_name]]);
+        return view("index", ['list' => $list,'res'=>$res,'delivery_time' => $delivery_time,'factory_name' => $factory_name,'transport_id' => $transport_id,'reachby_name' => $reachby_name,'material_name' => $material_name]);
     }
     // 系统订单
-    public function system_order(){
-
-    }
+//    public function system_order(){
+//
+//    }
     // 详细信息回显
     public function record_edit($id){
         $ms = $this -> qx();
@@ -167,15 +228,20 @@ class Outbound extends Controller {
             foreach ($rows as $row) {
                 $num+=$row['num'];
             }
-            return view('make_outbound_order',['rows'=>$rows,'fh'=>$fh,'zy'=>$zy,'sd'=>$sd,'cks'=>$cks,'id'=>$cd,'num'=>$num]);
+            $warker=db('warker')->where('is_del',1)->select();
+            return view('make_outbound_order',['rows'=>$rows,'fh'=>$fh,'zy'=>$zy,'sd'=>$sd,'cks'=>$cks,'id'=>$cd,'num'=>$num,'warker'=>$warker]);
         }
-            
+
     }
     // 出库订单
     public function insert(){
+        $staffs_id=Session::get('users')['id'];
         Db::startTrans();
         $data=input();
         $time=time();
+        if($data['ck_id']==0){
+            $this->error('请选择仓库');
+        }
         if(empty($data['huowei_name'])){
         }
         $ck_time=strtotime($data['ck_time']);
@@ -187,10 +253,9 @@ class Outbound extends Controller {
             }
         }
             try{
-                $id = db('outbound_from')
-                ->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id'],'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight'],'ck_time'=>$ck_time]);
+                $id = db('outbound_from')->insertGetId(['transport_id'=>$data['transport_id'],'reachout_name'=>$data['reachout_name'],'delivery_time'=>strtotime($data['delivery_time']),'transport'=>$data['transport'],'carid'=>$data['carid'],'driver'=>$data['driver'],'driverphone'=>$data['driverphone'],'workers'=>$data['workers'],'transport_unit'=>$data['transport_unit'],'ck_id'=>$data['ck_id'],'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight'],'ck_time'=>$ck_time,'staffs_id'=>$staffs_id]);
                 for ($i=0;$i<count($data['delivery_num']);$i++){
-                    db('outbound_xq_from')->insert([
+                    $p=db('outbound_xq_from')->insert([
                             'chukuid'=>$id,
                             'delivery_id'=>$data['Delivery_id'][$i],
                             'product_name'=>$data['material_name'][$i],
@@ -206,9 +271,9 @@ class Outbound extends Controller {
                             'sy_count'=>$data['sy_count'][$i]
                         ]);
                 }
-
+                $f=db('staffs_id')->insert(['staffs_id'=>$staffs_id,'nums'=>$data['all_count'],'dun'=>$data['all_weight'],'state'=>0,'task'=>'销售出库','rukuform_id'=>$id]);
                 $del=db('system_order')->where('id','in',$data['cd'])->update(['is_del'=>1]);
-                if($id && $del) {
+                if($id && $del && $p) {
                     // 提交事务
                     Db::commit();
                 }
@@ -267,12 +332,13 @@ class Outbound extends Controller {
         $rows=db('outbound_from')
             ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
             ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->join('staffs','outbound_from.staffs_id=staffs.id','left')
             ->where('warehouse.id','in',$warehouse)
             ->where('outbound_from.is_del',0)
             ->where('outbound_from.state',0)
             ->group('outbound_xq_from.chukuid')
             ->where($search)
-            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
+            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id,staffs.staffs_name')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         $cks=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         return view('to_examine',['rows'=>$rows,'cks'=>$cks,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
@@ -321,11 +387,13 @@ class Outbound extends Controller {
             $weight += $v['netweight'];
             $nums += $v['ck_nums'];
         }
-        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num,'nums'=>$nums,'weight'=>$weight]);
+        $warker=db('warker')->where('is_del',1)->select();
+        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num,'nums'=>$nums,'weight'=>$weight,'warker'=>$warker]);
     }
     //出库修改订单
     public function to_examine_up() {
         $data=input();
+        db('staffs_id')->where('rukuform_id',$data['id'])->update(['nums'=>$data['all_count'],'dun'=>$data['all_weight']]);
             $r = db('outbound_from')
             -> where('id', $data['id'])
             -> update([
@@ -414,7 +482,8 @@ class Outbound extends Controller {
             }
             $r=db('outbound_from')->where('id',$id)->update(['state'=>1]);
             $s=db('outbound_xq_from')->where('chukuid',$id)->update(['state'=>1]);
-            if($a && $b && $r && $s) {
+            $f=db('staffs_id')->where('rukuform_id',$id)->update(['state'=>1]);
+            if($a && $b && $r && $s && $f) {
                 Db::commit();
             }
         } catch (\Exception $e) {
@@ -475,13 +544,14 @@ class Outbound extends Controller {
         $rows=db('outbound_from')
             ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
             ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->join('staffs','outbound_from.staffs_id=staffs.id','left')
             ->where('warehouse.id','in',$warehouse)
             ->where('outbound_from.is_del',0)
             ->where('outbound_from.state',1)
             ->where('outbound_xq_from.qt_ck',0)
             ->group('outbound_from.id')
             ->where($search)
-            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id')
+            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id,staffs.staffs_name')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         $cks=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         return view('warehousing',['rows'=>$rows,'cks'=>$cks,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
@@ -492,9 +562,10 @@ class Outbound extends Controller {
         $z=0;
         $rows=db('outbound_from')
             ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->join('warker','outbound_from.workers=warker.id','left')
             ->where('outbound_from.is_del',0)
             ->where('outbound_from.id',$id)
-            ->field('outbound_from.*,warehouse.name as w_name')
+            ->field('outbound_from.*,warehouse.name as w_name,warker.name as workers')
             ->find();
         $cats=db('outbound_xq_from')
             ->where('outbound_xq_from.chukuid',$rows['id'])
@@ -808,10 +879,6 @@ class Outbound extends Controller {
      * 拆分总数回显
      */
     public function cf_edit($id){
-        $ms = $this -> qx();
-        if ($ms == 0) {
-            $this -> error('警告：越权操作');
-        }
         $row = db('system_order') -> where('id', $id) -> find();
         if ($row['delivery_time'] != 0) {
             $row['delivery_time'] = date("Y/m/d", $row['delivery_time']);
