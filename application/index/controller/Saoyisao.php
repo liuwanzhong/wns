@@ -54,7 +54,7 @@ class Saoyisao extends Controller {
         }
         if(empty($name)){
             // $this->error('仓库未选择');
-        dump(input());
+//        dump(input());
         }
         if(isset($s) && strstr($s,',')){
             $s=explode(',',$s);

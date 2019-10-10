@@ -28,6 +28,8 @@
             .cf .content::-webkit-scrollbar{
                 display: none;
             }
+            label{box-sizing: content-box;}
+            .seach{margin: 10px auto;}
         </style>
 	</head>
 	<body>
@@ -45,7 +47,7 @@
                 <a href="#" class="layui-btn" id="dc">导出</a>
             </div>
             <div class="seach">
-                    <form action="{:url('Outbound/index')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+                    <form action="{:url('Outbound/index')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;flex-wrap: wrap;">
                         <div class="layui-form-item">
                             <label class="layui-form-label">仓库名称</label>
                             <div class="layui-input-inline">
@@ -80,11 +82,7 @@
                             <div class="layui-input-inline">
                                 <input type="text" class="layui-input" id="material_name" name="material_name"  value="{$material_name}"/>
                             </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <div class="layui-input-inline">
-                                <button class="layui-btn save" lay-submit>查询</button>
-                            </div>
+                            <button class="layui-btn save" lay-submit>查询</button>
                         </div>
                     </form>
                 </div>
@@ -219,10 +217,9 @@
                 <span>拆分商品</span>
                 <a href="javascript:" class="close_cf">×</a>
             </div>
-            <div class="contents">
-                <form action="{:url('Outbound/chaifen')}" method="post" enctype="multipart/form-data">
+            <div class="contents" style="padding: 20px;">
+                <form class="layui-form" action="{:url('Outbound/chaifen')}" method="post" enctype="multipart/form-data">
                     <div class="wrap">
-                        <label>总数</label>
                         <input type="hidden" id="cf_id" name="cf_id" value="">
                         <input type="hidden" id="cf_delivery_time" name="cf_delivery_time" value="">
                         <input type="hidden" id="cf_factory_id" name="cf_factory_id" value="">
@@ -235,17 +232,26 @@
                         <input type="hidden" id="cf_reachby_name" name="cf_reachby_name" value="">
                         <input type="hidden" id="cf_material_id" name="cf_material_id" value="">
                         <input type="hidden" id="cf_material_name" name="cf_material_name" value="">
-                        <input type="text" id="cf_Delivery_num" name="cf_Delivery_num" value="" readonly/>
                         <input type="hidden" id="cf_detailed" name="cf_detailed" value="">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">总数</label>
+                            <div class="layui-input-inline">
+                                <input class="layui-input" type="text" id="cf_Delivery_num" name="cf_Delivery_num" value="" readonly/>
+                            </div>
+                        </div>
                     </div>
                     <div class="wrap">
-                        <label>拆分数量</label>
-                        <input type="text" id="cf_num" name="detailed[]" value="" />
-                        <input type="text" id="cf_num" name="detailed[]" value="" />
-                        <input type="text" id="cf_num" name="detailed[]" value="" />
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">拆分数量</label>
+                            <div class="layui-input-block" style="display: flex;">
+                                <input type="text" class="layui-input" name="detailed[]" value="" style="margin-right: 10px;" />
+                                <input type="text" class="layui-input" name="detailed[]" value="" style="margin-right: 10px;" />
+                                <input type="text" class="layui-input" name="detailed[]" value="" style="margin-right: 10px;" />
+                            </div>
+                        </div>
                     </div>
                     <div class="wrap btn">
-                        <input type="submit" class="save" id="btn_update" value="修改"/>
+                        <input type="submit" class="layui-btn save" id="btn_update" value="修改"/>
                     </div>
                 </form>
             </div>
