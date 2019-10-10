@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>在库管理</title>
+    <link rel="stylesheet" href="/images/boot.css">
+    <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+    <style type="text/css">
+        .layui-table th{text-align: center;font-weight: bold;}
+        .layui-table td{text-align: center;}
+        label{box-sizing: content-box;}
+    </style>
+</head>
+<body>
+<div class="note">
+    <div class="nav">
+        <span class="layui-breadcrumb">
+            <a href="/public/main.html" target="box">首页</a>
+            <a href="javascript:;">超级权限</a>
+            <a><cite>进销存</cite></a>
+        </span>
+    </div>
+    <a href="{:url('Chaoji/jxc_xx')}" class="layui-btn save" id="btn" lay-submit style="margin-left:40px">返回</a>
+
+    <div class="bd_content">
+        <table class="layui-table" style="width: 96%; margin: 12px auto">
+                <thead>
+                    <tr>
+                        <th rowspan="2">产品</th>
+                        <th colspan="3">入库</th>
+                        <th colspan="3">出库</th>
+                        <th rowspan="2">操作时间</th>
+                    </tr>
+                    <tr>
+                        <th>到货入库</th>
+                        <th>调拨入库</th>
+                        <th>其他入库</th>
+                        <th>销售出库</th>
+                        <th>调拨出库</th>
+                        <th>其他出库</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {volist name='res' id='j'}
+                    <tr>
+                        <td>{$j.hw_name}</a></td>
+                        <td>{$j.dh_ruku}</td>
+                        <td>{$j.db_ruku}</td>
+                        <td>{$j.qt_ruku}</td>
+                        <td>{$j.xx_chuku}</td>
+                        <td>{$j.db_chuku}</td>
+                        <td>{$j.qt_chuku}</td>
+                        <td>{$j.state_time}</td>
+                    </tr>
+                    {/volist}
+                </tbody>
+        </table>
+        <div style="text-align:center; margin-bottom: 200px;">
+        </div>
+    </div>
+</div>
+
+<script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/layui/layui.js"></script>
+<script>
+    layui.use(['element','laydate','form'], function(){
+        var laydate = layui.laydate;
+        var element = layui.element;
+        let form = layui.form;
+        laydate.render({
+            elem: '#s_delivery_time'
+            ,range: '~'
+            ,done: function(value){
+                $('#s_delivery_time').val(value)
+            }
+        });
+    })
+
+</script>
+</body>
+</html>
