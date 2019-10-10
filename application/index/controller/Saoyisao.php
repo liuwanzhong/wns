@@ -52,9 +52,6 @@ class Saoyisao extends Controller {
             Cookie::set('delivery',$delivery,['prefix'=>'think_']);
             Cookie::set('delivery_name',$delivery_name,['prefix'=>'think_']);
         }
-        if(empty($name)){
-            // $this->error('仓库未选择');
-        }
         if(isset($s) && strstr($s,',')){
             $s=explode(',',$s);
             foreach($s as $v){

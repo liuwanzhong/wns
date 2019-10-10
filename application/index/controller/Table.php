@@ -52,6 +52,26 @@ class Table extends Controller {
             $md[$k]['c_id']=$row['c_id'];
             $md[$k]['product_time']=date('Y-m-d',$row['product_time']);
         }
+
+        function my_sort($arrays,$sort_key,$sort_order=SORT_DESC,$sort_type=SORT_NUMERIC ){
+            if(is_array($arrays)){
+                foreach ($arrays as $array){
+                    if(is_array($array)){
+                        $key_arrays[] = $array[$sort_key];
+                    }else{
+                        return false;
+                    }
+                }
+            }else{
+                return false;
+            }
+            array_multisort($key_arrays,$sort_order,$sort_type,$arrays);
+            return $arrays;
+        }
+
+
+        $md = my_sort($md,'sy');
+
         return $md;
     }
     public function houwei_cd() {

@@ -10,7 +10,7 @@
 		<style type="text/css">
 			.layui-table th{text-align: center;font-weight: bold;}
         	.layui-table td{text-align: center;}
-			.label{box-sizing: content-box;}
+			label{box-sizing: content-box;}
 			.bd_content{height: 680px;}
 		</style>
 	<body>
@@ -90,9 +90,8 @@
 					}
 				});
 			})
-		</script>
 
-		<script type="text/javascript">
+
 			$('.del').click(function () {
 				let id=$(this).parents('tr').find('th').eq(0).text();
 				let p = $(this).parents('tr');

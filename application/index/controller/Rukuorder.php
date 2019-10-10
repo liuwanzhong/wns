@@ -289,7 +289,7 @@ class Rukuorder extends Controller {
                 ->select();
             foreach ($s as $c){
                 $a=db('record')->where('huowei',$c['rk_huowei_id'])->order('id desc')->limit(1)->select();
-                $b=db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$c['transfers_id'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums'],'huowei'=>$c['rk_huowei_id']]);
+                $b=db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$c['transfers_id'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums'],'huowei'=>$c['rk_huowei_id'],'hw_name'=>$c['product_name']]);
             }
             $r=db('rukuform')->where('id',$id)->update(['state'=>1]);
             $s=db('rukuform_xq')->where('rukuid',$id)->update(['state'=>1]);

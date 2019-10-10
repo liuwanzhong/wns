@@ -469,7 +469,7 @@ class Outbound extends Controller {
                 $d=(int)$d['rk_nums'];
                 $balance=$d-$r['ck_nums'];
                 //中间表
-                $a=db('record')->insert(['time'=>$form['ck_time'],'odd_number'=>$data['transport_id'],'task'=>$data['task'],'customer'=>$data['reachout_name'],'early_stage'=>$d,'xx_chuku'=>$r['ck_nums'],'balance'=>$balance,'huowei'=>$r['ck_huowei_id'],'count'=>$r['content']]);
+                $a=db('record')->insert(['time'=>$form['ck_time'],'odd_number'=>$data['transport_id'],'task'=>$data['task'],'customer'=>$data['reachout_name'],'early_stage'=>$d,'xx_chuku'=>$r['ck_nums'],'balance'=>$balance,'huowei'=>$r['ck_huowei_id'],'count'=>$r['content'],'hw_name'=>$r['product_name']]);
                 //改变实时数量
                 $b=db('rukuform_xq')->where('rk_huowei_id',$r['ck_huowei_id'])->update(['rk_nums'=>$balance]);
                 $rows=db('rukuform_xq')->where('is_del',0)->select();

@@ -17,8 +17,8 @@
 			<div class="nav">
 				<span class="layui-breadcrumb">
 					<a href="/public/main.html" target="box">首页</a>
-					<a href="javascript:;">管理</a>
-					<a><cite>货位管理</cite></a>
+					<a href="javascript:;">批次管理</a>
+					<a><cite>批次日志</cite></a>
 				</span>
 			</div>
 			<div class="search">
@@ -63,18 +63,18 @@
 					</tr>
 					</thead>
 					<tbody>
-                            {volist name='res' id='r'}
-                            <tr>
-                                <th>{$r['t_id']}</th>
-                                <th><?php if($r['t_state']==0){echo "入库";}else{echo "出库";}?></th>
-                                <th>{$r['tp_num']}</th>
-                                <th>{$r['w_name']}</th>
-                                <th>{$r['t_goods_name']}</th>
-                                <th>{$r['t_num']}</th>
-                                <th>{$r['t_delivery']}</th>
-                                <th><button class="layui-btn batch" lay-submit lay-filter="formDemo">查看</button></th>
-                            </tr>
-                            {/volist}
+						{volist name='res' id='r'}
+						<tr>
+							<td>{$r['t_id']}</td>
+							<td><?php if($r['t_state']==0){echo "入库";}else{echo "出库";}?></td>
+							<td>{$r['tp_num']}</td>
+							<td>{$r['w_name']}</td>
+							<td>{$r['t_goods_name']}</td>
+							<td>{$r['t_num']}</td>
+							<td>{$r['t_delivery']}</td>
+							<td><button class="layui-btn layui-btn-sm batch" lay-submit lay-filter="formDemo">查看</button></td>
+						</tr>
+						{/volist}
                     </tbody>
 				</table>
 				<div style="text-align:center; margin-bottom: 200px;">
