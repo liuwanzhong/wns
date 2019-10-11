@@ -151,11 +151,11 @@
     $('#dc').on('click', function() {
         var a=$('#s_delivery_time').val();
         var b=$('#s_transfers_id').val();
-        var data={delivery_time:a,transfers_id:b};
+        var data={s_delivery_time:a,s_transfers_id:b};
         console.log(data);
         $.post("{:url('Instor/outExcel')}",data, function (res) {
             if(res.error==0){
-                alert(res.msg);
+                alert('没有数据');
                 return false;
             }
             if (res.status) {

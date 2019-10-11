@@ -11,6 +11,7 @@
         .layui-table th{text-align: center;font-weight: bold;}
         .layui-table td{text-align: center;}
         #upload-add,#upload-edit{height: 30px;line-height: 30px;padding: 0 10px;margin-left: 10px;}
+        label{box-sizing: content-box;}
     </style>
 </head>
 <body>
@@ -22,34 +23,107 @@
             <a><cite>产品属性</cite></a>
         </span>
     </div>
+    <div class="seach">
+        <form action="{:url('Run/warker_list_show')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+            <input type="hidden" name="id" value="{$id}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">作业时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder="  " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <button class="layui-btn save" lay-submit>查询</button>
+                    <button class="layui-btn save" id="dc" name="dc" lay-submit>导出</button>
+                </div>
+            </div>
+        </form>
+    </div>
     <table class="layui-table" style="width: 96%; margin: 12px auto;">
         <thead>
             <tr>
-                <th>工厂</th>
-                <th>产品名称</th>
-                <th>产品日期</th>
+                <th>作业时间</th>
+                <th>工人姓名</th>
+                <th>装运单号</th>
+                <th>客户名称</th>
                 <th>总数量</th>
-                <th>总重量(吨)</th>
+                <th>总重量</th>
+                <th>单价</th>
+                <th>装卸费</th>
+                <th>作业类型</th>
             </tr>
         </thead>
-        {volist name='rows' id='r'}
-        <tr>
-            <td>{$r.factory}</td>
-            <td>{$r.product_name}</td>
-            <td>{$r.product_time}</td>
-            <td>{$r.rk_nums}</td>
-            <td>{$r.netweight}</td>
-        </tr>
-        {/volist}
         <tbody>
-
+            {volist name='rows' id='r'}
+            <tr class="tbd">
+                <input type="hidden" value="{$r.id}">
+                <td><?php if($r['time']){echo date('Y-m-d H:i:s',$r['time']);} ?></td>
+                <td>{$r.w_name}</td>
+                <td>{$r.numbers}</td>
+                <td>{$r.name}</td>
+                <td>{$r.num}</td>
+                <td>{$r.weight}</td>
+                <td><input type="text" name="money" class="blur" value=""></td>
+                <td class="money">{$r.money}</td>
+                <td>{$r.task}</td>
+            </tr>
+            {/volist}
         </tbody>
     </table>
+    <div style="padding: 0 30px"><span>总数量：{$num}</span><span style="padding:0 40px">总重量：{$weight}</span><span>总费用：{$money}</span></div>
+    <div style="text-align:center; margin-bottom: 200px;">
+        {$rows->render()}
+    </div>
 </div>
 
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 <script src="/layui/layui.js"></script>
-
+<script>
+    layui.use(['element','laydate','form'], function(){
+        var laydate = layui.laydate;
+        var element = layui.element;
+        let form = layui.form;
+        laydate.render({
+            elem: '#s_delivery_time'
+            ,range: '~'
+            ,done: function(value){
+                $('#s_delivery_time').val(value)
+            }
+        });
+    })
+    $('.blur').on('blur',function () {
+        let parent =$(this).parents('tr');
+        let id=$(this).parents('.tbd').find('input[type=hidden]').val();
+        let weight=$(this).parents('.tbd').find('td').eq(5).text();
+        let money=$(this).parents('.tbd').find('input[type=text]').val();
+        $.ajax({
+            url:'/index/Run/warker_money',
+            data:{id,weight,money},
+            success:function (data) {
+                parent.find('.money').text(data);
+                console.log(data)
+            }
+        })
+    })
+    $('#dc').on('click', function() {
+        var a=$('#s_delivery_time').val();
+        var data={s_delivery_time:a};
+        console.log(data);
+        $.post("{:url('Run/outExcel')}",data, function (res) {
+            if(res.error==0){
+                alert(res.msg);
+                return false;
+            }
+            if (res.status) {
+                alert(1);
+                window.location.href = ("{:Url('index/Run/download')}?file=" + res.url);
+            } else {
+                layer.msg('系统错误，操作失败');
+            }
+        }, 'json')
+    })
+</script>
 </body>
 </html>

@@ -59,6 +59,7 @@
 					<th>仓库</th>
 					<th>入库日期</th>
 					<th>总数量</th>
+					<th>总重量</th>
 					<th>操作</th>
 				</tr>
 				</thead>
@@ -72,7 +73,8 @@
 					<td>{$row.shipmentnum}</td>
 					<td>{$row.w_name}</td>
 					<td><?php if(!empty($row['userintime'])){echo date('Y-m-d',$row['userintime']);} ?></td>
-					<td>{$row.count}</td>
+					<td>{$row.nums}</td>
+					<td>{$row.weight}</td>
 					<td>
 						<a href="#" class="edit xq" title="详情" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
 						<a href="{:url('Rukuorder/warehousing_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>

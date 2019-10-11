@@ -276,11 +276,14 @@ class Rukuorder extends Controller {
             ->where('rukuid',$id)
             ->select();
         foreach ($s as $v) {
-            if($v['rk_huowei_id']==0 || $v['product_time']==''){
+            if($v['rk_huowei_id']==0 || $v['product_time']=='' || $data['stevedore']==''){
                 $this->error('请完善信息');
             }
         }
         try{
+            $war=explode(",",$data['stevedore']);
+            $warker_num=ceil($data['count']/count($war));//平分数量
+            $warker_weight=number_format($data['netweight']/count($war),3);//平分重量
             $s=db('rukuform_xq')
                 ->where('rukuid',$id)
                 ->select();
@@ -289,11 +292,10 @@ class Rukuorder extends Controller {
                 $b=db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$c['transfers_id'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums'],'huowei'=>$c['rk_huowei_id'],'hw_name'=>$c['product_name']]);
             }
             $r=db('rukuform')->where('id',$id)->update(['state'=>1]);
-            $s=db('rukuform_xq')->where('rukuid',$id)->update(['state'=>1]);
+            $s=db('rukuform_xq')->where('rukuid',$id)->update(['state'=>1,'warker_num'=>$warker_num,'warker_weight'=>$warker_weight,'warker_id'=>$data['stevedore']]);
             $f=db('staffs_id')->where('rukuform_id',$id)->update(['state'=>1]);
-            $stevedore=explode(",",$data['stevedore']);
-            for($i=0;$i<count($stevedore);$i++){
-                $l=db('stevedore')->insert(['warker_id'=>$stevedore[$i],'name'=>$data['customer'],'task'=>'销售出库','weight'=>$data['netweight'],'num'=>$data['count'],'rukuform_id'=>$data['id']]);
+            for($i=0;$i<count($war);$i++){
+                $l=db('stevedore')->insert(['warker_id'=>$war[$i],'numbers'=>$data['odd_number'],'name'=>$data['customer'],'num'=>$warker_num,'weight'=>$warker_weight,'task'=>'到货入库','time'=>$data['time']]);
             }
             if($r && $s && $b && $f && $l) {
                 Db::commit();
@@ -370,7 +372,7 @@ class Rukuorder extends Controller {
             ->order('rukuform.id desc')
             ->group('rukuform_xq.rukuid')
             ->where($search)
-            ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count,staffs.staffs_name,rukuform_xq.nums')
+            ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count,staffs.staffs_name')
             ->where('rukuform_xq.rk_nums>0')
             ->paginate(20,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         return view('warehousing',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);

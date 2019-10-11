@@ -1070,7 +1070,7 @@ class Instor extends Controller
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]]);
         return view('staffs_list',['row'=>$row,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]);
     }
-        /**
+     /**
      * 操作日志导出
      */
     public function outExcel(){
