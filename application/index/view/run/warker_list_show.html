@@ -25,11 +25,31 @@
     </div>
     <div class="seach">
         <form action="{:url('Run/warker_list_show')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
-            <input type="hidden" name="id" value="{$id}">
+            <div class="layui-form-item">
+                <label class="layui-form-label">工人名称</label>
+                <div class="layui-input-inline">
+                    <select name="name" id="" lay-search>
+                        <option value="">全部</option>
+                        {volist name='warker' id='r'}
+                        <option value="{$r.id}">{$r.name}</option>
+                        {/volist}
+                    </select>
+                </div>
+            </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">作业时间</label>
                 <div class="layui-input-inline">
                     <input type="text" class="layui-input" id="s_delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">作业类型</label>
+                <div class="layui-input-inline">
+                    <select name="state" id="" lay-search>
+                        <option value="">全部</option>
+                        <option value="到货入库">到货入库</option>
+                        <option value="销售出库">销售出库</option>
+                    </select>
                 </div>
             </div>
             <div class="layui-form-item">

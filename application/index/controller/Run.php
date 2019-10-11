@@ -288,24 +288,14 @@ class Run extends Controller {
             $this->error("删除失败");
         }
     }
-    //工人搬运列表
-    public function warker_list() {
-        $serch='';
-        $id=input('s_delivery_time');
-        if(!empty($id)){
-            $serch="id = $id";
-        }
-        $rows=db('warker')->where('is_del',1)->where("$serch")->select();
-        $warker=db('warker')->where('is_del',1)->select();
-        return view('warker_list',['rows'=>$rows,'warker'=>$warker]);
-    }
     //工人搬运详情
     public function warker_list_show() {
-        $id=input('id');
         $num=0;//总数量
         $weight=0;//总重量
         $money=0;//总金额
         $s_delivery_time=input('s_delivery_time');//作业时间
+        $name=input('name');//工人名称
+        $state=input('state');//作业类型
         $search = '';
         // 时间转换
         if (!empty($s_delivery_time)) {
@@ -317,18 +307,37 @@ class Run extends Controller {
             $time = ' stevedore.time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
             $search .= $time;
         }
+        if (!empty($name)) {
+            $material_name = $name;
+            if (!empty($search)) {
+                $material_name = " and stevedore.warker_id = $material_name";
+            } else {
+                $material_name = " stevedore.warker_id = $material_name";
+            }
+            $search .= $material_name;
+        }
+        if (!empty($state)) {
+            $material_name = $state;
+            if (!empty($search)) {
+                $material_name = ' and stevedore.task like ' . "'%" . $material_name . '%' . "'";
+            } else {
+                $material_name =' stevedore.task like ' . "'%" . $material_name . '%' . "'";
+            }
+            $search .= $material_name;
+        }
         $rows=db('stevedore')
-            ->where('stevedore.warker_id',$id)
             ->join('warker','warker.id=stevedore.warker_id')
             ->where("$search")
             ->field('stevedore.*,warker.name as w_name')
-            ->paginate(20,false,['query'=>['s_delivery_time'=>$s_delivery_time,'id'=>$id]]);
+            ->order('stevedore.warker_id asc')
+            ->paginate(100,false,['query'=>['s_delivery_time'=>$s_delivery_time]]);
         foreach ($rows as $row) {
             $num+=$row['num'];
             $weight+=$row['weight'];
             $money+=$row['money'];
         }
-        return view('warker_list_show',['rows'=>$rows,'num'=>$num,'weight'=>$weight,'money'=>$money,'id'=>$id,'s_delivery_time'=>$s_delivery_time]);
+        $warker=db('warker')->where('is_del',1)->select();
+        return view('warker_list_show',['rows'=>$rows,'num'=>$num,'weight'=>$weight,'money'=>$money,'s_delivery_time'=>$s_delivery_time,'warker'=>$warker]);
     }
     //价钱结算
     public function warker_money() {
