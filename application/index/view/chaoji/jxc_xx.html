@@ -22,7 +22,15 @@
             <a><cite>进销存</cite></a>
         </span>
     </div>
-
+    <div class="daochu">
+        <div class="layui-form-item">
+            <div class="layui-input-inline">
+                <!-- <form action="{:url('Chaoji/outExce')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;"> -->
+                    <button class="layui-btn save" id="dc" name="dc" lay-submit>导出</button>
+                <!-- </form> -->
+            </div>
+        </div>
+    </div>
     <div class="bd_content">
         <table class="layui-table" style="width: 96%; margin: 12px auto">
                 <thead>
@@ -89,7 +97,22 @@
             }
         });
     })
-
+    // 导出
+    $('#dc').on('click', function() {
+        console.log(1);
+        var a = 1;
+        $.post("{:url('Chaoji/outExcel')}",a, function (res) {
+            if(res.error==0){
+                alert(res.msg);
+                return false;
+            }
+            if (res.status) {
+                window.location.href = ("{:Url('index/Chaoji/download')}?file=" + res.url);
+            } else {
+                layer.msg('系统错误，操作失败');
+            }
+        }, 'json')
+    })
 </script>
 </body>
 </html>

@@ -349,7 +349,110 @@ class Run extends Controller {
         return $m;
     }
 
-
+    /**
+     * 工人导出
+     */
+    public function outExcel(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $s_delivery_time=input('s_delivery_time');//操作时间
+        $search = '';
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
+            foreach ($time as $key) {
+                $time[] = strtotime($key);
+                array_shift($time);
+            }
+            $time = ' stevedore.time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            $search .= $time;
+        }
+        $row=db('stevedore')
+            ->join('warker','warker.id=stevedore.warker_id')
+            ->where("$search")
+            ->field('stevedore.*,warker.name as w_name')
+            ->select();
+        if(!empty($row)){
+            Vendor('PHPExcel.PHPExcel');
+            Vendor('PHPExcel.PHPExcel.IOFactory');
+            $phpExcel = new \PHPExcel();
+            $phpExcel->setActiveSheetIndex(0)
+                ->setCellValue('A1', '作业时间')
+                ->setCellValue('B1', '工人姓名')
+                ->setCellValue('C1', '装运单号')
+                ->setCellValue('D1', '客户名称')
+                ->setCellValue('E1', '总数量')
+                ->setCellValue('F1', '总重量')
+                ->setCellValue('G1', '装卸费')
+                ->setCellValue('H1', '作业类型');
+            $len = count($row);
+            for($i = 0 ; $i < $len ; $i++){
+                $v = $row[$i];
+                $v['time']=date('Y-m-d H:i:s',$v['time']);
+                $rownum = $i+2;
+                $phpExcel->getActiveSheet()->setCellValue('A' . $rownum, $v['time']);
+                $phpExcel->getActiveSheet()->setCellValue('B' . $rownum, $v['w_name']);
+                $phpExcel->getActiveSheet()->setCellValue('C' . $rownum, $v['numbers']);
+                $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['name']);
+                $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['num']);
+                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, $v['weight']);
+                $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['money']);
+                $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['task']);
+            }
+            $phpExcel->setActiveSheetIndex(0);
+            $filename=date('Y-m-d',time()).'.xlsx';
+            $objWriter=\PHPExcel_IOFactory::createWriter($phpExcel,'Excel2007');
+            $filePath =$filename;
+            $objWriter->save($filePath);
+            if(!file_exists($filePath)){
+                $response = array(
+                    'status' => 'false',
+                    'url' => '',
+                    'token'=>''
+                );
+            }else{
+                $response = array(
+                    'status' => true,
+                    'url' => $filename,
+                );
+            }
+        }else{
+            $response = array(
+                'status' => 'false',
+                'url' => '',
+                'token'=>''
+            );
+        }
+        exit(json_encode($response));
+    }
+    /**
+     * 下载工人
+     */
+    public function download(){
+        $fileName = date('Y-m-d',time()).'.xlsx';
+        $path = ROOT_PATH."\public/".$fileName;
+        if(!file_exists($path)){
+            header("HTTP/1.0 404 Not Found");
+            exit;
+        }else{
+            $file = @fopen($path,"r");
+            if(!$file){
+                header("HTTP/1.0 505 Internal server error");
+                exit;
+            }
+            header("Content-type: application/octet-stream");
+            header("Accept-Ranges: bytes");
+            header("Accept-Length: ".filesize($path));
+            header("Content-Disposition: attachment; filename=" . $fileName);
+            while(!feof($file)){
+                echo fread($file,2048);
+            }
+            fclose($file);
+            unlink($path);
+            exit();
+        }
+    }
 
 
 

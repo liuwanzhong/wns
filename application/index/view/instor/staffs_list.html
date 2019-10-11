@@ -27,7 +27,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">保管名称</label>
                 <div class="layui-input-inline">
-                    <input type="text" class="layui-input" id="" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
+                    <input type="text" class="layui-input" id="s_transfers_id" name="s_transfers_id" value="<?php if(!empty($s_transfers_id)){echo $s_transfers_id;}?>" />
                 </div>
             </div>
             <div class="layui-form-item">
@@ -39,6 +39,7 @@
             <div class="layui-form-item">
                 <div class="layui-input-inline">
                     <button class="layui-btn save" lay-submit>查询</button>
+                    <button class="layui-btn save" id="dc" name="dc" lay-submit>导出</button>
                 </div>
             </div>
         </form>
@@ -146,6 +147,23 @@
                 $('.t').append(html);
             }
         })
+    })
+    $('#dc').on('click', function() {
+        var a=$('#s_delivery_time').val();
+        var b=$('#s_transfers_id').val();
+        var data={s_delivery_time:a,s_transfers_id:b};
+        console.log(data);
+        $.post("{:url('Instor/outExcel')}",data, function (res) {
+            if(res.error==0){
+                alert('没有数据');
+                return false;
+            }
+            if (res.status) {
+                window.location.href = ("{:Url('index/Instor/download')}?file=" + res.url);
+            } else {
+                layer.msg('系统错误，操作失败');
+            }
+        }, 'json')
     })
 </script>
 

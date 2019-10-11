@@ -1071,4 +1071,123 @@ class Instor extends Controller
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]]);
         return view('staffs_list',['row'=>$row,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time]);
     }
+     /**
+     * 操作日志导出
+     */
+    public function outExcel(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $s_transfers_id=input('s_transfers_id');//保管名称
+        $s_delivery_time=input('s_delivery_time');//操作时间
+        $search = '';
+        //保管名称
+        if (!empty($s_transfers_id)) {
+            $search = 'staffs.staffs_name like ' . "'%" . $s_transfers_id . '%' . "'";
+        }
+        // 产品日期
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
+            foreach ($time as $key) {
+                $time[] = strtotime($key);
+                array_shift($time);
+            }
+            if (!empty($search)) {
+                $time = ' and unix_timestamp(staffs_id.state_time) BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            } else {
+                $time = 'unix_timestamp(staffs_id.state_time) BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            }
+            $search .= $time;
+        }
+        $row=db('staffs_id')
+            ->join('staffs','staffs_id.staffs_id=staffs.id')
+            ->order('state_time desc')
+            ->where("$search")
+            ->field('staffs_id.*,staffs.staffs_name')
+        ->select();
+        if(!empty($row)){
+            Vendor('PHPExcel.PHPExcel');
+            Vendor('PHPExcel.PHPExcel.IOFactory');
+            $phpExcel = new \PHPExcel();
+            $phpExcel->setActiveSheetIndex(0)
+                ->setCellValue('A1', '保管名称')
+                ->setCellValue('B1', '操作时间')
+                ->setCellValue('C1', '类型')
+                ->setCellValue('D1', '订单编号')
+                ->setCellValue('E1', '售达方（工厂）')
+                ->setCellValue('F1', '总数量')
+                ->setCellValue('G1', '总吨位')
+                ->setCellValue('H1', '状态');
+            $len = count($row);
+            for($i = 0 ; $i < $len ; $i++){
+                $v = $row[$i];
+                if($v['state']){
+                    $v['state']='已审核';
+                }else{
+                    $v['state']='未审核';
+                }
+                $rownum = $i+2;
+                $phpExcel->getActiveSheet()->setCellValue('A' . $rownum, $v['staffs_name']);
+                $phpExcel->getActiveSheet()->setCellValue('B' . $rownum, $v['state_time']);
+                $phpExcel->getActiveSheet()->setCellValue('C' . $rownum, $v['task']);
+                $phpExcel->getActiveSheet()->setCellValue('D' . $rownum, $v['order_number']);
+                $phpExcel->getActiveSheet()->setCellValue('E' . $rownum, $v['factory']);
+                $phpExcel->getActiveSheet()->setCellValue('F' . $rownum, $v['nums']);
+                $phpExcel->getActiveSheet()->setCellValue('G' . $rownum, $v['dun']);
+                $phpExcel->getActiveSheet()->setCellValue('H' . $rownum, $v['state']);
+            }
+            $phpExcel->setActiveSheetIndex(0);
+            $filename=date('Y-m-d',time()).'.xlsx';
+            $objWriter=\PHPExcel_IOFactory::createWriter($phpExcel,'Excel2007');
+            $filePath =$filename;
+            $objWriter->save($filePath);
+            if(!file_exists($filePath)){
+                $response = array(
+                    'status' => 'false',
+                    'url' => '',
+                    'token'=>''
+                );
+            }else{
+                $response = array(
+                    'status' => true,
+                    'url' => $filename,
+                );
+            }
+        }else{
+            $response = array(
+                'status' => 'false',
+                'url' => '',
+                'token'=>''
+            );
+        }
+        exit(json_encode($response));
+    }
+    /**
+     * 下载操作日志
+     */
+    public function download(){
+        $fileName = date('Y-m-d',time()).'.xlsx';
+        $path = ROOT_PATH."\public/".$fileName;
+        if(!file_exists($path)){
+            header("HTTP/1.0 404 Not Found");
+            exit;
+        }else{
+            $file = @fopen($path,"r");
+            if(!$file){
+                header("HTTP/1.0 505 Internal server error");
+                exit;
+            }
+            header("Content-type: application/octet-stream");
+            header("Accept-Ranges: bytes");
+            header("Accept-Length: ".filesize($path));
+            header("Content-Disposition: attachment; filename=" . $fileName);
+            while(!feof($file)){
+                echo fread($file,2048);
+            }
+            fclose($file);
+            unlink($path);
+            exit();
+        }
+    }
 }
