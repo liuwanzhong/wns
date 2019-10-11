@@ -271,7 +271,7 @@ class Outbound extends Controller {
                             'sy_count'=>$data['sy_count'][$i]
                         ]);
                 }
-                $f=db('staffs_id')->insert(['staffs_id'=>$staffs_id,'nums'=>$data['all_count'],'dun'=>$data['all_weight'],'state'=>0,'task'=>'销售出库','rukuform_id'=>$id]);
+                $f=db('staffs_id')->insert(['staffs_id'=>$staffs_id,'nums'=>$data['all_count'],'dun'=>$data['all_weight'],'state'=>0,'task'=>'销售出库','rukuform_id'=>$id,'order_number'=>$data['transport_id'],'factory'=>$data['reachout_name']]);
                 $del=db('system_order')->where('id','in',$data['cd'])->update(['is_del'=>1]);
                 if($id && $del && $p) {
                     // 提交事务
@@ -345,6 +345,7 @@ class Outbound extends Controller {
     }
     // 出库订单详情
     public function to_examine_show($id) {
+        static $warker_name='';
         $warehouse=self::$stafss['warehouse'];
         $num=0;
         $ms=$this->qx();
@@ -361,6 +362,16 @@ class Outbound extends Controller {
             ->where('outbound_from.id',$id)
             ->field('outbound_from.*,warehouse.name as w_name')
             ->find();
+        //装卸工
+        $warker=db('warker')->where('is_del',1)->select();
+        $war=explode(",",$rows['workers']);
+        foreach ($warker as $item) {
+            foreach ($war as $w) {
+                if($w==$item['id']){
+                    $warker_name.=$item['name'].',';
+                }
+            }
+        }
         $cats=db('outbound_xq_from')
             ->where('outbound_xq_from.chukuid',$rows['id'])
             ->join('cabinet','cabinet.id=outbound_xq_from.ck_huowei_id','left')
@@ -388,7 +399,7 @@ class Outbound extends Controller {
             $nums += $v['ck_nums'];
         }
         $warker=db('warker')->where('is_del',1)->select();
-        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num,'nums'=>$nums,'weight'=>$weight,'warker'=>$warker]);
+        return view('to_examine_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num,'nums'=>$nums,'weight'=>$weight,'warker'=>$warker,'warker_name'=>$warker_name,'war'=>$war]);
     }
     //出库修改订单
     public function to_examine_up() {

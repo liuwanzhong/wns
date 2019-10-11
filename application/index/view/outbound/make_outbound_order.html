@@ -81,16 +81,12 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">工人:</label>
+                <label class="layui-form-label">装卸工:</label>
                 <div class="layui-input-inline">
-<!--                    <input type="text" name="workers" autocomplete="off" class="layui-input">-->
-                    <select name="workers" lay-filter="ck_id" onchange="showtable(this.value)">
-                        <option value="0">请选择工人</option>
-                        <?php foreach($warker as $w): ?>
-                        <option value="<?=$w['id']?>"><?=$w['name']?></option>
-                        <?php endforeach; ?>
-                    </select>
+                    <input type="hidden" name="workers">
+                    <span class="names"></span>
                 </div>
+                <a href="#" class="layui-btn" id="dialog">添加</a>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">承运单位:</label>
@@ -210,12 +206,45 @@
         </table>
         <button class="layui-btn sure" style="margin: 20px auto 100px;">确定</button>
     </div>
-
+</div>
+<div class="model modeladd">
+    <div class="head">
+        <span>添加工人</span>
+        <a href="javascript:" class="close">×</a>
+    </div>
+    <div class="content" style="height: calc(100% - 100px); overflow-x: hidden;">
+        <div class="layui-form gr">
+            {volist name = 'warker' id = 'r'}
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <input type="checkbox" name="{$r.name}" value="{$r.id}" title="{$r.name}" lay-skin="primary">
+                </div>
+            </div>
+            {/volist}
+        </div>
+        <button id="warker" class="layui-btn">确定</button>
+    </div>
 </div>
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
-
+    $('#dialog').on('click', function(){
+        $('.modeladd').show();
+    })
+    $('#warker').on('click',function () {
+        let list = $('.content').find('input:checkbox:checked');
+        let name = '',ids = [];
+        list.each(function () {
+            name += $(this)[0].name+',';
+            ids.push($(this)[0].value);
+        })
+        $('.names').text(name);
+        $('input[name=workers]').val(ids);
+        $('.modeladd').hide();
+    })
+    $('.close').on('click', function(){
+        $('.modeladd').hide();
+    })
     layui.use(['element', 'form','laydate','layer'], function () {
         let element = layui.element;
         let form = layui.form;

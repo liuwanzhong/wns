@@ -50,6 +50,8 @@
                 <th>保管名称</th>
                 <th>操作时间</th>
                 <th>类型</th>
+                <th>订单编号</th>
+                <th>售达方（工厂）</th>
                 <th>总数量</th>
                 <th>总吨位</th>
                 <th>状态</th>
@@ -64,6 +66,8 @@
                 <td>{$ro['staffs_name']}</td>
                 <td>{$ro['state_time']}</td>
                 <td>{$ro['task']}</td>
+                <td>{$ro['order_number']}</td>
+                <td>{$ro['factory']}</td>
                 <td>{$ro['nums']}</td>
                 <td>{$ro['dun']}</td>
                 <td><?php if($ro['state']==0){echo "<span style='color:red'>未审核</span>";}else{echo "<span>已审核</span>";} ?></td>

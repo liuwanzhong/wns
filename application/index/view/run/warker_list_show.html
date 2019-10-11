@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>状态管理</title>
+    <link rel="stylesheet" href="/images/boot.css">
+    <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
+    <style type="text/css">
+        .layui-table th{text-align: center;font-weight: bold;}
+        .layui-table td{text-align: center;}
+        #upload-add,#upload-edit{height: 30px;line-height: 30px;padding: 0 10px;margin-left: 10px;}
+    </style>
+</head>
+<body>
+<div class="note">
+    <div class="nav">
+        <span class="layui-breadcrumb">
+            <a href="/public/main.html" target="box">首页</a>
+            <a href="javascript:;">管理</a>
+            <a><cite>产品属性</cite></a>
+        </span>
+    </div>
+    <table class="layui-table" style="width: 96%; margin: 12px auto;">
+        <thead>
+            <tr>
+                <th>工厂</th>
+                <th>产品名称</th>
+                <th>产品日期</th>
+                <th>总数量</th>
+                <th>总重量(吨)</th>
+            </tr>
+        </thead>
+        {volist name='rows' id='r'}
+        <tr>
+            <td>{$r.factory}</td>
+            <td>{$r.product_name}</td>
+            <td>{$r.product_time}</td>
+            <td>{$r.rk_nums}</td>
+            <td>{$r.netweight}</td>
+        </tr>
+        {/volist}
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+
+<script src="/static/jquery-1.9.1.min.js"></script>
+<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
+<script src="/layui/layui.js"></script>
+
+</body>
+</html>

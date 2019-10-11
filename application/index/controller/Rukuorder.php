@@ -76,7 +76,6 @@ class Rukuorder extends Controller {
         return ['number'=>$number,'groos'=>$groos];
     }
     //添加入库订单
-
     public function insert(){
         Db::startTrans();
         $staffs_id=Session::get('users')['id'];
@@ -89,7 +88,7 @@ class Rukuorder extends Controller {
         }
         $userintime=strtotime($data['userintime']);
         try{
-            $id = db('rukuform')->insertGetId(['shipmentnum'=>$data['shipmentnum'],'userintime'=>$userintime,'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id'],'staffs_id'=>$staffs_id]);
+            $id = db('rukuform')->insertGetId(['shipmentnum'=>$data['shipmentnum'],'userintime'=>$userintime,'transport'=>$data['transport'],'carid'=>$data['carid'],'stevedore'=>$data['stevedore'],'ck_id'=>$data['ck_id'],'staffs_id'=>$staffs_id,'nums'=>$data['num'],'weight'=>$data['z']]);
             for ($i=0;$i<count($data['transfers_factory']);$i++){
                 $t=strtotime($data['intime'][$i]);
                 $rs = db('rukuform_xq')->insert(['factory'=>$data['transfers_factory'][$i],
@@ -106,7 +105,7 @@ class Rukuorder extends Controller {
                                                  'rukuid'=>$id,
                                                  'nums'=>$data['nums'][$i]]);
             }
-            $staffs=db('staffs_id')->insert(['nums'=>$data['num'],'dun'=>$data['z'],'state'=>0,'staffs_id'=>$staffs_id,'task'=>'到货入库','rukuform_id'=>$id]);
+            $staffs=db('staffs_id')->insert(['nums'=>$data['num'],'dun'=>$data['z'],'state'=>0,'staffs_id'=>$staffs_id,'task'=>'到货入库','rukuform_id'=>$id,'order_number'=>$data['shipmentnum'],'factory'=>$data['transfers_factory'][0]]);
             $del=db('cw_management')->where('id','in',$data['cd'])->update(['is_del'=>1]);
             if($id && $rs && $del && $staffs) {
                 // 提交事务
@@ -115,7 +114,6 @@ class Rukuorder extends Controller {
             }
         } catch (\Exception $e) {
             $this->error('添加入库订单失败,请重试');
-            dump($e->getMessage());
             // 回滚事务
             Db::rollback();
         }
@@ -166,7 +164,7 @@ class Rukuorder extends Controller {
             ->order('rukuform.id desc')
             ->group('rukuform_xq.rukuid')
             ->where($search)
-            ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count,staffs.staffs_name')
+            ->field('rukuform.*,warehouse.name as w_name,rukuform_xq.factory as x_name,sum(rukuform_xq.rk_nums) as count,staffs.staffs_name,sum(rukuform_xq.netweight) as netweight')
             ->paginate(20,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         return view('to_examine',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
     }
@@ -222,7 +220,6 @@ class Rukuorder extends Controller {
             $this->error('警告：越权操作');
         }
         $data=input();
-//        dump($data['stevedore']);exit;
         $n=0;//总数量
         $z=0;//总重量
         for ($i=0;$i<count($data['nums']);$i++){
@@ -233,8 +230,8 @@ class Rukuorder extends Controller {
         array_shift($data);
         $r = db('rukuform')
             -> where('id', $data['id'])
-            -> update(['shipmentnum' => $data['shipmentnum'], 'userintime' => $userintime, 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id']]);
-        db('staffs_id')->where('rukuform_id',$data['id'])->update(['nums'=>$n,'dun'=>$z]);
+            -> update(['shipmentnum' => $data['shipmentnum'], 'userintime' => $userintime, 'transport' => $data['transport'], 'carid' => $data['carid'], 'stevedore' => $data['stevedore'], 'ck_id' => $data['ck_id'],'nums'=>$n,'weight'=>$z]);
+        db('staffs_id')->where('rukuform_id',$data['id'])->update(['nums'=>$n,'dun'=>$z,'order_number'=>$data['shipmentnum']]);
         for ($i = 0; $i < count($data['transfers_factory']); $i++) {
             $t=strtotime($data['intime'][$i]);
             if (empty($data['cd'][$i])) {
@@ -294,13 +291,18 @@ class Rukuorder extends Controller {
             $r=db('rukuform')->where('id',$id)->update(['state'=>1]);
             $s=db('rukuform_xq')->where('rukuid',$id)->update(['state'=>1]);
             $f=db('staffs_id')->where('rukuform_id',$id)->update(['state'=>1]);
-            if($r && $s && $b && $f) {
+            $stevedore=explode(",",$data['stevedore']);
+            for($i=0;$i<count($stevedore);$i++){
+                $l=db('stevedore')->insert(['warker_id'=>$stevedore[$i],'name'=>$data['customer'],'task'=>'销售出库','weight'=>$data['netweight'],'num'=>$data['count'],'rukuform_id'=>$data['id']]);
+            }
+            if($r && $s && $b && $f && $l) {
                 Db::commit();
             }
         } catch (\Exception $e) {
             $this->error('审核失败,请联系管理员');
             // 回滚事务
             Db::rollback();
+//            dump($e->getMessage());
         }
         return redirect('to_examine');
     }

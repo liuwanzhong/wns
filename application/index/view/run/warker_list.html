@@ -22,37 +22,38 @@
             <a><cite>产品属性</cite></a>
         </span>
     </div>
-    <div class="handle">
-        <button type="button" class="layui-btn" id="dialog">添加</button>
-    </div>
     <table class="layui-table" style="width: 96%; margin: 12px auto;">
         <thead>
             <tr>
                 <th>ID</th>
+                <th>操作时间</th>
                 <th>工人姓名</th>
-                <th>说明</th>
-                <th>创建时间</th>
+                <th>工厂名称</th>
+                <th>总数量</th>
+                <th>总重量(吨)</th>
+                <th>类型</th>
                 <th>操作</th>
             </tr>
         </thead>
         <tbody>
-            {volist name='list' id='v'}
+            {volist name='rows' id='v'}
             <tr>
                 <td>{$v.id}</td>
-                <td>{$v.name}</td>
-                <td>{$v.content}</td>
                 <td>{$v.state_time}</td>
+                <td>{$v.g_name}</td>
+                <td>{$v.name}</td>
+                <td>{$v.num}</td>
+                <td>{$v.weight}</td>
+                <td>{$v.task}</td>
                 <td style="width:300px">
-                    <a href="#" class="edits" title="编辑" style="margin-right: 15px;"><i class="ico">&#xe619;</i><input type="hidden" name="myids" value="{$v.id}"></a>
-                    <a href="{:url('Run/warker_delete','id='.$v['id'])}" class="" title="删除"><i class="ico">&#xe605;</i></a>
-                    <a href="{:url('Run/warker_list','id='.$v['id'])}" class="" title="查看"><i class="ico">&#xe61a;</i></a>
+                    <a href="{:url('Run/warker_list_show','id='.$v.rukuform_id)}" class="" title="查看"><i class="ico">&#xe61a;</i></a>
                 </td>
             </tr>
             {/volist}
         </tbody>
     </table>
     <div style="text-align:center; margin-bottom: 200px;">
-        {$list->render()}
+        {$rows->render()}
     </div>
 </div>
 

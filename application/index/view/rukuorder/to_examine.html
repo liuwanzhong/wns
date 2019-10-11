@@ -60,6 +60,7 @@
 						<th>仓库</th>
 						<th>入库日期</th>
 						<th>总数量</th>
+						<th>总重量</th>
 						<th>操作</th>
 					</tr>
 					</thead>
@@ -74,9 +75,10 @@
 						<td>{$row.w_name}</td>
 						<td><?php if(!empty($row['userintime'])){echo date('Y-m-d',$row['userintime']);} ?></td>
 						<td>{$row.count}</td>
+						<td>{$row.netweight}</td>
 						<td>
 							<a href="#" class="edit xq" style="margin-right: 15px;"><i class="ico" title="详情">&#xe619;</i></a>
-							<a href="{:url('Rukuorder/to_examine_yes',['id'=>$row.id,'customer'=>$row.x_name,'odd_number'=>$row.shipmentnum,'time'=>$row.userintime,'task'=>'到货入库'])}" class="edit ks" title="审核通过"><i class="ico">&#xe602;</i></a>
+							<a href="{:url('Rukuorder/to_examine_yes',['id'=>$row.id,'customer'=>$row.x_name,'odd_number'=>$row.shipmentnum,'time'=>$row.userintime,'task'=>'到货入库','stevedore'=>$row.stevedore,'netweight'=>$row.netweight,'count'=>$row.count])}" class="edit ks" title="审核通过"><i class="ico">&#xe602;</i></a>
 							<a href="{:url('Rukuorder/to_examine_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
 						</td>
 					</tr>

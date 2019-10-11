@@ -288,6 +288,20 @@ class Run extends Controller {
             $this->error("删除失败");
         }
     }
+    //工人搬运列表
+    public function warker_list($id) {
+        $rows=db('stevedore')
+            ->where('stevedore.warker_id',$id)
+            ->join('warker','warker.id=stevedore.warker_id')
+            ->field('stevedore.*,warker.name as g_name')
+            ->paginate(100);
+        return view('warker_list',['rows'=>$rows]);
+    }
+    //工人搬运详情
+    public function warker_list_show($id) {
+        $rows=db('rukuform_xq')->where('is_del',0)->where('state',1)->where('rukuid',$id)->select();
+        return view('warker_list_show',['rows'=>$rows]);
+    }
 
 
 
