@@ -379,6 +379,10 @@ class Rukuorder extends Controller {
     }
     //订单详情
     public function warehousing_show($id) {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $num=0;
         $mao=0;
         $jing=0;
@@ -504,6 +508,10 @@ class Rukuorder extends Controller {
     }
     //导出入库明细
     public function outExcel(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data = input();
         unset($data['/index/rukuorder/outexcel_html']);
         $id=$data['id'];

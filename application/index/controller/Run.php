@@ -595,6 +595,10 @@ class Run extends Controller {
      * 托盘详细
      */
     public function tray_xx(){
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
         $id=$_POST['id'];
         $row=db('tray')
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
@@ -609,6 +613,10 @@ class Run extends Controller {
      * 清空托盘
      */
     public function clean(){
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
         $id=$_POST['id'];
         $res=db('tray')
         ->where('id',$id)
@@ -626,6 +634,10 @@ class Run extends Controller {
      * 新增托盘 二维码
      */
     public function tray_add(){
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
         $data=input();
 
         if(!empty($data['tp_num'])&&!empty($data['warehouse_id'])){
@@ -661,7 +673,14 @@ class Run extends Controller {
             $this -> error('请填写完整数据');
         }
     }
+    /**
+     * 删除托盘
+     */
     public function tray_del(){
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            return 0;
+        }
         $id=$_POST['id'];
         dump($id);
         $row=db('tray')
