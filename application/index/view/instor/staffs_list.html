@@ -37,6 +37,16 @@
                 </div>
             </div>
             <div class="layui-form-item">
+                <label class="layui-form-label">作业类型</label>
+                <div class="layui-input-inline">
+                    <select name="name" id="">
+                        <option value="">全部</option>
+                        <option value="到货入库">到货入库</option>
+                        <option value="销售出库">销售出库</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
                 <div class="layui-input-inline">
                     <button class="layui-btn save" lay-submit>查询</button>
                     <button class="layui-btn save" id="dc" name="dc" lay-submit>导出</button>
@@ -48,9 +58,9 @@
         <table class="layui-table" style="width: 96%; margin: 12px auto;">
             <thead>
             <tr>
+                <th>作业类型</th>
                 <th>保管名称</th>
                 <th>操作时间</th>
-                <th>类型</th>
                 <th>订单编号</th>
                 <th>售达方（工厂）</th>
                 <th>总数量</th>
@@ -64,9 +74,9 @@
             <tr>
                 <input type="hidden" value="{$ro['rukuform_id']}">
                 <input type="hidden" value="{$ro['task']}">
+                <td>{$ro['task']}</td>
                 <td>{$ro['staffs_name']}</td>
                 <td>{$ro['state_time']}</td>
-                <td>{$ro['task']}</td>
                 <td>{$ro['order_number']}</td>
                 <td>{$ro['factory']}</td>
                 <td>{$ro['nums']}</td>

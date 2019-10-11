@@ -123,7 +123,6 @@
             data:{id,weight,money},
             success:function (data) {
                 parent.find('.money').text(data);
-                console.log(data)
             }
         })
     })
@@ -137,7 +136,6 @@
                 return false;
             }
             if (res.status) {
-                alert(1);
                 window.location.href = ("{:Url('index/Run/download')}?file=" + res.url);
             } else {
                 layer.msg('系统错误，操作失败');

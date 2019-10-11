@@ -497,7 +497,7 @@ class Instor extends Controller
                 $c = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $data['rk_huowei_id'])->find();
                 $num = $c['rk_nums'] + $data['rk_nums'];
                 //存在则添加记录
-                $s = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'customer' => $data['customer'], 'early_stage' => $c['rk_nums'], 'qt_ruku' => $data['rk_nums'], 'balance' => $num, 'huowei' => $data['rk_huowei_id'], 'count' => $data['content'],'hw_name'=>$data['customer']]);
+                $s = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'customer' => '其他入库', 'early_stage' => $c['rk_nums'], 'qt_ruku' => $data['rk_nums'], 'balance' => $num, 'huowei' => $data['rk_huowei_id'], 'count' => $data['content'],'hw_name'=>$data['customer']]);
                 //修改实时数量
                 $a = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $data['rk_huowei_id'])->update(['rk_nums' => $num]);
                 $rk=db('cabinet')->where('id',$data['rk_huowei_id'])->find();
@@ -517,7 +517,7 @@ class Instor extends Controller
                 //不存在则添加库存
                 $id = db('rukuform')->insertGetId(['shipmentnum' => $data['shipmentnum'], 'transport' => $data['transport'], 'carid' => $data['carid'], 'ck_id' => $data['ck_id'], 'userintime' => $userintime, 'intime' => $userintime]);
                 $f = db('rukuform_xq')->insert( ['transfers_id' => $data['odd_number'], 'product_name' => $data['customer'], 'rk_status_id' => $data['rk_status_id'], 'rk_huowei_id' => $data['rk_huowei_id'], 'rk_nums' => $data['rk_nums'], 'product_time' => $product_time, 'netweight' => $data['mao'], 'Grossweight' => $data['jin'], 'state' => 1, 'rukuid' => $id,'qt_rk'=>1]);
-                $p = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'early_stage' => 0, 'qt_ruku' => $data['rk_nums'], 'balance' => $data['rk_nums'], 'huowei' => $data['rk_huowei_id'], 'count' => $data['content'],'hw_name'=>$data['customer']]);
+                $p = db('record')->insert(['time' => $userintime, 'odd_number' => $data['odd_number'], 'task' => '其他入库', 'early_stage' => 0, 'qt_ruku' => $data['rk_nums'], 'balance' => $data['rk_nums'], 'huowei' => $data['rk_huowei_id'], 'count' => $data['content'],'hw_name'=>$data['customer'],'customer' => '其他入库']);
                 $rk=db('cabinet')->where('id',$data['rk_huowei_id'])->find();
                 $s=db('other_rk')->insert(['product_name'=>$data['customer'],'product_time'=>$product_time,'huowei'=>$rk['name'],'count'=>$data['rk_nums'],'rk_time'=>$userintime,'conter'=>$data['content'],'factory'=>$warehouse['name'],'ck_name'=>$warehouse['name']]);
                 if ($id && $f && $p && $s) {
@@ -1043,7 +1043,8 @@ class Instor extends Controller
     //操作日志
     public function staffs_id() {
         $s_transfers_id=input('s_transfers_id');//保管名称
-        $s_delivery_time=input('s_delivery_time');//操作时间
+        $s_delivery_time=input('s_delivery_time');//时间
+        $name=input('name');//作业类型
         $search = '';
         //保管名称
         if (!empty($s_transfers_id)) {
@@ -1062,6 +1063,15 @@ class Instor extends Controller
                 $time = 'unix_timestamp(staffs_id.state_time) BETWEEN ' . $time['0'] . ' and ' . $time['1'];
             }
             $search .= $time;
+        }
+        if (!empty($name)) {
+            $material_name = $name;
+            if (!empty($search)) {
+                $material_name = ' and staffs_id.task like ' . "'%" . $material_name . '%' . "'";
+            } else {
+                $material_name =' staffs_id.task like ' . "'%" . $material_name . '%' . "'";
+            }
+            $search .= $material_name;
         }
         $row=db('staffs_id')
             ->join('staffs','staffs_id.staffs_id=staffs.id')
