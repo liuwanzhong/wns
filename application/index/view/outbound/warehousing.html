@@ -63,8 +63,10 @@
 						<th>审核</th>
 						<th>出库仓库</th>
 						<th>装运单号</th>
+						<th>送达方</th>
 						<th>出库日期</th>
 						<th>总数量</th>
+						<th>总重量</th>
 						<th>操作</th>
 					</tr>
 					</thead>
@@ -76,8 +78,10 @@
 						<td>已审核</td>
 						<td>{$row.w_name}</td>
 						<td>{$row.transport_id}</td>
+						<td>{$row.reachout_name}</td>
 						<td><?php if(!empty($row['ck_time'])){echo date('Y-m-d',$row['ck_time']);} ?></td>
-						<td>{$row.count}</td>
+						<td>{$row.total_shu}</td>
+						<td>{$row.total_zhong}</td>
 						<td>
 							<a href="#" class="edit xq" title="详情" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
 							<a href="{:url('Outbound/warehousing_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>

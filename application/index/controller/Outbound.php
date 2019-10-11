@@ -77,10 +77,6 @@ class Outbound extends Controller {
             -> paginate(100,false,['query'=>['delivery_time'=>$delivery_time,'factory_name'=>$factory_name,'transport_id'=>$transport_id,'reachby_name'=>$reachby_name,'material_name'=>$material_name]]);
         return view("index", ['list' => $list,'res'=>$res,'delivery_time' => $delivery_time,'factory_name' => $factory_name,'transport_id' => $transport_id,'reachby_name' => $reachby_name,'material_name' => $material_name]);
     }
-    // 系统订单
-//    public function system_order(){
-//
-//    }
     // 详细信息回显
     public function record_edit($id){
         $ms = $this -> qx();
@@ -419,7 +415,9 @@ class Outbound extends Controller {
                 'transport_unit' => $data['transport_unit'],
                 'update_time' => time(),
                 'ck_id' => $data['ck_id'],
-                'ck_time'=>strtotime($data['userintime']),'total_shu'=>$data['all_count'],'total_zhong'=>$data['all_weight'],
+                'ck_time'=>strtotime($data['userintime']),
+                'total_shu'=>$data['all_count'],
+                'total_zhong'=>$data['all_weight']
                 ]);
         for($i=0;$i<count($data['material_name']);$i++){
             if(empty($data['cd'][$i])){
@@ -475,6 +473,12 @@ class Outbound extends Controller {
             $this->error('缺少必要参数,请重试');
         }
         try{
+            $war=explode(",",$data['stevedore']);
+            $warker_num=ceil($data['count']/count($war));//平分数量
+            $warker_weight=number_format($data['netweight']/count($war),3);//平分重量
+            for($i=0;$i<count($war);$i++){
+                $l=db('stevedore')->insert(['warker_id'=>$war[$i],'numbers'=>$data['transport_id'],'name'=>$data['reachout_name'],'num'=>$warker_num,'weight'=>$warker_weight,'task'=>'销售出库','time'=>$data['time']]);
+            }
             foreach ($row as $r) {
                 $d=db('rukuform_xq')->where('is_del',0)->where('rk_huowei_id',$r['ck_huowei_id'])->field('rk_nums')->find();
                 $d=(int)$d['rk_nums'];
@@ -490,11 +494,12 @@ class Outbound extends Controller {
                         db('record')->where('huowei',$rows[$i]['rk_huowei_id'])->update(['is_del'=>0]);
                     }
                 }
+
             }
             $r=db('outbound_from')->where('id',$id)->update(['state'=>1]);
             $s=db('outbound_xq_from')->where('chukuid',$id)->update(['state'=>1]);
             $f=db('staffs_id')->where('rukuform_id',$id)->update(['state'=>1]);
-            if($a && $b && $r && $s && $f) {
+            if($a && $b && $r && $s && $f && $l) {
                 Db::commit();
             }
         } catch (\Exception $e) {
@@ -562,7 +567,7 @@ class Outbound extends Controller {
             ->where('outbound_xq_from.qt_ck',0)
             ->group('outbound_from.id')
             ->where($search)
-            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,sum(outbound_xq_from.ck_nums) as count,outbound_xq_from.delivery_id,staffs.staffs_name')
+            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,outbound_xq_from.delivery_id,staffs.staffs_name')
             ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
         $cks=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         return view('warehousing',['rows'=>$rows,'cks'=>$cks,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);

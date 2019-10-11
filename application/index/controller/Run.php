@@ -289,18 +289,55 @@ class Run extends Controller {
         }
     }
     //工人搬运列表
-    public function warker_list($id) {
+    public function warker_list() {
+        $serch='';
+        $id=input('s_delivery_time');
+        if(!empty($id)){
+            $serch="id = $id";
+        }
+        $rows=db('warker')->where('is_del',1)->where("$serch")->select();
+        $warker=db('warker')->where('is_del',1)->select();
+        return view('warker_list',['rows'=>$rows,'warker'=>$warker]);
+    }
+    //工人搬运详情
+    public function warker_list_show() {
+        $id=input('id');
+        $num=0;//总数量
+        $weight=0;//总重量
+        $money=0;//总金额
+        $s_delivery_time=input('s_delivery_time');//作业时间
+        $search = '';
+        // 时间转换
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
+            foreach ($time as $key) {
+                $time[] = strtotime($key);
+                array_shift($time);
+            }
+            $time = ' stevedore.time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            $search .= $time;
+        }
         $rows=db('stevedore')
             ->where('stevedore.warker_id',$id)
             ->join('warker','warker.id=stevedore.warker_id')
-            ->field('stevedore.*,warker.name as g_name')
-            ->paginate(100);
-        return view('warker_list',['rows'=>$rows]);
+            ->where("$search")
+            ->field('stevedore.*,warker.name as w_name')
+            ->paginate(20,false,['query'=>['s_delivery_time'=>$s_delivery_time,'id'=>$id]]);
+        foreach ($rows as $row) {
+            $num+=$row['num'];
+            $weight+=$row['weight'];
+            $money+=$row['money'];
+        }
+        return view('warker_list_show',['rows'=>$rows,'num'=>$num,'weight'=>$weight,'money'=>$money,'id'=>$id,'s_delivery_time'=>$s_delivery_time]);
     }
-    //工人搬运详情
-    public function warker_list_show($id) {
-        $rows=db('rukuform_xq')->where('is_del',0)->where('state',1)->where('rukuid',$id)->select();
-        return view('warker_list_show',['rows'=>$rows]);
+    //价钱结算
+    public function warker_money() {
+        $id=input('id');
+        $weight=input('weight');
+        $money=input('money');
+        $m=$weight*$money;
+        db('stevedore')->where('id',$id)->update(['money'=>$m]);
+        return $m;
     }
 
 

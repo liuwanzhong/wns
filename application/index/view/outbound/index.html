@@ -62,7 +62,7 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">出库时间</label>
                             <div class="layui-input-inline">
-                                <input type="text" class="layui-input" name="delivery_time" autocomplete="off" placeholder="  " value="<?php if(!empty($delivery_time)){echo $delivery_time;}?>">
+                                <input type="text" class="layui-input" id="s_delivery_time" name="delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
                             </div>
                         </div>
                         <div class="layui-form-item">
@@ -260,18 +260,15 @@
         <script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
         <script src="/layui/layui.js"></script>
         <script type="text/javascript">
-            layui.use('element', function () {
-
-            })
             layui.use(['element','laydate','form'], function(){
                 var laydate = layui.laydate;
                 var element = layui.element;
                 let form = layui.form;
                 laydate.render({
-                    elem: '#delivery_time'
+                    elem: '#s_delivery_time'
                     ,range: '~'
                     ,done: function(value){
-                        $('#delivery_time').val(value)
+                        $('#s_delivery_time').val(value)
                     }
                 });
             })
