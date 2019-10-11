@@ -25,7 +25,7 @@ class chaoji extends Controller {
         ->select();
         // 初期数
         $cq_num=db('record')
-        ->field('hw_name,SUM(early_stage) early_stage')
+        ->field('hw_name')
         ->where("task = '到货入库' or task = '其他入库' or task = '调拨入库'")
         ->where("hw_name <> ''")
         ->group('hw_name')
@@ -37,7 +37,7 @@ class chaoji extends Controller {
         ->group('hw_name')
         ->select();
         foreach($cq_num as $k=>$v){
-            $jxc_xx[$k]['early_stage']=$v['early_stage'];
+            $jxc_xx[$k]['early_stage']=0;
         }
         foreach($jc_num as $k=>$v){
             $jxc_xx[$k]['rk_nums']=$v['rk_nums'];

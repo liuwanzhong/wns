@@ -6,6 +6,7 @@ use think\Db;
 use think\Request;
 use think\response\Redirect;
 use think\Session;
+use think\Loader;
 
 class Instor extends Controller
 {
@@ -216,6 +217,10 @@ class Instor extends Controller
     }
     // 结存
     public function jiecun(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告:越权操作');
+        }
         $s_transfers_id=input('s_transfers_id');//仓库名称
         $s_delivery_time=input('s_delivery_time');//生产日期
         $s_material_name=input('s_material_name');//产品名称
@@ -252,6 +257,10 @@ class Instor extends Controller
     }
 
     public function jiec2() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告:越权操作');
+        }
         Db::startTrans();
         $data=input();
         $time=time();
@@ -339,6 +348,10 @@ class Instor extends Controller
     }
     // 添加盘点页
     public function add_pandian(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告:越权操作');
+        }
         $id=input('id');
         $list=db('rukuform_xq')
         ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id','left')
@@ -1198,6 +1211,124 @@ class Instor extends Controller
             fclose($file);
             unlink($path);
             exit();
+        }
+    }
+
+
+
+
+
+
+    /**
+     * 临时插入
+     */
+    /**
+     * 读取数据
+     */
+    public function upload_excel1() {
+        ini_set('memory_limit', '1024M');
+        //加载第三方类文件
+        Loader ::import("PHPExcel.PHPExcel");
+        //防止乱码
+        header("Content-type:application/vnd.ms-excel");
+        //实例化主文件
+        //$model = new \PHPExcel();
+        //接收前台传过来的execl文件
+        $file = $_FILES['file'];
+        //截取文件的后缀名，转化成小写
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if ($extension == "xlsx") {
+            //2007(相当于是打开接收的这个excel)
+            $objReader = \PHPExcel_IOFactory ::createReader('Excel2007');
+        } else {
+            //2003(相当于是打开接收的这个excel)
+            $objReader = \PHPExcel_IOFactory ::createReader('Excel5');
+        }
+
+        $objContent   = $objReader -> load($file['tmp_name']);
+        $sheetContent = $objContent -> getSheet(0) -> toArray();
+        unset($sheetContent[0]);
+        foreach ($sheetContent as $k => $v) {
+            if($v[4]=='沃尔玛产品'){
+                $v[4]=3;
+            }elseif($v[4]=='特通产品'){
+                $v[4]=4;
+            }elseif($v[4]=='电商产品'){
+                $v[4]=2;
+            }else{
+                $v[4]=1;
+            }
+            $id=db('cabinet')->where('name',$v['2'])->field('id')->select();
+            $v['2']=$id[0]['id'];
+            $arr['hw_name']               = $v[0];//货物名              1
+            $arr['ck_id']                 = $v[1];//仓库id
+            $arr['hw_id']                 = $v[2];//货位id
+            $arr['num']                   = $v[3];//数量                1
+            $arr['zt']                    = $v[4];//状态
+            $arr['time']                  = strtotime($v[5]);//生产日期 1
+            $arr['gc']                    = $v[6];//工厂
+            $arr['ch']                    = $v[7];//集装箱号/车皮号
+
+
+
+            Db::startTrans();
+            $warehouse=db('warehouse')->where('id',$arr['ck_id'])->find();
+            $time=time();
+            $r = db('record')->where('is_del', 1)->where('huowei', $arr['hw_id'])->count();
+            if ($r) {
+                try {
+                    $c = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $arr['hw_id'])->find();
+                    $num = $c['rk_nums'] + $arr['num'];
+                    //存在则添加记录
+                    $s = db('record')->insert(['time' => $arr['time'], 'task' => '其他入库', 'early_stage' => $c['rk_nums'], 'qt_ruku' => $arr['num'], 'balance' => $num, 'huowei' => $arr['hw_id'],'hw_name'=>$arr['hw_name']]);
+                    //修改实时数量
+                    $a = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $arr['hw_id'])->update(['rk_nums' => $num]);
+                    $rk=db('cabinet')->where('id',$arr['hw_id'])->find();
+                    $f=db('other_rk')->insert(['product_name'=>$arr['hw_name'],'product_time'=>$arr['time'],'huowei'=>$rk['name'],'count'=>$arr['num'],'rk_time'=>$time,'ck_name'=>$warehouse['name'],'factory'=>$arr['gc']]);
+                    if ($s && $a && $f) {
+                        // 提交事务
+                        Db::commit();
+                    }
+                } catch (\Exception $e) {
+                    echo '存在';
+                    // 回滚事务
+                    Db::rollback();
+                }
+                echo '成功1';
+            } else {
+                try {
+                    //不存在则添加库存
+                    $id = db('rukuform')->insertGetId(['ck_id' => $arr['ck_id'], ]);
+
+                    $f = db('rukuform_xq')->insert( [ 'product_name' => $arr['hw_name'], 'rk_status_id' => $arr['zt'], 'rk_huowei_id' => $arr['hw_id'], 'rk_nums' => $arr['num'], 'product_time' => $arr['time'], 'state' => 1, 'rukuid' => $id,'qt_rk'=>1]);
+
+                    $p = db('record')->insert(['time' => $arr['time'], 'task' => '其他入库', 'early_stage' => 0, 'qt_ruku' => $arr['num'], 'balance' => $arr['num'], 'huowei' => $arr['hw_id'],'hw_name'=>$arr['hw_name']]);
+
+                    $rk=db('cabinet')->where('id',$arr['hw_id'])->find();
+
+                    $s=db('other_rk')->insert(['product_name'=>$arr['hw_name'],'product_time'=>$arr['time'],'huowei'=>$rk['name'],'count'=>$arr['num'],'rk_time'=>$time,'ck_name'=>$warehouse['name'],'factory'=>$arr['gc']]);
+                    if ($id && $f && $p && $s) {
+                        // 提交事务
+                        Db::commit();
+                    }
+                } catch (\Exception $e) {
+                    echo '不存在';
+                    // 回滚事务
+                    Db::rollback();
+                }
+                echo '成功2';
+            }
+
+
+
+
+
+
+
+
+
+
+
         }
     }
 }
