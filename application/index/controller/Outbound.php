@@ -79,10 +79,6 @@ class Outbound extends Controller {
     }
     // 详细信息回显
     public function record_edit($id){
-        $ms = $this -> qx();
-        if ($ms == 0) {
-            $this -> error('警告：越权操作');
-        }
         $row = db('system_order') -> where('id', $id) -> find();
         if ($row['delivery_time'] != 0) {
             $row['delivery_time'] = date("Y/m/d", $row['delivery_time']);
@@ -399,6 +395,10 @@ class Outbound extends Controller {
     }
     //出库修改订单
     public function to_examine_up() {
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
         $data=input();
         db('staffs_id')->where('rukuform_id',$data['id'])->update(['nums'=>$data['all_count'],'dun'=>$data['all_weight']]);
             $r = db('outbound_from')
@@ -511,6 +511,10 @@ class Outbound extends Controller {
     }
     //出库删除
     public function to_examine_del() {
+        $ms = $this -> qx();
+        if ($ms == 0) {
+            $this -> error('警告：越权操作');
+        }
         $id=input('id');
         if(empty($id)){
             $this->error('缺少必要参数,请重试');
@@ -855,6 +859,10 @@ class Outbound extends Controller {
      * 拆分
      */
     public function chaifen(){
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
         $data=input();
         $num=(int)$data['cf_Delivery_num'];
         $nums=0;

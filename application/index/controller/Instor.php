@@ -148,14 +148,7 @@ class Instor extends Controller
         if($ms==0){
             $this->error('警告：越权操作');
         }
-//        $time=db('record')->where('huowei',$id)->where('task','结存')->where('is_del',1)->field('time')->order('time desc')->limit(1)->select();
-//        if(empty($time)){
             $rows=db('record')->where('huowei',$id)->where('is_del',1)->select();
-//        }else{
-//            $state_time=$state_time[0]['state_time'];
-//            $rows=db('record')->where('huowei',$id)->where("state_time >= '$state_time'")->where('is_del',1)->select();
-//            echo db('record')->getlastSql();
-//        }
         return view('show',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'s_material_zt'=>$s_material_zt]);
     }
     /**
@@ -319,7 +312,6 @@ class Instor extends Controller
         $time=input('time');
         $rows=db('record')->where('is_del',0)->where('cj_id',$id)->select();
         foreach ($rows as $k=>$row) {
-//            $rows[$k]['time']=date('Y-m-d',$row['time']);
             if(!empty($row['time'])){
                 $rows[$k]['time']=date('Y-m-d',$row['time']);
             }
@@ -410,6 +402,10 @@ class Instor extends Controller
      * 盘点删除
      */
     public function del_pandian() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告:越权操作');
+        }
         $time = input('time');
         $list = db('pandian')
             -> where('create_time', $time)

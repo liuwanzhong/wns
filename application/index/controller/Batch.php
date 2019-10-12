@@ -11,10 +11,6 @@ class Batch extends Controller {
      * 扫码判断
      */
     public function batch(){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
         $tp_num=input('tp_num');
         $res=db('tray')
         ->where('tp_num',$tp_num)
@@ -188,7 +184,7 @@ class Batch extends Controller {
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
         ->field('warehouse.name w_name,tray_log.id t_id,tray_log.tp_num tp_num,tray_log.batch t_batch,tray_log.time t_time,tray_log.goods_name t_goods_name,tray_log.order t_order,tray_log.delivery t_delivery,tray_log.id t_id,tray_log.state t_state,tray_log.num t_num')
         ->where($search)
-            ->where('warehouse.id','in',$warehouse)
+        ->where('warehouse.id','in',$warehouse)
         ->where('tray_log.is_del',0)
         ->paginate(100,false,['query'=>['name'=>$name,'tp_num'=>$tp_num,'batch'=>$batch]]);
         $cks = db('warehouse')->where('is_del',1)->select();

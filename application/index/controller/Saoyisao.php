@@ -131,21 +131,13 @@ class Saoyisao extends Controller {
             $name='';
         }
         $re=db('tray_order')
-        ->where('is_del',0)
+        ->where('tray_order.is_del',0)
+        ->join('warehouse','warehouse.id=tray_order.transport_id')
         ->where($search )
+        ->field('tray_order.*,warehouse.name w_name')
         ->order('create_time desc')
         ->paginate(100,false,['query'=>['name'=>$name]]);
-        $res=$re->all();
-        foreach ($res as $k=>$re) {
-            foreach ($cks as $ck) {
-                if($re['transport_id']==$ck['name']){
-                    $md[]=$re;
-                }
-            }
-        }
-        return view('out_log',['res'=>$re,'name'=>$name,'cks'=>$cks,'md'=>$md]);
-//        ->paginate(100,false,['query'=>['name'=>$name]]);
-//        return view('out_log',['res'=>$res,'name'=>$name]);
+        return view('out_log',['res'=>$re,'name'=>$name,'cks'=>$cks]);
     }
     /**
      * 往期出库详细
@@ -168,6 +160,22 @@ class Saoyisao extends Controller {
             ->select();
         }
         return view('tray_log_xx',['res'=>$res,'row'=>$row]);
+    }
+    /**
+     * 往期出库删除
+     */
+    public function tray_log_del(){
+        $ms=$this->qx();
+        if($ms==0){
+            return 0;
+        }
+        $id=input('id');
+        $res=db('tray_order')
+        ->where('id',$id)
+        ->update([
+            'is_del'=>1
+        ]);
+        return $res;
     }
     /**
      * 入库扫码页

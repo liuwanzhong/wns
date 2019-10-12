@@ -54,10 +54,10 @@
 					</tr>
 					</thead>
 					<tbody>
-                        {volist name='md' id='r'}
+                        {volist name='res' id='r'}
                         <tr>
                             <th>{$r.id}</th>
-                            <th>{$r.transport_id}</th>
+                            <th>{$r.w_name}</th>
                             <th>{$r.delivery}</th>
                             <th>{$r.delivery_name}</th>
                             <th>
@@ -97,14 +97,14 @@
 				let p = $(this).parents('tr');
 				console.log(id);
 				$.ajax({
-					url:'/index/Run/tray_del',
+					url:'/index/Saoyisao/tray_log_del',
 					type:'post',
 					data:{"id":id},
 					success:function (data) {
 						if(data){
 							p.remove();
 						}else{
-							alert('删除失败')
+							alert('删除失败或没有权限')
 						}
 					}
 				})
