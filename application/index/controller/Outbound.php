@@ -460,6 +460,7 @@ class Outbound extends Controller {
     }
     //出库审核
     public function to_examine_yes() {
+        $staffs_id=Session::get('users')['id'];
         $ms=$this->qx();
         if($ms==0){
             $this->error('警告：越权操作');
@@ -496,7 +497,7 @@ class Outbound extends Controller {
                 }
 
             }
-            $r=db('outbound_from')->where('id',$id)->update(['state'=>1]);
+            $r=db('outbound_from')->where('id',$id)->update(['state'=>1,'staffs_id'=>$staffs_id]);
             $s=db('outbound_xq_from')->where('chukuid',$id)->update(['state'=>1]);
             $f=db('staffs_id')->where('rukuform_id',$id)->update(['state'=>1]);
             if($a && $b && $r && $s && $f && $l) {

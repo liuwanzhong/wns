@@ -261,6 +261,7 @@ class Rukuorder extends Controller {
     }
     //审核
     public function to_examine_yes() {
+        $staffs_id=Session::get('users')['id'];
         Db::startTrans();
         $ms=$this->qx();
         if($ms==0){
@@ -288,10 +289,10 @@ class Rukuorder extends Controller {
                 ->where('rukuid',$id)
                 ->select();
             foreach ($s as $c){
-                $a=db('record')->where('huowei',$c['rk_huowei_id'])->order('id desc')->limit(1)->select();
+//                $a=db('record')->where('huowei',$c['rk_huowei_id'])->order('id desc')->limit(1)->select();
                 $b=db('record')->insert(['rukuform_id'=>$c['id'],'time'=>$data['time'],'odd_number'=>$c['transfers_id'],'task'=>$data['task'],'customer'=>$data['customer'],'early_stage'=>0,'balance'=>$c['rk_nums'],'dh_ruku'=>$c['rk_nums'],'huowei'=>$c['rk_huowei_id'],'hw_name'=>$c['product_name']]);
             }
-            $r=db('rukuform')->where('id',$id)->update(['state'=>1]);
+            $r=db('rukuform')->where('id',$id)->update(['state'=>1,'staffs_id'=>$staffs_id]);
             $s=db('rukuform_xq')->where('rukuid',$id)->update(['state'=>1,'warker_num'=>$warker_num,'warker_weight'=>$warker_weight,'warker_id'=>$data['stevedore']]);
             $f=db('staffs_id')->where('rukuform_id',$id)->update(['state'=>1]);
             for($i=0;$i<count($war);$i++){
@@ -439,6 +440,7 @@ class Rukuorder extends Controller {
         $s_transfers_id=input('s_transfers_id');//工厂
         $s_delivery_time=input('s_delivery_time');//时间
         $s_material_name=input('s_material_name');//产品属性
+        $prodcut_name=input('prodcut_name');//产品名称
         $search = '';
         //工厂名
         if (!empty($s_transfers_id)) {
@@ -469,6 +471,16 @@ class Rukuorder extends Controller {
             }
             $search .= $material_name;
         }
+        //产品名称
+        if (!empty($prodcut_name)) {
+            $material_name = $prodcut_name;
+            if (!empty($search)) {
+                $material_name = ' and rukuform_xq.product_name like ' . "'%" . $material_name . '%' . "'";
+            } else {
+                $material_name = ' rukuform_xq.product_name like ' . "'%" . $material_name . '%' . "'";
+            }
+            $search .= $material_name;
+        }
         $row=db('rukuform_xq')
             ->join('kc_status','rukuform_xq.rk_status_id=kc_status.id','left')
             ->join('cabinet','rukuform_xq.rk_huowei_id=cabinet.id','left')
@@ -491,11 +503,9 @@ class Rukuorder extends Controller {
             ->order('rukuform.id desc')
             ->where("$search")
             ->field('rukuform_xq.*,kc_status.title as k_name,cabinet.name as c_name,warehouse.name as w_name,rukuform.userintime as time')
-            ->paginate(10,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+            ->paginate(10,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name],'prodcut_name'=>$prodcut_name]);
         //产品属性
         $status=db('kc_status')->where('is_del',0)->select();
-//        $a = $this->request->action();
-//        echo $a;exit;
         $sums=0;
         $sum=0;
         foreach($row as $v){
@@ -504,7 +514,7 @@ class Rukuorder extends Controller {
         foreach($rows as $v){
             $sums += $v['rk_nums'];
         }
-        return view('detailed',['rows'=>$rows,'status'=>$status,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'sum'=>$sum,'sums'=>$sums]);
+        return view('detailed',['rows'=>$rows,'status'=>$status,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'sum'=>$sum,'sums'=>$sums,'prodcut_name'=>$prodcut_name]);
     }
     //导出入库明细
     public function outExcel(){

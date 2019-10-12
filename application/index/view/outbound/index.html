@@ -62,7 +62,9 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">出库时间</label>
                             <div class="layui-input-inline">
-                                <input type="text" class="layui-input" name="delivery_time" id="delivery_time" autocomplete="off" placeholder="  " value="<?php if(!empty($delivery_time)){echo $delivery_time;}?>">
+
+                                <input type="text" class="layui-input" id="s_delivery_time" name="delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+
                             </div>
                         </div>
                         <div class="layui-form-item">
@@ -159,7 +161,7 @@
                     <input type="hidden" name="id" id="id" >
                     <div class="wrap">
                         <label>发货日期</label>
-                        <input type="text" id="delivery_time" name="delivery_time" value="" placeholder="xxxx/x/x"/ />
+                        <input type="text" id="delivery_time" name="delivery_time" value="" placeholder="xxxx/x/x"/>
                     </div>
                     <div class="wrap">
                         <label>工厂编号</label>

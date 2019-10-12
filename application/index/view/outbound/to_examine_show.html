@@ -189,7 +189,6 @@
                         </td>
                         <?php else:?>
                         <td>
-<!--                            <?php echo date('Y-m-d',$v['product_time']) ?>-->
                             <input type="date" name="product_time[]" value="<?php if(!empty($v['product_time'])){echo date('Y-m-d',$v['product_time']);} ?>" readonly style="border:0">
                         </td>
                         <?php endif; ?>
@@ -343,34 +342,6 @@
             form.render();
 
         })
-        //
-        // // 入库货位 数据请求
-        // form.on('select(ck_id)', function(data){
-        //     let id = data.elem.value;
-        //     if(id != 0){
-        //         $('.showhuowei').empty();
-        //         $.ajax({
-        //             type: "get",//请求方式有post，get请求方式，这里是post请求
-        //             url: '/index/table/show/id/' + id,//请求的方法的路径
-        //             dataType: 'json',//请求参数的格式为json.另外还有text等
-        //             success: function(data){
-        //                 var data = JSON.parse(data);
-        //                 console.log(data);
-        //                 $('.showhuowei').append("<option value='0'>请选择货位</option>");
-        //                 for (var i=0;i<data.length;i++)
-        //                 {
-        //                     $('.showhuowei').append("<option value='"+data[i].id+"'>"+data[i].name+"</option>");
-        //                 }
-        //                 $(".forzentitle").val(data.title);
-        //                 $('.frozencount').val(data.goods_feel);
-        //                 $(".editfrozenid").val(data.id);
-        //                 form.render();
-        //             }
-        //         })
-        //     }
-        // })
-
-
         let par = '';
         $('.tbd').on('click', '.dia', function () {
             let id = $('#table').val();
@@ -387,6 +358,7 @@
                     url:'/index/Table/houwei_ck',
                     data: {id,ne},
                     success:function (data) {
+                        console.log(data)
                         let html = '';
                         for (let i =0; i<data.length; i++){
                             html += ` <tr>

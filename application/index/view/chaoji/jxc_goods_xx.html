@@ -29,6 +29,7 @@
                 <thead>
                     <tr>
                         <th rowspan="2">产品</th>
+                        <th rowspan="2">客户</th>
                         <th colspan="3">入库</th>
                         <th colspan="3">出库</th>
                         <th rowspan="2">操作时间</th>
@@ -46,6 +47,7 @@
                     {volist name='res' id='j'}
                     <tr>
                         <td>{$j.hw_name}</a></td>
+                        <td>{$j.customer}</a></td>
                         <td>{$j.dh_ruku}</td>
                         <td>{$j.db_ruku}</td>
                         <td>{$j.qt_ruku}</td>

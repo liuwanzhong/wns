@@ -34,17 +34,19 @@ class Table extends Controller {
             ->where('rukuform_xq.state',1)
             ->where('rukuform_xq.is_del',0)
             ->where('rukuform_xq.sy_count>=1')
-//            ->order('rukuform_xq.product_time asc')
+            ->order('rukuform_xq.product_time asc')
             ->join('cabinet','cabinet.id=rukuform_xq.rk_huowei_id')
+            ->where('cabinet.warehouse_id',$id)
             ->field('rukuform_xq.*,cabinet.name,cabinet.id as c_id')
             ->select();
-        foreach ($ck as $c) {
-            foreach ($rukuform as $k=>$item) {
-                if($c['id']==$item['rk_huowei_id']){
-                    $md[]=$item;
-                }
-            }
-        }
+//        foreach ($ck as $c) {
+//            foreach ($rukuform as $k=>$item) {
+//                if($c['id']==$item['rk_huowei_id']){
+//                    $md[]=$item;
+//                }
+//            }
+//        }
+        $md=$rukuform;
         foreach ($md as $k=>$row) {
             $md[$k]['m']=$row['Grossweight']/$row['rk_nums'];
             $md[$k]['j']=$row['netweight']/$row['rk_nums'];
@@ -52,27 +54,8 @@ class Table extends Controller {
             $md[$k]['c_id']=$row['c_id'];
             $md[$k]['product_time']=date('Y-m-d',$row['product_time']);
         }
-
-        function my_sort($arrays,$sort_key,$sort_order=SORT_DESC,$sort_type=SORT_NUMERIC ){
-            if(is_array($arrays)){
-                foreach ($arrays as $array){
-                    if(is_array($array)){
-                        $key_arrays[] = $array[$sort_key];
-                    }else{
-                        return false;
-                    }
-                }
-            }else{
-                return false;
-            }
-            array_multisort($key_arrays,$sort_order,$sort_type,$arrays);
-            return $arrays;
-        }
-
-
-        $md = my_sort($md,'sy');
-
         return $md;
+
     }
     public function houwei_cd() {
         $data=input();

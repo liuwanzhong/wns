@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="/images/index.css" />
-    <link rel="stylesheet" href="/layui/css/layui.css" />
+    <link href="/images/index.css" type="text/css" rel="stylesheet"/>
+    <link rel="stylesheet" href="/images/css.css">
+    <link rel="stylesheet" type="text/css" href="/layui/css/layui.css"/>
     <style>
         .layui-textarea{min-height: 0;padding: 3px 10px;line-height: initial;}
         .submit{margin-left: 30px;margin-top: 30px;}
@@ -52,12 +53,6 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label">装卸工:</label>
-                <div class="layui-input-inline">
-                    <input type="text" name="stevedore" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-form-item">
                 <label class="layui-form-label">入库仓库:</label>
                 <div class="layui-input-inline">
                     <select name="ck_id" lay-filter="ck_id" id="table">
@@ -68,6 +63,14 @@
                     </select>
                 </div>
             </div>
+<!--            <div class="layui-form-item">-->
+<!--                <label class="layui-form-label">装卸工:</label>-->
+<!--                <div class="layui-input-inline">-->
+<!--                    <input type="hidden" name="stevedore">-->
+<!--                    <span class="names"></span>-->
+<!--                </div>-->
+<!--                <a href="#" class="layui-btn" id="dialog">添加</a>-->
+<!--            </div>-->
         </div>
         <div class="container">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
@@ -138,9 +141,46 @@
         </div>
     </form>
 </div>
+<!--<div class="model modeladd">-->
+<!--    <div class="head">-->
+<!--        <span>添加工人</span>-->
+<!--        <a href="javascript:" class="close">×</a>-->
+<!--    </div>-->
+<!--    <div class="content" style="height: calc(100% - 100px); overflow-x: hidden;">-->
+<!--        <div class="layui-form gr">-->
+<!--            {volist name = 'row' id = 'r'}-->
+<!--            <div class="layui-form-item">-->
+<!--                <div class="layui-input-inline">-->
+<!--                    <input type="checkbox" name="{$r.name}" value="{$r.id}" title="{$r.name}" lay-skin="primary">-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            {/volist}-->
+<!--        </div>-->
+<!--        <button id="warker" class="layui-btn">确定</button>-->
+<!--    </div>-->
+<!--</div>-->
 <script src="/static/jquery-1.9.1.min.js"></script>
 <script src="/layui/layui.js"></script>
 <script type="text/javascript">
+    // $('#dialog').on('click', function(){
+    //     $('.modeladd').show();
+    // })
+    // $('#warker').on('click',function () {
+    //     console.log(1)
+    //     let list = $('.content').find('input:checkbox:checked');
+    //     console.log(list)
+    //     let name = '',ids = [];
+    //     list.each(function () {
+    //         name += $(this)[0].name+',';
+    //         ids.push($(this)[0].value);
+    //     })
+    //     $('.names').text(name);
+    //     $('input[name=stevedore]').val(ids);
+    //     $('.modeladd').hide();
+    // })
+    // $('.close').on('click', function(){
+    //     $('.modeladd').hide();
+    // })
     layui.use(['element', 'form','laydate', 'layer'], function () {
         let element = layui.element;
         let form = layui.form;
