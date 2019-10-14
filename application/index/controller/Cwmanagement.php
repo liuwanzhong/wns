@@ -55,13 +55,6 @@ class Cwmanagement extends Controller {
             }
             $search .= $factorys;
         }
-        // 未删除
-        if(!empty($search)){
-            $del=' and is_del = 0';
-        }else{
-            $del=' is_del = 0';
-        }
-        $search .= $del;
         // 查询所有数据
         $list = db('cw_management')
             -> where("$search")
@@ -253,7 +246,4 @@ class Cwmanagement extends Controller {
             $this -> error('删除失败');
         }
     }
-
-
-
 }

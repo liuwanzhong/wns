@@ -13,7 +13,6 @@ class Instor extends Controller
     //货物列表
     public function index(){
         $warehouse=self::$stafss['warehouse'];
-        $zt=Session::get('zt');
         static $md=[];
         $time=time();
         $zq=db('rukuform_xq')->where('is_del',0)->where('state',1)->where("product_time<$time-60*60*24*30")->select();
@@ -29,6 +28,8 @@ class Instor extends Controller
         $s_material_name=input('s_material_name');//产品名称
         $s_material_zt=input('s_material_zt');//状态
         $status_id=input('status');//产品属性
+        $pro=isset($_POST['pro_time']) ? $_POST['pro_time'] : 30;
+        $pro_time=$time-24*3600*$pro;
         $search = '';
         if (!empty($s_transfers_id)) {
             $search = "warehouse.id=$s_transfers_id";
@@ -129,9 +130,8 @@ class Instor extends Controller
                 }
             }
         }
-
         $status=db('kc_status')->where('is_del',0)->select();
-        return view('index2',['orders'=>$orders,'status'=>$status,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'md'=>$md,'zt'=>$zt,'s_material_zt'=>$s_material_zt,'status_id'=>$status_id,'sum'=>$sum,'sums'=>$sums]);
+        return view('index2',['orders'=>$orders,'status'=>$status,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'md'=>$md,'s_material_zt'=>$s_material_zt,'status_id'=>$status_id,'sum'=>$sum,'sums'=>$sums,'pro_time'=>$pro_time,'pro'=>$pro]);
     }
 
     public function zt() {
@@ -1314,17 +1314,6 @@ class Instor extends Controller
                 }
                 echo '成功2';
             }
-
-
-
-
-
-
-
-
-
-
-
         }
     }
 }
