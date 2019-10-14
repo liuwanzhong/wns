@@ -264,7 +264,7 @@ class Outbound extends Controller {
                         ]);
                 }
                 $f=db('staffs_id')->insert(['staffs_id'=>$staffs_id,'nums'=>$data['all_count'],'dun'=>$data['all_weight'],'state'=>0,'task'=>'销售出库','rukuform_id'=>$id,'order_number'=>$data['transport_id'],'factory'=>$data['reachout_name']]);
-                $del=db('system_order')->where('id','in',$data['cd'])->update(['is_del'=>1]);
+                $del=db('system_order')->where('id','in',$data['cd'])->update(['is_del'=>$id]);
                 if($id && $del && $p) {
                     // 提交事务
                     Db::commit();
@@ -517,15 +517,30 @@ class Outbound extends Controller {
             $this -> error('警告：越权操作');
         }
         $id=input('id');
-        if(empty($id)){
-            $this->error('缺少必要参数,请重试');
-        }
-        $r=db('outbound_from')->where('id',$id)->update(['is_del'=>1]);
-        if($r!==false){
-            return redirect('to_examine');
-        }else{
+        Db::startTrans();
+        try {
+            $outbound_from = db('outbound_from')
+                ->where('id', $id)
+                ->delete();
+            $outbound_xq_from = db('outbound_xq_from')
+                ->where('chukuid', $id)
+                ->delete();
+            $staffs_id = db('staffs_id')
+                ->where('rukuform_id', $id)
+                ->delete();
+            $system_order = db('system_order')
+                ->where('is_del', $id)
+                ->update(['is_del' => 0]);
+            if($outbound_from && $outbound_xq_from && $staffs_id && $system_order) {
+                // 提交事务
+                Db::commit();
+            }
+        }catch (\Exception $e) {
             $this->error('删除失败,请联系管理员');
+            // 回滚事务
+            Db::rollback();
         }
+        return redirect('to_examine');
     }
     // 出库台账
     public function warehousing() {

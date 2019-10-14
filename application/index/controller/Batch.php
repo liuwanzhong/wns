@@ -11,6 +11,7 @@ class Batch extends Controller {
      * 扫码判断
      */
     public function batch(){
+        use model('ware')
         $tp_num=input('tp_num');
         $res=db('tray')
         ->where('tp_num',$tp_num)
