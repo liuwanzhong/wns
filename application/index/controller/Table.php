@@ -60,15 +60,18 @@ class Table extends Controller {
     public function houwei_cd() {
         $data=input();
         array_shift($data);
-        $mj=$this->blur($data['m'],$data['j'],$data['count']);
+        //计算重量
+        $goods_name=db('goods_name')->where('name',$data['ne'])->find();
+        $num=($data['count']*$goods_name['jing'])/1000;
+        $mj['num']=floor($num*1000)/1000;
+//        $mj=$this->blur($data['m'],$data['j'],$data['count']);
         $row=db('rukuform_xq')->where('id',$data['id'])->find();
         db('rukuform_xq')->where('id',$data['id'])->update(['sy_count'=>$row['sy_count']-$data['count']]);
         $row=db('rukuform_xq')->where('id',$data['id'])->find();
         $mj['sy']=$row['sy_count'];
-
-        $row=db('rukuform_xq')->where('id',$data['id'])->find();
-        $row['product_time']=date('Y-m-d',$row['product_time']);
-        $mj['row']=$row;
+//        $row=db('rukuform_xq')->where('id',$data['id'])->find();
+//        $row['product_time']=date('Y-m-d',$row['product_time']);
+//        $mj['row']=$row;
         return $mj;
     }
     public function huifu() {
@@ -78,11 +81,11 @@ class Table extends Controller {
         db('rukuform_xq')->where('id',$id)->update(['sy_count'=>$row['sy_count']+$num]);
     }
 
-    public function blur($groos_min,$min,$max) {
-        //净重
-        $number=sprintf("%.3f",$min*$max);
-        //毛重
-        $groos=sprintf("%.3f",$groos_min*$max);
-        return ['m'=>$number,'j'=>$groos];
-    }
+//    public function blur($groos_min,$min,$max) {
+//        //净重
+//        $number=sprintf("%.3f",$min*$max);
+//        //毛重
+//        $groos=sprintf("%.3f",$groos_min*$max);
+//        return ['m'=>$number,'j'=>$groos];
+//    }
 }

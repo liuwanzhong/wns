@@ -104,6 +104,17 @@ class Outbound extends Controller {
             $this -> error('修改失败,请联系管理员');
         }
     }
+    //删除系统订单
+    public function delete($id){
+        $res=db('system_order')
+        ->where('id',$id)
+        ->delete();
+        if($res){
+            return 1;
+        }else{
+            return 2;
+        }
+    }
     // 导入excel
     public function upload_excel(){
         $ms = $this -> qx();
@@ -395,10 +406,6 @@ class Outbound extends Controller {
     }
     //出库修改订单
     public function to_examine_up() {
-        $ms = $this -> qx();
-        if ($ms == 0) {
-            $this -> error('警告：越权操作');
-        }
         $data=input();
         db('staffs_id')->where('rukuform_id',$data['id'])->update(['nums'=>$data['all_count'],'dun'=>$data['all_weight']]);
             $r = db('outbound_from')
@@ -500,6 +507,12 @@ class Outbound extends Controller {
             $r=db('outbound_from')->where('id',$id)->update(['state'=>1,'staffs_id'=>$staffs_id]);
             $s=db('outbound_xq_from')->where('chukuid',$id)->update(['state'=>1]);
             $f=db('staffs_id')->where('rukuform_id',$id)->update(['state'=>1]);
+            echo '1'.dump($a);
+            echo '2'.dump($b);
+            echo '3'.dump($r);
+            echo '4'.dump($s);
+            echo '5'.dump($f);
+            echo '6'.dump($l);
             if($a && $b && $r && $s && $f && $l) {
                 Db::commit();
             }

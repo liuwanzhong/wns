@@ -190,7 +190,7 @@
         <span>选择货位</span>
         <a href="javascript:" class="close">×</a>
     </div>
-    <div class="content" style="height: 100%;overflow-x: hidden;">
+    <div class="content" style="height: 80%;overflow-x: hidden;">
         <table class="layui-table layui-form">
             <thead>
             <tr>
@@ -331,10 +331,10 @@
 
 
         let par = '';
+        let ne='';
         $('.tbd').on('click', '.dia', function () {
             let id = $('#table').val();
-            let ne = $(this).parents('tr').find('.status input').val()
-            console.log(id,ne)
+            ne = $(this).parents('tr').find('.status input').val()
             if(id == 0){
                 layer.alert('请选择仓库',{icon:5});
                 return false;
@@ -347,13 +347,10 @@
                     url:'/index/Table/houwei_ck',
                     data: {id,ne},
                     success:function (data) {
-                        console.log(data)
                         let html = '';
                         for (let i =0; i<data.length; i++){
                             html += ` <tr>
                             <input type="hidden" id="id" class="layui-input" value="${data[i].id}">
-                            <input type="hidden" id="m" class="layui-input" value="${data[i].m}">
-                            <input type="hidden" id="j" class="layui-input" value="${data[i].j}">
                             <input type="hidden" id="c_id" class="layui-input" value="${data[i].c_id}">
                             <td><input type="radio" name="sex" value="nan" title=""></td>
                             <td>${data[i].product_name}</td>
@@ -375,8 +372,8 @@
             let che = $('.kc_list').find('input:radio:checked')[0];
             let tr = $(che).parents('tr');
             let id = tr.find('#id').val();
-            let m = tr.find('#m').val();
-            let j = tr.find('#j').val();
+            // let m = tr.find('#m').val();
+            // let j = tr.find('#j').val();
             let c_id = tr.find('#c_id').val();
             let hw = tr.find('.hw').text();
             let num = tr.find('input[type=text]').val();
@@ -391,20 +388,21 @@
             $('.model_table').hide();
             $.ajax({
                 url:'/index/Table/houwei_cd',
-                data:{id, m, j, count:num},
+                data:{id,count:num,ne},
                 success:function (d) {
+                    console.log(d);
                     par.find('.rukuform_xq_id').val(id);
                     par.find('.huowei').html(`<input type="hidden" value="${c_id}" name="huowei[]" readonly><span>${hw}</span>`);
                     par.find('.count').find('span').text(num);
                     par.find('.count').find('input').val(num);
-                    par.find('.jin').find('span').text(d.m);
-                    par.find('.jin').find('input').val(d.m);
+                    par.find('.jin').find('span').text(d.num);
+                    par.find('.jin').find('input').val(d.num);
                     par.find('.sy_count').find('span').text(d.sy);
                     par.find('.sy_count').find('input').val(d.sy);
                     par.find('.indate').find('input').val(time);
                     par.find('.indate').find('span').text(time);
                     let count = Number(allcount) + Number(num);
-                    let weight = [(Number(allweight) + Number(d.m))*1000]/1000;
+                    let weight = [(Number(allweight) + Number(d.num))*1000]/1000;
                     let we=Math.round(weight*1000)/1000;
                     $('.all_count').text(count);
                     $('.all_weight').text(we);

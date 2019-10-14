@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{$row.name}
+<br>
+<?php foreach($row['cabinets'] as $r): ?>
+{$r['name']}
+<?php endforeach; ?>
+
+<br>
+
+<?php foreach($row['staffs'] as $r): ?>
+{$r['staffs_name']}
+<?php endforeach; ?>
+</body>
+</html>

@@ -14,42 +14,6 @@
     </style>
 </head>
 <body>
-<?php if(!empty($md) && $zt==0): ?>
-<div class="model" style="display: block;width:70%">
-    <div class="head">
-        <span>库存预警</span>
-        <a href="javascript:" class="close">×</a>
-    </div>
-    <div class="content" style="height: calc(100% - 50px);overflow-x: hidden;box-sizing: border-box;">
-        <table class="layui-table">
-            <thead>
-                <tr>
-                    <th>仓库名称</th>
-                    <th>货位</th>
-                    <th>产品名称</th>
-                    <th>生产日期</th>
-                    <th>实时数量</th>
-                    <th>备注</th>
-                    <th>状态</th>
-                </tr>
-            </thead>
-            <tbody>
-            {volist name='md' id='m'}
-            <tr>
-                <td>{$m.ckname}</td>
-                <td>{$m.name}</td>
-                <td>{$m.product_name}</td>
-                <td><span style="color:red"><?php if(!empty($m['product_time'])){echo date('Y-m-d',$m['product_time']);} ?></span></td>
-                <td>{$m.rk_nums}</td>
-                <td>{$m.content}</td>
-                <td><?php if($m['state']==1){echo '正常';}else{echo "<span style='color:red'>冻结</soan>";}  ?></td>
-            </tr>
-            {/volist}
-            </tbody>
-        </table>
-    </div>
-</div>
-<?php endif; ?>
 <div class="note">
     <div class="nav">
         <span class="layui-breadcrumb">
@@ -60,6 +24,7 @@
     </div>
     <div class="seach">
         <form action="{:url('Instor/index')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+            <div class="form_box">
             <div class="layui-form-item">
                 <label class="layui-form-label">仓库名称</label>
                 <div class="layui-input-inline">
@@ -104,7 +69,14 @@
                     </select>
                 </div>
             </div>
-            <button class="layui-btn save" lay-submit>查询</button>
+            <div class="layui-form-item">
+                <label class="layui-form-label">预警日期(天)</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" id="pro_time" name="pro_time"  value="<?php if(!empty($pro)){echo $pro;}?>"/>
+                </div>
+                <button class="layui-btn save" lay-submit>查询</button>
+            </div>
+            </div>
         </form>
     </div>
     <div class="layui-form-item">
@@ -136,7 +108,7 @@
             </thead>
             <tbody class="tbd">
                 {volist name='orders' id='v'}
-                <tr>
+                <tr  <?php if($v['product_time']<$pro_time){echo "style='color:red'";} ?> >
                     <input type="hidden" name="id" value="{$v.id}">
                     <td>{$v.ckname}</td>
                     <td>{$v.name}</td>
@@ -180,14 +152,6 @@
                 $('#s_delivery_time').val(value)
             }
         });
-    })
-    $('.close').on('click', function(){
-        $.ajax({
-            url:'/index/Instor/zt',
-            type:'get',
-            data:{'zt':1}
-        })
-        $('.model').hide();
     })
     $('#btn').click(function(){
         let alls = [];

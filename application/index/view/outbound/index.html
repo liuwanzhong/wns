@@ -121,6 +121,7 @@
                             <td>
                                 <a href="#" class="img_edit" title="详细" style="margin-right: 15px;">详细</a>
                                 <a href="#" class="chaifen" title="拆分" style="margin-right: 15px;">拆分</a>
+                                <a href="#" class="delete" title="删除" style="margin-right: 15px;">删除</a>
                             </td>
                         </tr>
                         {/volist}
@@ -289,6 +290,24 @@
             $('.chaifen').on('click', function(){
 				$('.cf').show();
 			})
+            //删除
+            $('.delete').click(function(){
+                let p = $(this).parents('tr');
+				let val = $(this).parents('tr').find('input[type=hidden]').val();
+				$.ajax({
+					url:'/index/Outbound/delete',
+					type:'post',
+					data:{'id':val},
+					success:function(data){
+                        if(data){
+                            alert('删除成功');
+                            p.remove();
+                        }else{
+                            alert('删除失败');
+                        }
+					}
+				})
+            })
             // 关闭
             $('.close_edit').on('click', function(){
 				$('.model_edit').hide();

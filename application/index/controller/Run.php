@@ -13,25 +13,8 @@ use Think\Model;
 class Run extends Controller {
     //地区库房列表
     public function warehouse() {
-
-        $user = Warehouse::index();
-        dump($user);
-        exit;
-
-
-
-
-
-        $rows=model('Warehouse');
-        $row=$rows->Warehouse();
-
-
-
-         $this->assign('rows',$row);
-        // $this->display();
-         return $this->fetch();
-        // $this->fetch();
-        // $this->show('warehouse');
+        $rows=db('warehouse')->where('is_del',1)->paginate(100);
+        return view('warehouse',['rows'=>$rows]);
         }
     //添加库房
     public function warehouse_add() {

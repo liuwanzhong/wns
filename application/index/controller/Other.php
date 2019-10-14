@@ -4,6 +4,7 @@
 namespace app\index\controller;
 
 
+use app\index\Model\Warehouse;
 use think\Controller;
 
 class Other extends Controller {
@@ -153,7 +154,6 @@ class Other extends Controller {
         $rows=db('fayunbb')->where('state',0)->where("$search")->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'zydh'=>$zydh]]);
         return view('transport_ss',['rows'=>$rows,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'zydh'=>$zydh]);
     }
-
     //运输报表审核测试
     public function transport_ss_tab(){
         $page = input('get.limit');
@@ -164,7 +164,6 @@ class Other extends Controller {
 
         return ['code'=> 0, "count" => $rows_length, 'data' => $arr, 'page'=> $page];
     }
-
     //审核
     public function shenhe($id)
     {
@@ -316,5 +315,15 @@ class Other extends Controller {
 //            unlink($path);
             exit();
         }
+    }
+
+
+    public function index() {
+        $row=new Warehouse();
+//        $c=$row->start(6);
+//        $this->assign(['row'=>$c]);
+//        return $this->fetch();
+        $c=$row->index(6);
+        echo $c;
     }
 }

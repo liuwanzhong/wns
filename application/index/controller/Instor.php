@@ -13,7 +13,6 @@ class Instor extends Controller
     //货物列表
     public function index(){
         $warehouse=self::$stafss['warehouse'];
-        $zt=Session::get('zt');
         static $md=[];
         $time=time();
         $zq=db('rukuform_xq')->where('is_del',0)->where('state',1)->where("product_time<$time-60*60*24*30")->select();
@@ -29,6 +28,8 @@ class Instor extends Controller
         $s_material_name=input('s_material_name');//产品名称
         $s_material_zt=input('s_material_zt');//状态
         $status_id=input('status');//产品属性
+        $pro=isset($_POST['pro_time']) ? $_POST['pro_time'] : 30;
+        $pro_time=$time-24*3600*$pro;
         $search = '';
         if (!empty($s_transfers_id)) {
             $search = "warehouse.id=$s_transfers_id";
@@ -129,9 +130,8 @@ class Instor extends Controller
                 }
             }
         }
-
         $status=db('kc_status')->where('is_del',0)->select();
-        return view('index2',['orders'=>$orders,'status'=>$status,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'md'=>$md,'zt'=>$zt,'s_material_zt'=>$s_material_zt,'status_id'=>$status_id,'sum'=>$sum,'sums'=>$sums]);
+        return view('index2',['orders'=>$orders,'status'=>$status,'order'=>$order,'ware'=>$ware,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name,'md'=>$md,'s_material_zt'=>$s_material_zt,'status_id'=>$status_id,'sum'=>$sum,'sums'=>$sums,'pro_time'=>$pro_time,'pro'=>$pro]);
     }
 
     public function zt() {
@@ -353,12 +353,14 @@ class Instor extends Controller
         ->field('cabinet.name c_name,warehouse.name w_name,rukuform_xq.*')
         ->order('cabinet.name asc')
         ->group('rukuform_xq.id')
+        // ->limit(10)
         ->select();
         return view('add_pandian',['list'=>$list]);
     }
     // 执行添加
     public function do_add(){
         $data=input();
+        $time=time();
         if(!empty($data['w_name']) && !empty($data['pd_num'])){
             for ($i=0;$i<count($data['w_name']);$i++){
                 if(empty($data['pd_num'][$i])){
@@ -375,7 +377,7 @@ class Instor extends Controller
                     'pd_num'=>$data['pd_num'][$i],
                     'rk_nums'=>$data['rk_nums'][$i],
                     'chayi'=>$data['rk_nums'][$i]-$data['pd_num'][$i],
-                    'create_time'=>time(),
+                    'create_time'=>$time,
                     'count1'=>$data['count1'][$i],
                     'count2'=>$data['count2'][$i],
                     'count3'=>$data['count3'][$i],
@@ -1256,7 +1258,6 @@ class Instor extends Controller
             }
             if(!empty($v[2])){
                 $id=db('cabinet')->where('name',$v['2'])->field('id')->select();
-                dump(db('cabinet')->getlastSql());
                 dump($id);
                 $v['2']=$id[0]['id'];
                 $arr['hw_name']               = $v[0];//货物名              1
@@ -1290,11 +1291,9 @@ class Instor extends Controller
                             Db::commit();
                         }
                     } catch (\Exception $e) {
-                        echo '存在';
                         // 回滚事务
                         Db::rollback();
                     }
-                    echo '成功1';
                 } else {
                     try {
                         //不存在则添加库存
@@ -1312,28 +1311,11 @@ class Instor extends Controller
                             Db::commit();
                         }
                     } catch (\Exception $e) {
-                        echo '不存在';
                         // 回滚事务
                         Db::rollback();
                     }
-                    echo '成功2';
                 }
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         }
     }
