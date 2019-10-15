@@ -23,19 +23,27 @@ class chaoji extends Controller {
         ->group('product_name')
         ->where('state',1)
         ->select();
+//        echo db('rukuform_xq')->getlastSql();
+//        dump(count($jc_num));
         // 初期数
         $cq_num=db('record')
         ->field('hw_name')
         ->where("task = '到货入库' or task = '其他入库' or task = '调拨入库'")
+        ->where("task <> '结存'")
         ->where("hw_name <> ''")
         ->group('hw_name')
         ->select();
+//        echo db('record')->getlastSql();
+//        dump(count($jc_num));
         // 出入库详细
         $xx=db('record')
         ->field('hw_name,SUM(dh_ruku) dh_ruku,SUM(db_ruku) db_ruku,SUM(qt_ruku) qt_ruku,SUM(xx_chuku) xx_chuku,SUM(db_chuku) db_chuku,SUM(qt_chuku) qt_chuku')
         ->where("hw_name <> ''")
+        ->where("task <> '结存'")
         ->group('hw_name')
         ->select();
+//        echo db('record')->getlastSql();
+//        dump(count($xx));//exit;
         foreach($cq_num as $k=>$v){
             $jxc_xx[$k]['early_stage']=0;
         }
@@ -210,6 +218,12 @@ class chaoji extends Controller {
             $this->error('清除失败');
         }
     }
+
+
+
+
+
+    
     /**
      * 进销存导出
      */

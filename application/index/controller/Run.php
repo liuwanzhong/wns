@@ -3,17 +3,19 @@
 
 namespace app\index\controller;
 
-
+use app\index\model\Warehouse;
 use think\Controller;
 use think\Db;
 use think\Loader;
+
+use Think\Model;
 
 class Run extends Controller {
     //地区库房列表
     public function warehouse() {
         $rows=db('warehouse')->where('is_del',1)->paginate(100);
         return view('warehouse',['rows'=>$rows]);
-    }
+        }
     //添加库房
     public function warehouse_add() {
         $ms=$this->qx();

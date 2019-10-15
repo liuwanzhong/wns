@@ -353,12 +353,14 @@ class Instor extends Controller
         ->field('cabinet.name c_name,warehouse.name w_name,rukuform_xq.*')
         ->order('cabinet.name asc')
         ->group('rukuform_xq.id')
+        // ->limit(10)
         ->select();
         return view('add_pandian',['list'=>$list]);
     }
     // 执行添加
     public function do_add(){
         $data=input();
+        $time=time();
         if(!empty($data['w_name']) && !empty($data['pd_num'])){
             for ($i=0;$i<count($data['w_name']);$i++){
                 if(empty($data['pd_num'][$i])){
@@ -375,7 +377,7 @@ class Instor extends Controller
                     'pd_num'=>$data['pd_num'][$i],
                     'rk_nums'=>$data['rk_nums'][$i],
                     'chayi'=>$data['rk_nums'][$i]-$data['pd_num'][$i],
-                    'create_time'=>time(),
+                    'create_time'=>$time,
                     'count1'=>$data['count1'][$i],
                     'count2'=>$data['count2'][$i],
                     'count3'=>$data['count3'][$i],
@@ -1243,7 +1245,7 @@ class Instor extends Controller
 
         $objContent   = $objReader -> load($file['tmp_name']);
         $sheetContent = $objContent -> getSheet(0) -> toArray();
-        unset($sheetContent[0]);
+//        unset($sheetContent[0]);
         foreach ($sheetContent as $k => $v) {
             if($v[4]=='沃尔玛产品'){
                 $v[4]=3;
@@ -1254,66 +1256,67 @@ class Instor extends Controller
             }else{
                 $v[4]=1;
             }
-            $id=db('cabinet')->where('name',$v['2'])->field('id')->select();
-            $v['2']=$id[0]['id'];
-            $arr['hw_name']               = $v[0];//货物名              1
-            $arr['ck_id']                 = $v[1];//仓库id
-            $arr['hw_id']                 = $v[2];//货位id
-            $arr['num']                   = $v[3];//数量                1
-            $arr['zt']                    = $v[4];//状态
-            $arr['time']                  = strtotime($v[5]);//生产日期 1
-            $arr['gc']                    = $v[6];//工厂
-            $arr['ch']                    = $v[7];//集装箱号/车皮号
+            if(!empty($v[2])){
+                $id=db('cabinet')->where('name',$v['2'])->field('id')->select();
+                dump($id);
+                $v['2']=$id[0]['id'];
+                $arr['hw_name']               = $v[0];//货物名              1
+                $arr['ck_id']                 = 6;//仓库id
+                $arr['hw_id']                 = $v[2];//货位id
+                $arr['num']                   = $v[3];//数量                1
+                $arr['zt']                    = $v[4];//状态
+                $arr['time']                  = strtotime($v[5]);//生产日期 1
+                $arr['gc']                    = $v[6];//工厂
+                $arr['ch']                    = $v[7];//集装箱号/车皮号
 
 
 
-            Db::startTrans();
-            $warehouse=db('warehouse')->where('id',$arr['ck_id'])->find();
-            $time=time();
-            $r = db('record')->where('is_del', 1)->where('huowei', $arr['hw_id'])->count();
-            if ($r) {
-                try {
-                    $c = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $arr['hw_id'])->find();
-                    $num = $c['rk_nums'] + $arr['num'];
-                    //存在则添加记录
-                    $s = db('record')->insert(['time' => $arr['time'], 'task' => '其他入库', 'early_stage' => $c['rk_nums'], 'qt_ruku' => $arr['num'], 'balance' => $num, 'huowei' => $arr['hw_id'],'hw_name'=>$arr['hw_name']]);
-                    //修改实时数量
-                    $a = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $arr['hw_id'])->update(['rk_nums' => $num]);
-                    $rk=db('cabinet')->where('id',$arr['hw_id'])->find();
-                    $f=db('other_rk')->insert(['product_name'=>$arr['hw_name'],'product_time'=>$arr['time'],'huowei'=>$rk['name'],'count'=>$arr['num'],'rk_time'=>$time,'ck_name'=>$warehouse['name'],'factory'=>$arr['gc']]);
-                    if ($s && $a && $f) {
-                        // 提交事务
-                        Db::commit();
+
+                Db::startTrans();
+                $warehouse=db('warehouse')->where('id',$arr['ck_id'])->find();
+                $time=time();
+                $r = db('record')->where('is_del', 1)->where('huowei', $arr['hw_id'])->count();
+                if ($r) {
+                    try {
+                        $c = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $arr['hw_id'])->find();
+                        $num = $c['rk_nums'] + $arr['num'];
+                        //存在则添加记录
+                        $s = db('record')->insert(['time' => $arr['time'], 'task' => '其他入库', 'early_stage' => $c['rk_nums'], 'qt_ruku' => $arr['num'], 'balance' => $num, 'huowei' => $arr['hw_id'],'hw_name'=>$arr['hw_name']]);
+                        //修改实时数量
+                        $a = db('rukuform_xq')->where('is_del', 0)->where('rk_huowei_id', $arr['hw_id'])->update(['rk_nums' => $num]);
+                        $rk=db('cabinet')->where('id',$arr['hw_id'])->find();
+                        $f=db('other_rk')->insert(['product_name'=>$arr['hw_name'],'product_time'=>$arr['time'],'huowei'=>$rk['name'],'count'=>$arr['num'],'rk_time'=>$time,'ck_name'=>$warehouse['name'],'factory'=>$arr['gc']]);
+                        if ($s && $a && $f) {
+                            // 提交事务
+                            Db::commit();
+                        }
+                    } catch (\Exception $e) {
+                        // 回滚事务
+                        Db::rollback();
                     }
-                } catch (\Exception $e) {
-                    echo '存在';
-                    // 回滚事务
-                    Db::rollback();
-                }
-                echo '成功1';
-            } else {
-                try {
-                    //不存在则添加库存
-                    $id = db('rukuform')->insertGetId(['ck_id' => $arr['ck_id'], ]);
+                } else {
+                    try {
+                        //不存在则添加库存
+                        $id = db('rukuform')->insertGetId(['ck_id' => $arr['ck_id'], ]);
 
-                    $f = db('rukuform_xq')->insert( [ 'product_name' => $arr['hw_name'], 'rk_status_id' => $arr['zt'], 'rk_huowei_id' => $arr['hw_id'], 'rk_nums' => $arr['num'], 'product_time' => $arr['time'], 'state' => 1, 'rukuid' => $id,'qt_rk'=>1]);
+                        $f = db('rukuform_xq')->insert( [ 'product_name' => $arr['hw_name'], 'rk_status_id' => $arr['zt'], 'rk_huowei_id' => $arr['hw_id'], 'rk_nums' => $arr['num'], 'product_time' => $arr['time'], 'state' => 1, 'rukuid' => $id,'qt_rk'=>1]);
 
-                    $p = db('record')->insert(['time' => $arr['time'], 'task' => '其他入库', 'early_stage' => 0, 'qt_ruku' => $arr['num'], 'balance' => $arr['num'], 'huowei' => $arr['hw_id'],'hw_name'=>$arr['hw_name']]);
+                        $p = db('record')->insert(['time' => $arr['time'], 'task' => '其他入库', 'early_stage' => 0, 'qt_ruku' => $arr['num'], 'balance' => $arr['num'], 'huowei' => $arr['hw_id'],'hw_name'=>$arr['hw_name']]);
 
-                    $rk=db('cabinet')->where('id',$arr['hw_id'])->find();
+                        $rk=db('cabinet')->where('id',$arr['hw_id'])->find();
 
-                    $s=db('other_rk')->insert(['product_name'=>$arr['hw_name'],'product_time'=>$arr['time'],'huowei'=>$rk['name'],'count'=>$arr['num'],'rk_time'=>$time,'ck_name'=>$warehouse['name'],'factory'=>$arr['gc']]);
-                    if ($id && $f && $p && $s) {
-                        // 提交事务
-                        Db::commit();
+                        $s=db('other_rk')->insert(['product_name'=>$arr['hw_name'],'product_time'=>$arr['time'],'huowei'=>$rk['name'],'count'=>$arr['num'],'rk_time'=>$time,'ck_name'=>$warehouse['name'],'factory'=>$arr['gc']]);
+                        if ($id && $f && $p && $s) {
+                            // 提交事务
+                            Db::commit();
+                        }
+                    } catch (\Exception $e) {
+                        // 回滚事务
+                        Db::rollback();
                     }
-                } catch (\Exception $e) {
-                    echo '不存在';
-                    // 回滚事务
-                    Db::rollback();
                 }
-                echo '成功2';
             }
+
         }
     }
 }
