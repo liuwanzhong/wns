@@ -25,7 +25,7 @@
                             {$menu.staffs_name}
 						</a>
 						<dl class="layui-nav-child">
-							<dd><a href="javascript:;" target="box" id="dialog">修改密码</a></dd>
+							<dd><a href="#" target="box" id="dialog">修改密码</a></dd>
 							<dd><a href="{:url('Login/out')}">安全退出</a></dd>
 						</dl>
 					</li>
@@ -63,7 +63,7 @@
 				<a href="javascript:" class="close">×</a>
 			</div>
 			<div class="content">
-				<form action="{:url('Login/users_edit','id='.$menu['id'])}" method="post">
+				<form action="" method="post">
 					<div class="wrap">
 						<label>原密码:</label>
 						<input type="password" name="pwd1" value=""/>
