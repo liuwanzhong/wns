@@ -11,7 +11,6 @@ class Batch extends Controller {
      * 扫码判断
      */
     public function batch(){
-        use model('ware')
         $tp_num=input('tp_num');
         $res=db('tray')
         ->where('tp_num',$tp_num)
@@ -118,10 +117,6 @@ class Batch extends Controller {
      * 批次查看
      */
     public function tray_batch(){
-        $ms=$this->qx();
-        if($ms==0){
-            $this->error('警告：越权操作');
-        }
         $id=$_POST['id'];
         $res=db('tray')
         ->where('id',$id)

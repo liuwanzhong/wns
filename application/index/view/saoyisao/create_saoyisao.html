@@ -9,7 +9,7 @@
     
     <style>
         .submit{margin-left: 30px;margin-top: 30px;}
-        .container{display: block;overflow-x: hidden;height: 580px;}
+        .container{display: block;overflow-x: hidden;height: auto;}
         .container::-webkit-scrollbar{width: 0;}
         video {
             display: block;
@@ -29,6 +29,31 @@
             <a href="javascript:;">扫码</a>
             <a><cite>扫码出库</cite></a>
         </span>
+    </div>
+    <h2>需要出库货物</h2>
+    <div class="container">
+        <table class="layui-table" style="width: 96%; margin: 12px auto;">
+            <thead>
+            <tr>
+                <th>货物名</th>
+                <th>装运单号</th>
+                <th>出库日期</th>
+                <th>总数量</th>
+                <th>总重量</th>
+            </tr>
+            </thead>
+            <tbody>
+            {volist name='cats' id='row'}
+            <tr>
+                <td>{$row.product_name}</td>
+                <td>{$rows.transport_id}</td>
+                <td><?php if(!empty($rows['ck_time'])){echo date('Y-m-d',$rows['ck_time']);} ?></td>
+                <td>{$row.count}</td>
+                <td>{$row.netweight}</td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
     </div>
     <form method="post" class="layui-form" action="{:url('Saoyisao/create_order')}">
         <div class="form_box">
@@ -51,6 +76,7 @@
                 </div>
             </div>
         </div>
+            <h2>已扫码</h2>
         <div class="container">
             <table class="layui-table" style="width: 96%; margin: 12px auto;">
                 <thead>
@@ -146,7 +172,8 @@
     *删除
     */
     $('.del').click(function () {
-        alert(1)
+        let p = $(this).parents('tr');
+        p.remove();
     })
 </script>
 </body>

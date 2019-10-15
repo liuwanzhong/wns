@@ -17,67 +17,105 @@
 			<div class="nav">
 				<span class="layui-breadcrumb">
 					<a href="/public/main.html" target="box">首页</a>
-					<a href="javascript:;">管理</a>
-					<a><cite>创建出货信息</cite></a>
+					<a href="javascript:;">扫码</a>
+					<a><cite>生成出库扫码</cite></a>
 				</span>
 			</div>
 			<div class="search">
-
-                <form class="layui-form" action="{:url('Saoyisao/create_saoyisao')}" method="post" enctype="multipart/form-data" style="display: flex;">
+				<form action="{:url('Outbound/warehousing')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
 					<div class="layui-form-item">
-						<label class="layui-form-label">出库仓库</label>
+						<label class="layui-form-label">仓库名称</label>
 						<div class="layui-input-inline">
-							<select name="warehouse_id" id="">
-								<option value="0">---请选择所属仓库---</option>
-								{volist name='cks' id='c'}
-								<option value="{$c['id']}">{$c['name']}</option>
+							<select name="s_transfers_id">
+								<option value="0">全部</option>
+								{volist name='cks' id='w'}
+								<option value="{$w.name}" <?php if($s_transfers_id==$w['name']){echo 'selected';} ?>>{$w.name}</option>
 								{/volist}
 							</select>
 						</div>
 					</div>
-
 					<div class="layui-form-item">
-                        <label class="layui-form-label">收货客户</label>
-                        <div class="layui-input-inline">
-                            <input type="text" class="layui-input"  name="delivery_name" required autocomplete="off" placeholder="  " value="<?php if(!empty($batch)){echo $batch;}?>">
-                        </div>
-                    </div>
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">收货地址</label>
-                        <div class="layui-input-inline">
-                            <input type="text" class="layui-input"  name="delivery"  required autocomplete="off" placeholder=" " value="<?php if(!empty($batch)){echo $batch;}?>">
-                        </div>
-                    </div>
-                    <div class="layui-form-item">
-                        <div class="layui-input-inline">
-                            <button class="layui-btn create" lay-submit>确定创建</button>
-                        </div>
-                    </div>
-                 </form>
-            </div>
-			<main class="bd_content">
+						<label class="layui-form-label">出库时间</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="delivery_time" name="s_delivery_time" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_delivery_time)){echo $s_delivery_time;}?>">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">装运单号</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" id="s_material_name" name="s_material_name" autocomplete="off" placeholder=" - " value="<?php if(!empty($s_material_name)){echo $s_material_name;}?>">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-inline">
+							<button class="layui-btn save" lay-submit>查询</button>
+						</div>
+					</div>
+				</form>
+			</div>
+			<main class="bd_content" style="margin-top: 12px;">
+				<table class="layui-table" style="width: 96%; margin: 12px auto;">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>保管名称</th>
+						<th>审核</th>
+						<th>出库仓库</th>
+						<th>装运单号</th>
+						<th>送达方</th>
+						<th>出库日期</th>
+						<th>总数量</th>
+						<th>总重量</th>
+						<th>操作</th>
+					</tr>
+					</thead>
+					<tbody>
+					{volist name='rows' id='row'}
+					<tr>
+						<td>{$row.id}</td>
+						<td>{$row.staffs_name}</td>
+						<td>已审核</td>
+						<td>{$row.w_name}</td>
+						<td>{$row.transport_id}</td>
+						<td>{$row.reachout_name}</td>
+						<td><?php if(!empty($row['ck_time'])){echo date('Y-m-d',$row['ck_time']);} ?></td>
+						<td>{$row.total_shu}</td>
+						<td>{$row.total_zhong}</td>
+						<td>
+							<a href="#" class="edit xq" title="详情" style="margin-right: 15px;"><i class="ico">&#xe619;</i></a>
+							<a href="{:url('Saoyisao/warehousing_del','id='.$row.id)}" title="删除"><i class="ico">&#xe605;</i></a>
+							<a href="{:url('Saoyisao/create_saoyisao','id='.$row.id)}" title="扫码">扫码</a>
+						</td>
+					</tr>
+					{/volist}
+					</tbody>
+				</table>
+				<div style="text-align:center; margin-bottom: 200px;">
+					{$rows->render()}
+				</div>
 			</main>
 		</div>
-
 		<script src="/static/jquery-1.9.1.min.js"></script>
 		<script src="/static/layer/layer.js" type="text/javascript" charset="utf-8"></script>
 		<script src="/layui/layui.js"></script>
-		<script>
-			layui.use(['element','laydate','form'], function(){
-				var laydate = layui.laydate;
-				var element = layui.element;
-				let form = layui.form;
+		<script type="text/javascript">
+			layui.use(['element', 'laydate','form'],function () {
+				let element = layui.element,
+						laydate = layui.laydate;
 				laydate.render({
-					elem: '#s_delivery_time'
+					elem: '#delivery_time'
 					,range: '~'
 					,done: function(value){
 						$('#s_delivery_time').val(value)
 					}
-				});
+				})
 			})
-		</script>
 
-		<script type="text/javascript">
+			//详情
+			$('.xq').on('click',function () {
+				let id=$(this).parents('tr').find('td').eq(0).text();
+				location.href='/index/Saoyisao/warehousing_show?id='+id;
+			})
 		</script>
 	</body>
 </html>

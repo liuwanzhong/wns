@@ -12,10 +12,108 @@ class Saoyisao extends Controller {
      * 生成扫码出库单
      */
     public function index(){
+        // $warehouse=self::$stafss['warehouse'];
+        // $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
+        // Cookie(null,'think_');
+        // return view('index',['cks'=>$cks]);
         $warehouse=self::$stafss['warehouse'];
-        $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
-        Cookie(null,'think_');
-        return view('index',['cks'=>$cks]);
+        $s_transfers_id=input('s_transfers_id');
+        $s_delivery_time=input('s_delivery_time');
+        $s_material_name=input('s_material_name');
+        $search = '';
+        // 出库货物
+        if (!empty($s_transfers_id)) {
+            $search = 'warehouse.name like ' . "'%" . $s_transfers_id . '%' . "'";
+        }
+        // 时间转换
+        if (!empty($s_delivery_time)) {
+            $time = explode('~', $s_delivery_time);
+            foreach ($time as $key) {
+                $time[] = strtotime($key);
+                array_shift($time);
+            }
+            if (!empty($search)) {
+                $time = ' and outbound_from.ck_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            } else {
+                $time = 'outbound_from.ck_time BETWEEN ' . $time['0'] . ' and ' . $time['1'];
+            }
+            $search .= $time;
+        }
+        // 订单号
+        if (!empty($s_material_name)) {
+            $material_name = $s_material_name;
+            if (!empty($search)) {
+                $material_name = ' and outbound_from.transport_id like ' . "'%" . $material_name . '%' . "'";
+            } else {
+                $material_name = ' outbound_from.transport_id like ' . "'%" . $material_name . '%' . "'";
+            }
+            $search .= $material_name;
+        }
+        $rows=db('outbound_from')
+            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->join('staffs','outbound_from.staffs_id=staffs.id','left')
+            ->where('warehouse.id','in',$warehouse)
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.state',1)
+            ->where('outbound_xq_from.qt_ck',0)
+            ->group('outbound_from.id')
+            ->where($search)
+            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,outbound_xq_from.delivery_id,staffs.staffs_name')
+            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+        $cks=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
+        return view('index',['rows'=>$rows,'cks'=>$cks,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
+    }
+    //详细
+    public function warehousing_show($id) {
+        $num=0;
+        $z=0;
+        $rows=db('outbound_from')
+            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->join('warker','outbound_from.workers=warker.id','left')
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.id',$id)
+            ->field('outbound_from.*,warehouse.name as w_name,warker.name as workers')
+            ->find();
+        $cats=db('outbound_xq_from')
+            ->where('outbound_xq_from.chukuid',$rows['id'])
+            ->join('cabinet','cabinet.id=outbound_xq_from.ck_huowei_id','left')
+            ->field('outbound_xq_from.*,cabinet.name as c_name')
+            ->select();
+        $cks = db('warehouse')->where('is_del',1)->select();
+        $cabinet=db('cabinet')->where('is_del',1)->select();
+       if(!empty($rows['userintime'])){
+           $rows['userintime']=date("Y-m-d",$rows['userintime']);
+       }
+        foreach ($cats as $k=>$row) {
+            if($row['netweight']!=0 &&$row['ck_nums']!=0){
+                $cats[$k]['j']=$row['netweight']/$row['ck_nums'];
+            }else{
+                $cats[$k]['j']=0;
+            }
+        }
+        foreach ($cats as $cat) {
+            $num+=$cat['ck_nums'];
+            $z+=$cat['netweight'];
+        }
+        return view('warehousing_show',['rows'=>$rows,'cats'=>$cats,'id'=>$id,'cks'=>$cks,'cabinet'=>$cabinet,'num'=>$num,'z'=>$z]);
+    }
+    //删除
+    public function warehousing_del() {
+        $ms=$this->qx();
+        if($ms==0){
+            $this->error('警告：越权操作');
+        }
+        $id=input('id');
+        if(empty($id)){
+            $this->error('缺少必要参数,请重试');
+        }
+        $r=db('rukuform')->where('id',$id)->update(['is_del'=>1]);
+        if($r!==false){
+            return redirect('warehousing');
+        }else{
+            $this->error('删除失败,请联系管理员');
+        }
     }
     /**
      * 扫码出库
@@ -26,8 +124,24 @@ class Saoyisao extends Controller {
             $this->error('警告：越权操作');
         }
         $md=[];
-        $warehouse_id=input('warehouse_id');
-        $delivery=input('delivery');
+        $id=input('id');
+        $rows=db('outbound_from')
+            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->join('warker','outbound_from.workers=warker.id','left')
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.id',$id)
+            ->field('outbound_from.*,warehouse.name as w_name,warker.name as workers')
+            ->find();
+        $cats=db('outbound_xq_from')
+            ->where('outbound_xq_from.chukuid',$rows['id'])
+            ->join('cabinet','cabinet.id=outbound_xq_from.ck_huowei_id','left')
+            ->field('outbound_xq_from.*,cabinet.name as c_name')
+            ->select();
+        // dump($rows);
+        // dump($cats);exit;
+
+        $warehouse_id=$rows['ck_id'];
+        $delivery=$rows['reachout_name'];
         $delivery_name=input('delivery_name');
         $tp_num=input('tp_num');
         if(Cookie::has('tp_num','think_')){
@@ -68,7 +182,9 @@ class Saoyisao extends Controller {
                 $xx='';
             }
         }
-        return view('create_saoyisao',['name'=>$name,'delivery'=>$delivery,'delivery_name'=>$delivery_name,'xx'=>$xx,'tp_num'=>$tp_num]);
+        // dump($rows);
+        // dump($cats);exit;
+        return view('create_saoyisao',['name'=>$name,'cats'=>$cats,'rows'=>$rows,'delivery'=>$delivery,'delivery_name'=>$delivery_name,'xx'=>$xx,'tp_num'=>$tp_num]);
     }
     /**
      * 生成出库单据
@@ -79,6 +195,7 @@ class Saoyisao extends Controller {
             $this->error('警告：越权操作');
         }
         $data=input();
+        dump($data);exit;
         $log_id='';
         $tp_num=implode(',',$data['tp_num']);
         foreach($data['tp_num'] as $v){

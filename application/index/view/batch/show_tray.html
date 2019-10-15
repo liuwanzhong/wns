@@ -22,7 +22,7 @@
 				</span>
 			</div>
 			<div class="search">
-                <form action="{:url('batch/show_tray')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
+                <form action="{:url('Saoyisao/create_saoyisao')}" method="post" enctype="multipart/form-data" class="layui-form" style="display: flex;">
                     <div class="layui-form-item">
                         <label class="layui-form-label">仓库</label>
                         <div class="layui-input-inline">
@@ -128,7 +128,7 @@
 
 			//查看数据
 			$('.batch').click(function () {
-				let id=$(this).parents('tr').find('th').eq(0).text();
+				let id=$(this).parents('tr').find('td').eq(0).text();
 				console.log(id);
 				$.ajax({
 					url:'/index/Batch/tray_batch',
