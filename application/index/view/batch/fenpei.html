@@ -23,7 +23,13 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">货物名:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="goods_name" value="" required autocomplete="off" class="layui-input">
+<!--                    <input type="text" name="goods_name" value="" required autocomplete="off" class="layui-input">-->
+                    <select name='goods_name' class='showhuowei' lay-search>
+                        <option value=''>请选择货物名</option>
+                        {volist name='goods_name' id='g'}
+                        <option value='{$g.name}'>{$g.name}</option>
+                        {/volist}
+                    </select>
                 </div>
             </div>
             <div class="layui-form-item">

@@ -61,9 +61,11 @@ class Table extends Controller {
         $data=input();
         array_shift($data);
         //计算重量
-        $goods_name=db('goods_name')->where('name',$data['ne'])->find();
-        $num=($data['count']*$goods_name['jing'])/1000;
-        $mj['num']=floor($num*1000)/1000;
+        if(!empty($data['ne'])){
+            $goods_name=db('goods_name')->where('name',$data['ne'])->find();
+            $num=($data['count']*$goods_name['jing'])/1000;
+            $mj['num']=floor($num*1000)/1000;
+        }
 //        $mj=$this->blur($data['m'],$data['j'],$data['count']);
         $row=db('rukuform_xq')->where('id',$data['id'])->find();
         db('rukuform_xq')->where('id',$data['id'])->update(['sy_count'=>$row['sy_count']-$data['count']]);

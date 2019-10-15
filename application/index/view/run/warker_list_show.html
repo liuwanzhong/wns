@@ -60,8 +60,9 @@
             </div>
         </form>
     </div>
-    <table class="layui-table" style="width: 96%; margin: 12px auto;">
-        <thead>
+    <div class="bd_content">
+        <table class="layui-table" style="width: 96%; margin: 12px auto 100px;">
+            <thead>
             <tr>
                 <th>作业时间</th>
                 <th>工人姓名</th>
@@ -73,8 +74,8 @@
                 <th>装卸费</th>
                 <th>作业类型</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {volist name='rows' id='r'}
             <tr class="tbd">
                 <input type="hidden" value="{$r.id}">
@@ -89,8 +90,9 @@
                 <td>{$r.task}</td>
             </tr>
             {/volist}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
     <div style="padding: 0 30px"><span>总数量：{$num}</span><span style="padding:0 40px">总重量：{$weight}</span><span>总费用：{$money}</span></div>
     <div style="text-align:center; margin-bottom: 200px;">
         {$rows->render()}

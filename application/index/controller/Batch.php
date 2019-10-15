@@ -32,7 +32,8 @@ class Batch extends Controller {
         ->join('warehouse','warehouse.id=tray.warehouse_id','left')
         ->where('tray.is_del',0)
         ->select();
-        return view('fenpei',['res'=>$res,'tp_num'=>$tp_num]);
+        $goods_name=db('goods_name')->where('is_del',0)->select();
+        return view('fenpei',['res'=>$res,'tp_num'=>$tp_num,'goods_name'=>$goods_name]);
     }
     /**
      * 指定拖盘加入货物
