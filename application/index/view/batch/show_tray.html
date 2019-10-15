@@ -86,7 +86,7 @@
         <!--批次-->
         <div class="model_table" style="display: none; top: 45%; overflow: hidden;">
 			<div class="head">
-				<span>修改商品</span>
+				<span>查看</span>
 				<a href="javascript:" class="close">×</a>
 			</div>
 			<div class="content" style="height: 100%;overflow-x: hidden;">
@@ -128,7 +128,7 @@
 
 			//查看数据
 			$('.batch').click(function () {
-				let id=$(this).parents('tr').find('th').eq(0).text();
+				let id=$(this).parents('tr').find('td').eq(0).text();
 				console.log(id);
 				$.ajax({
 					url:'/index/Batch/tray_batch',
