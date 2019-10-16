@@ -18,12 +18,11 @@
 <body>
 <div class="note">
     <form method="post" class="layui-form" action="{:url('batch/tray_rk_insert')}">
-        <input type="hidden" name="tp_num" value="">
+        <input type="hidden" name="tp_num" value="{$tp_num}">
         <div class="form_box">
             <div class="layui-form-item">
                 <label class="layui-form-label">货物名:</label>
                 <div class="layui-input-inline">
-<!--                    <input type="text" name="goods_name" value="" required autocomplete="off" class="layui-input">-->
                     <select name='goods_name' class='showhuowei' lay-search>
                         <option value=''>请选择货物名</option>
                         {volist name='goods_name' id='g'}
@@ -47,7 +46,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">入库仓库:</label>
                 <div class="layui-input-inline">
-                    <input type="text"  value="" autocomplete="off" class="layui-input" readonly>
+                        <input type="text"  value="{$res[0]['name']}" autocomplete="off" class="layui-input" readonly>
                 </div>
             </div>
         </div>

@@ -12,6 +12,7 @@ class Saoyisao extends Controller {
      * 生成扫码出库单
      */
     public function index(){
+        // Cookie::clear('think_');
         // $warehouse=self::$stafss['warehouse'];
         // $cks = db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
         // Cookie(null,'think_');
@@ -54,6 +55,7 @@ class Saoyisao extends Controller {
             ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
             ->join('staffs','outbound_from.staffs_id=staffs.id','left')
             ->where('warehouse.id','in',$warehouse)
+            ->where("outbound_from.ck_sh = 0 ")
             ->where('outbound_from.is_del',0)
             ->where('outbound_from.state',1)
             ->where('outbound_xq_from.qt_ck',0)
@@ -124,26 +126,62 @@ class Saoyisao extends Controller {
             $this->error('警告：越权操作');
         }
         $md=[];
-        $id=input('id');
-        $rows=db('outbound_from')
+        $tp_num=input('tp_num');
+
+
+
+        if(!empty(input('id'))){
+            $id=input('id');
+            $rows=db('outbound_from')
             ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
-            ->join('warker','outbound_from.workers=warker.id','left')
-            ->where('outbound_from.is_del',0)
+            ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->join('staffs','outbound_from.staffs_id=staffs.id','left')
             ->where('outbound_from.id',$id)
-            ->field('outbound_from.*,warehouse.name as w_name,warker.name as workers')
-            ->find();
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.state',1)
+            ->where('outbound_xq_from.qt_ck',0)
+            ->group('outbound_from.id')
+            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,outbound_xq_from.delivery_id,staffs.staffs_name')
+            ->select();    
+            $res=db('tray_log')
+            ->where('ru_from_id',$id)
+            ->select();
+            foreach($res as $v){
+                $tp_num1=$v['tp_num'].',';
+                $tp_num1=trim($tp_num1,',');
+                Cookie::set('tp_num',$tp_num1,['prefix'=>'think_']);
+            }
+            $data['staffs_name']=$rows[0]['staffs_name'];//保管名
+            Cookie::set('staffs_name',$data['staffs_name'],['prefix'=>'think_']);
+
+            $data['w_name']=$rows[0]['w_name'];//出库仓库
+            Cookie::set('w_name',$data['w_name'],['prefix'=>'think_']);
+
+            $data['transport_id']=$rows[0]['transport_id'];//装运单号
+            Cookie::set('transport_id',$data['transport_id'],['prefix'=>'think_']);
+
+            $data['reachout_name']=$rows[0]['reachout_name'];//送达方
+            Cookie::set('reachout_name',$data['reachout_name'],['prefix'=>'think_']);
+
+            $data['ck_time']=$rows[0]['ck_time'];//出库日期
+            Cookie::set('ck_time',$data['ck_time'],['prefix'=>'think_']);
+
+            $data['total_shu']=$rows[0]['total_shu'];//总数量
+            Cookie::set('total_shu',$data['total_shu'],['prefix'=>'think_']);
+
+            $data['total_zhong']=$rows[0]['total_zhong'];//总重量
+            Cookie::set('total_zhong',$data['total_zhong'],['prefix'=>'think_']);
+
+            $data['id']=$id;
+            Cookie::set('id',$data['id'],['prefix'=>'think_']);
+        }
         $cats=db('outbound_xq_from')
-            ->where('outbound_xq_from.chukuid',$rows['id'])
+            ->where('outbound_xq_from.chukuid',Cookie::get('id','think_'))
             ->join('cabinet','cabinet.id=outbound_xq_from.ck_huowei_id','left')
             ->field('outbound_xq_from.*,cabinet.name as c_name')
             ->select();
-        // dump($rows);
-        // dump($cats);exit;
-
-        $warehouse_id=$rows['ck_id'];
-        $delivery=$rows['reachout_name'];
-        $delivery_name=input('delivery_name');
-        $tp_num=input('tp_num');
+        
+        
         if(Cookie::has('tp_num','think_')){
             $md=Cookie::get('tp_num','think_');
             $f=$md.','.$tp_num;
@@ -154,18 +192,7 @@ class Saoyisao extends Controller {
         if(Cookie::has('tp_num','think_')){
             $s=Cookie::get('tp_num','think_');
         }
-        if(Cookie::has('name','think_') || Cookie::has('delivery','think_') || Cookie::has('delivery_name','think_')){
-            $name=Cookie::get('name','think_');
-            $delivery=Cookie::get('delivery','think_');
-            $delivery_name=Cookie::get('delivery_name','think_');
-            $cks = db('warehouse')->where('is_del',1)->where('id',$name)->find();
-        }else{
-            $cks = db('warehouse')->where('is_del',1)->where('id',$warehouse_id)->find();
-            $name=$cks['name'];
-            Cookie::set('name',$cks['name'],['prefix'=>'think_']);
-            Cookie::set('delivery',$delivery,['prefix'=>'think_']);
-            Cookie::set('delivery_name',$delivery_name,['prefix'=>'think_']);
-        }
+        $s=trim($s,',');
         if(isset($s) && strstr($s,',')){
             $s=explode(',',$s);
             foreach($s as $v){
@@ -174,17 +201,14 @@ class Saoyisao extends Controller {
                 ->select();
             }
         }else{
-            if(!empty($tp_num)){
+            $s=explode(',',$s);
+            foreach($s as $v){
                 $xx[]=db('tray')
-                ->where('tp_num',$tp_num)
+                ->where('tp_num',$v)
                 ->select();
-            }else{
-                $xx='';
             }
         }
-        // dump($rows);
-        // dump($cats);exit;
-        return view('create_saoyisao',['name'=>$name,'cats'=>$cats,'rows'=>$rows,'delivery'=>$delivery,'delivery_name'=>$delivery_name,'xx'=>$xx,'tp_num'=>$tp_num]);
+        return view('create_saoyisao',['xx'=>$xx,'cats'=>$cats,'tp_num'=>$tp_num,'staffs_name'=>Cookie::get('staffs_name','think_'),'w_name'=>Cookie::get('w_name','think_'),'transport_id'=>Cookie::get('transport_id','think_'),'reachout_name'=>Cookie::get('reachout_name','think_'),'ck_time'=>Cookie::get('ck_time','think_'),'total_shu'=>Cookie::get('total_shu','think_'),'total_zhong'=>Cookie::get('total_zhong','think_'),'id'=>Cookie::get('id','think_')]);
     }
     /**
      * 生成出库单据
@@ -199,10 +223,14 @@ class Saoyisao extends Controller {
         $log_id='';
         $tp_num=implode(',',$data['tp_num']);
         foreach($data['tp_num'] as $v){
+        db('tray_order')
+        ->where('tp_num',$v)
+        ->where('ru_from_id',$data[0]['ru_from_id'])
+        ->delete();
             $res=db('tray')
             ->where('tp_num',$v)
             ->update([
-                'delivery'=>$data['delivery'],
+                'delivery'=>$data['reachout_name'],
                 'state'=>0
             ]);
             $row=db('tray')
@@ -219,42 +247,110 @@ class Saoyisao extends Controller {
                 'batch'=>$row[0]['batch'],
                 'state'=>1,
                 'time'=>time(),
+                'ru_from_id'=>$data['id'],
+                'sh'=>0,
             ]);
             $log_id.=$id.',';
         }
+        db('outbound_from')
+        ->where('id',$data['id'])
+        ->update([
+            'ck_sh'=>1,
+        ]);
         $res=db('tray_order')
         ->insert([
             'transport_id'=>$data['transport_id'],
-            'delivery'=>$data['delivery'],
-            'delivery_name'=>$data['delivery_name'],
+            'delivery'=>$data['reachout_name'],
+            // 'delivery_name'=>$data['delivery_name'],
             'log_id'=>$log_id,
             'create_time'=>time(),
         ]);
         return redirect('index');
     }
     /**
+     * 出库审核
+     */
+    public function shenghe(){
+        $warehouse=self::$stafss['warehouse'];
+        $s_transfers_id=input('s_transfers_id');
+        $s_delivery_time=input('s_delivery_time');
+        $s_material_name=input('s_material_name');
+        $rows=db('outbound_from')
+            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->join('staffs','outbound_from.staffs_id=staffs.id','left')
+            ->where("outbound_from.ck_sh = 1")
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.state',1)
+            ->where('outbound_xq_from.qt_ck',0)
+            ->group('outbound_from.id')
+            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,outbound_xq_from.delivery_id,staffs.staffs_name')
+            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+            // ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+        $cks=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
+        return view('ck_sh',['rows'=>$rows,'cks'=>$cks,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
+    }
+    /**
+     * 执行审核
+     */
+    public function do_shenhe($id){
+        $data=input();
+        dump($data);
+        $res=db('outbound_from')
+        ->where('id',$id)
+        ->update([
+            'ck_sh'=>2,
+        ]);
+        if($res){
+            return redirect('out_log');
+        }else{
+            return error('审核失败请联系管理员');
+        }
+    }
+    /**
      * 往期出库
      */
     public function out_log(){
-        static $md=[];
         $warehouse=self::$stafss['warehouse'];
+        $s_transfers_id=input('s_transfers_id');
+        $s_delivery_time=input('s_delivery_time');
+        $s_material_name=input('s_material_name');
+        $rows=db('outbound_from')
+            ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+            ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+            ->join('staffs','outbound_from.staffs_id=staffs.id','left')
+            ->where("outbound_from.ck_sh = 2")
+            ->where('outbound_from.is_del',0)
+            ->where('outbound_from.state',1)
+            ->where('outbound_xq_from.qt_ck',0)
+            ->group('outbound_from.id')
+            ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,outbound_xq_from.delivery_id,staffs.staffs_name')
+            ->paginate(100,false,['query'=>['s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]]);
+        // dump($rows);exit;
         $cks=db('warehouse')->where('is_del',1)->where('id','in',$warehouse)->select();
-        $search = '';
-        $data=input();
-        if(!empty($data['name'])){
-            $name=$data['name'];
-            $search = 'transport_id like ' . "'%" . $name . '%' . "'";
-        }else{
-            $name='';
-        }
-        $re=db('tray_order')
-        ->where('tray_order.is_del',0)
-        ->join('warehouse','warehouse.id=tray_order.transport_id')
-        ->where($search )
-        ->field('tray_order.*,warehouse.name w_name')
-        ->order('create_time desc')
-        ->paginate(100,false,['query'=>['name'=>$name]]);
-        return view('out_log',['res'=>$re,'name'=>$name,'cks'=>$cks]);
+        return view('out_log',['rows'=>$rows,'cks'=>$cks,'s_transfers_id'=>$s_transfers_id,'s_delivery_time'=>$s_delivery_time,'s_material_name'=>$s_material_name]);
+    }
+    /**
+     * 往期出库详细
+     */
+    public function sh_xx(){
+        $id=input('id');
+        $rows=db('outbound_from')
+        ->join('warehouse','outbound_from.ck_id=warehouse.id','left')
+        ->join('outbound_xq_from','outbound_from.id=outbound_xq_from.chukuid','left')
+        ->join('staffs','outbound_from.staffs_id=staffs.id','left')
+        ->where("outbound_from.ck_sh = 2")
+        ->where('outbound_from.is_del',0)
+        ->where('outbound_from.state',1)
+        ->where('outbound_xq_from.qt_ck',0)
+        ->group('outbound_from.id')
+        ->field('outbound_from.*,warehouse.name as w_name,outbound_xq_from.product_name as x_name,outbound_xq_from.delivery_id,staffs.staffs_name')
+        ->select();
+        $xx=db('tray_log')
+        ->where('ru_from_id',$id)
+        ->select();
+        $cks=db('warehouse')->where('is_del',1)->where('id',$rows[0]['ck_id'])->select();
+        return view('sh_xx',['rows'=>$rows,'cks'=>$cks,'xx'=>$xx]);
     }
     /**
      * 往期出库详细

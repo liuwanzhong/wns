@@ -35,44 +35,43 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">保管名称:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="staffs_name" autocomplete="off" class="layui-input" value="{$staffs_name}">
+                    <input type="text" name="staffs_name" autocomplete="off" class="layui-input" value="{$rows[0]['staffs_name']}">
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">出库仓库:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="w_name" autocomplete="off" class="layui-input" value="{$w_name}" >
+                    <input type="text" name="w_name" autocomplete="off" class="layui-input" value="{$cks[0]['name']}" >
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">装运单号:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="transport_id" autocomplete="off" class="layui-input" value="{$transport_id}" >
+                    <input type="text" name="transport_id" autocomplete="off" class="layui-input" value="{$rows[0]['transport_id']}" >
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">送达方:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="reachout_name" autocomplete="off" class="layui-input" value="{$reachout_name}" >
+                    <input type="text" name="reachout_name" autocomplete="off" class="layui-input" value="{$rows[0]['reachout_name']}" >
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">出库日期:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="ck_time" autocomplete="off" class="layui-input" value="{$ck_time}" >
+                    <input type="text" name="ck_time" autocomplete="off" class="layui-input" value="{$rows[0]['ck_time']}" >
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">总数量:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="total_shu" autocomplete="off" class="layui-input" value="{$total_shu}" >
+                    <input type="text" name="total_shu" autocomplete="off" class="layui-input" value="{$rows[0]['total_shu']}" >
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">总重量:</label>
                 <div class="layui-input-inline">
-                    <input type="text" name="total_zhong" autocomplete="off" class="layui-input" value="{$total_zhong}" >
-                    <input type="hidden" name="id" autocomplete="off" class="layui-input" value="{$id}" >
+                    <input type="text" name="total_zhong" autocomplete="off" class="layui-input" value="{$rows[0]['total_zhong']}" >
                 </div>
             </div>
         </div>
@@ -89,33 +88,30 @@
                         {if condition="!empty($xx)"}
                         {volist name='xx' id='x'}
                             <tr>
-                                <input type="hidden" name="tp_num[]" id="" value="{$x.0.tp_num}">
+                                <input type="hidden" name="tp_num[]" id="" value="{$x.tp_num}">
                                 <th>
-                                    {$x.0.goods_name}
+                                    {$x.goods_name}
                                 </th>
                                 <th>
-                                    {$x.0.num}
+                                    {$x.num}
                                 </th>
                                 <th>
-                                    {$x.0.goods_time}
+                                    {$x.goods_time}
                                 </th>
                                 <th>
-                                    {$x.0.batch}
+                                    {$x.batch}
                                 </th>
                             </tr>
                         {/volist}
                         {/if}
                 </tbody>
             </table>
-            <button class="layui-btn submit" lay-submit lay-filter="formDemo">立即提交</button>
         </div>
     </form>
-    <div class="saoma" style="margin: 10px 30px;">
-        <div id="video"></div>
-        <div>
-            <button class="layui-btn open" id="open">扫码</button>
+    <div class="layui-form-item">
+        <div class="layui-input-inline">
+            <a href="{:url('Saoyisao/out_log')}"><button class="layui-btn save" id="fanhui" lay-submit>返回</button></button></a>
         </div>
-        <div id="result"></div>
     </div>
 </div>
 
@@ -133,45 +129,8 @@
             type: 'date'
         })
     });
-    /*
-    *扫码
-    */
-    var ds = null;
-    var xx = null;
-    var scan = new QRScan('video');
-
-    $('#open').on('click', function () {
-        scan.openScan();
-        ds = window.setInterval(function () {
-            startScan();
-        }, 1500);
-    })
-    // document.getElementById('close').onclick = function () {
-    //     scan.closeScan();
-    //     window.clearInterval(ds);
-    // };
     
-    var re_div = document.getElementById('result');
-    function startScan() {
-        scan.getImgDecode(function (data) {
-            console.log(data);
-            var p = document.createElement('p');
-            if (data.success) {
-                window.location.href=data.payload;
-            } else {
-                p.innerHTML = '识别失败，请校准';
-            }
-            re_div.appendChild(p);
-        });
-    };
 
-    /*
-    *删除
-    */
-    $('.del').click(function () {
-        let p = $(this).parents('tr');
-        p.remove();
-    })
 </script>
 </body>
 </html>

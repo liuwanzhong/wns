@@ -5,6 +5,9 @@ namespace app\index\controller;
 
 use think\Controller;
 use think\Db;
+use think\Request;
+use think\Loader;
+use think\Session;
 
 class Batch extends Controller {
     /**
@@ -44,31 +47,34 @@ class Batch extends Controller {
             $this->error('警告：越权操作');
         }
         $data=input();
+        // dump($data);exit;
         $batch=implode(',',$data['batch']);
-        $res=db('tray')
-        ->where('tp_num',$data['tp_num'])
-        ->update([
-            'goods_name'=>$data['goods_name'],
-            'num'=>$data['num'],
-            'batch'=>$batch,
-            'state'=>1,
-            'goods_time'=>strtotime($data['ck_time'])
-        ]);
-        db('tray_log')
-        ->insert([
-            'tp_num'=>$data['tp_num'],
-            'goods_name'=>$data['goods_name'],
-            'num'=>$data['num'],
-            'batch'=>$batch,
-            'state'=>0,
-            'time'=>time()
-        ]);
-
-        if($res){
-            $this->success('成功','saoyisao/rk_saoma');
-        }else{
-            $this->error('失败');
-        }
+            $res=db('tray')
+                ->where('tp_num',$data['tp_num'])
+                ->update([
+                    'goods_name'=>$data['goods_name'],
+                    'num'=>$data['num'],
+                    'batch'=>$batch,
+                    'state'=>1,
+                    'goods_time'=>strtotime($data['ck_time'])
+                ]);
+            $r=db('tray_log')
+                ->insert([
+                    'tp_num'=>$data['tp_num'],
+                    'goods_name'=>$data['goods_name'],
+                    'num'=>$data['num'],
+                    'batch'=>$batch,
+                    'state'=>0,
+                    'time'=>time()
+                ]);
+                if($r && $res){
+                    $this->redirect('Saoyisao/rk_saoma');
+                }else{
+                    $this->error('失败');
+                }
+            
+            
+        
     }
     /**
      * 托盘查看

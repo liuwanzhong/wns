@@ -74,7 +74,7 @@
 					<tr>
 						<td>{$row.id}</td>
 						<td>{$row.staffs_name}</td>
-						<td><?php if($row['ck_sh']==2){echo '未审核';} ?></td>
+						<td><?php if($row['ck_sh']==1){echo '未审核';} ?></td>
 						<td>{$row.w_name}</td>
 						<td>{$row.transport_id}</td>
 						<td>{$row.reachout_name}</td>
@@ -82,7 +82,8 @@
 						<td>{$row.total_shu}</td>
 						<td>{$row.total_zhong}</td>
 						<td>
-							<a href="{:url('Saoyisao/sh_xx','id='.$row.id)}" title="详细">详细</a>
+							<a href="{:url('Saoyisao/create_saoyisao','id='.$row.id)}" title="继续扫码">继续扫码</a>
+							<a href="{:url('Saoyisao/do_shenhe','id='.$row.id)}" title="审核">审核</a>
 						</td>
 					</tr>
 					{/volist}
